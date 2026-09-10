@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "532440630758",
+    "project_id": "pithi-potha",
+    "storage_bucket": "pithi-potha.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:532440630758:android:8e80296c7e144694a0c227",
+        "android_client_info": {
+          "package_name": "com.pirith.pitithpotha"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBtFe44hnpBtNOJV--f7Z8McK0haJNUOJE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
