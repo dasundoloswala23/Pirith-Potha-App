@@ -72,8 +72,15 @@ verified with network disabled. See
 
 ## Phase 7 — Favorites / History
 
-Guest-local + authenticated-synced favorites and recently-played history,
-safe merge on login.
+Favorites and recently-played history, persisted locally via
+`shared_preferences` (works fully offline for guest and signed-in users
+alike). **Scope note:** Firestore sync for signed-in (non-anonymous) users
+across devices, and the "safe merge on login" case this originally called
+for, were deliberately deferred rather than built here — the
+`FavoritesRepository`/`HistoryRepository` interfaces don't leak
+local-vs-remote storage to callers, so adding sync later is a data-layer
+change, not a redesign. Revisit as its own phase once cross-device sync is
+actually needed.
 
 ## Phase 8 — AdMob
 

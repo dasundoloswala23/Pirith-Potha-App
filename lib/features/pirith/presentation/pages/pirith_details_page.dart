@@ -7,6 +7,7 @@ import '../../../../core/constants/app_route_paths.dart';
 import '../../../../core/l10n/app_localizations.dart';
 import '../../../downloads/domain/entities/download_entity.dart';
 import '../../../downloads/presentation/bloc/download_bloc.dart';
+import '../../../favorites/presentation/widgets/favorite_button.dart';
 import '../../../player/presentation/bloc/player_bloc.dart';
 import '../../domain/entities/pirith_entity.dart';
 import '../bloc/catalogue_bloc.dart';
@@ -77,11 +78,7 @@ class PirithDetailsPage extends StatelessWidget {
                           const SizedBox(width: 12),
                           _DetailsDownloadButton(item: item),
                           const SizedBox(width: 12),
-                          IconButton.outlined(
-                            onPressed: () => _comingSoon(context, l10n),
-                            icon: const Icon(Icons.favorite_outline),
-                            tooltip: l10n.actionAddFavorite,
-                          ),
+                          FavoriteButton(pirithId: item.id, outlined: true),
                         ],
                       ),
                       if (item.description.isNotEmpty || item.descriptionSinhala.isNotEmpty) ...[
@@ -116,12 +113,6 @@ class PirithDetailsPage extends StatelessWidget {
         },
       ),
     );
-  }
-
-  void _comingSoon(BuildContext context, AppLocalizations l10n) {
-    ScaffoldMessenger.of(context)
-      ..hideCurrentSnackBar()
-      ..showSnackBar(SnackBar(content: Text(l10n.comingSoon)));
   }
 }
 

@@ -5,6 +5,8 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import '../core/l10n/app_localizations.dart';
 import '../features/auth/presentation/bloc/auth_bloc.dart';
 import '../features/downloads/presentation/bloc/download_bloc.dart';
+import '../features/favorites/presentation/bloc/favorites_bloc.dart';
+import '../features/history/presentation/bloc/history_bloc.dart';
 import '../features/pirith/presentation/bloc/catalogue_bloc.dart';
 import '../features/player/presentation/bloc/player_bloc.dart';
 import 'router/app_router.dart';
@@ -25,6 +27,8 @@ class PirithPothaApp extends StatefulWidget {
     required this.catalogueBloc,
     required this.playerBloc,
     required this.downloadBloc,
+    required this.favoritesBloc,
+    required this.historyBloc,
     super.key,
   });
 
@@ -32,6 +36,8 @@ class PirithPothaApp extends StatefulWidget {
   final CatalogueBloc catalogueBloc;
   final PlayerBloc playerBloc;
   final DownloadBloc downloadBloc;
+  final FavoritesBloc favoritesBloc;
+  final HistoryBloc historyBloc;
 
   @override
   State<PirithPothaApp> createState() => _PirithPothaAppState();
@@ -48,6 +54,8 @@ class _PirithPothaAppState extends State<PirithPothaApp> {
         BlocProvider<CatalogueBloc>.value(value: widget.catalogueBloc),
         BlocProvider<PlayerBloc>.value(value: widget.playerBloc),
         BlocProvider<DownloadBloc>.value(value: widget.downloadBloc),
+        BlocProvider<FavoritesBloc>.value(value: widget.favoritesBloc),
+        BlocProvider<HistoryBloc>.value(value: widget.historyBloc),
       ],
       child: MaterialApp.router(
         onGenerateTitle: (context) => AppLocalizations.of(context).appName,

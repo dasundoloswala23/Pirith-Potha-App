@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../app/theme/app_typography.dart';
 import '../../../../core/l10n/app_localizations.dart';
 import '../../../downloads/presentation/bloc/download_bloc.dart';
+import '../../../favorites/presentation/widgets/favorite_button.dart';
 import '../../../pirith/presentation/widgets/pirith_artwork.dart';
 import '../../domain/entities/playback_status.dart';
 import '../bloc/player_bloc.dart';
@@ -61,13 +62,7 @@ class _NowPlaying extends StatelessWidget {
           const SizedBox(height: 24),
           Row(
             children: [
-              IconButton(
-                icon: const Icon(Icons.favorite_outline),
-                tooltip: l10n.actionAddFavorite,
-                onPressed: () => ScaffoldMessenger.of(context)
-                  ..hideCurrentSnackBar()
-                  ..showSnackBar(SnackBar(content: Text(l10n.comingSoon))),
-              ),
+              FavoriteButton(pirithId: state.item.id),
               Expanded(
                 child: Slider(
                   value: state.position.inMilliseconds

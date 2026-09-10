@@ -6,6 +6,7 @@ import '../../../../app/theme/app_typography.dart';
 import '../../../../core/constants/app_route_paths.dart';
 import '../../../../core/l10n/app_localizations.dart';
 import '../../../../core/widgets/pirith_mark.dart';
+import '../../../history/presentation/bloc/history_bloc.dart';
 import '../../../pirith/domain/entities/pirith_entity.dart';
 import '../../../pirith/presentation/bloc/catalogue_bloc.dart';
 import '../../../pirith/presentation/widgets/category_card.dart';
@@ -30,6 +31,13 @@ class HomePage extends StatelessWidget {
             Text(l10n.homeTitle),
           ],
         ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.history),
+            tooltip: l10n.sectionRecentlyPlayed,
+            onPressed: () => context.push(AppRoutePaths.recentlyPlayed),
+          ),
+        ],
       ),
       body: BlocBuilder<CatalogueBloc, CatalogueState>(
         builder: (context, state) {
@@ -106,6 +114,45 @@ class _HomeContent extends StatelessWidget {
               child: _FeaturedCard(item: featured, artworkIndex: 0),
             ),
           ),
+        SliverToBoxAdapter(
+          child: BlocBuilder<HistoryBloc, HistoryState>(
+            builder: (context, historyState) {
+              if (historyState is! HistoryLoaded || historyState.entries.isEmpty) {
+                return const SizedBox.shrink();
+              }
+              final byId = {for (final p in state.pirith) p.id: p};
+              final recent = [
+                for (final entry in historyState.entries)
+                  if (byId[entry.pirithId] != null) byId[entry.pirithId]!,
+              ].take(10).toList();
+              if (recent.isEmpty) return const SizedBox.shrink();
+
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _SectionHeader(
+                    title: l10n.sectionRecentlyPlayed,
+                    seeAllLabel: l10n.actionSeeAll,
+                    onSeeAll: () => context.push(AppRoutePaths.recentlyPlayed),
+                  ),
+                  SizedBox(
+                    height: 96,
+                    child: ListView.separated(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      scrollDirection: Axis.horizontal,
+                      itemCount: recent.length,
+                      separatorBuilder: (_, _) => const SizedBox(width: 10),
+                      itemBuilder: (context, index) {
+                        final item = recent[index];
+                        return _RecentTile(item: item, artworkIndex: index);
+                      },
+                    ),
+                  ),
+                ],
+              );
+            },
+          ),
+        ),
         if (state.categories.isNotEmpty) ...[
           SliverToBoxAdapter(
             child: _SectionHeader(
@@ -203,6 +250,40 @@ class _SectionHeader extends StatelessWidget {
           ),
           if (onSeeAll != null) TextButton(onPressed: onSeeAll, child: Text(seeAllLabel!)),
         ],
+      ),
+    );
+  }
+}
+
+class _RecentTile extends StatelessWidget {
+  const _RecentTile({required this.item, required this.artworkIndex});
+
+  final PirithEntity item;
+  final int artworkIndex;
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      borderRadius: BorderRadius.circular(10),
+      onTap: () {
+        context.read<PlayerBloc>().add(PlayerPlayRequested(item));
+        context.push(AppRoutePaths.player);
+      },
+      child: SizedBox(
+        width: 72,
+        child: Column(
+          children: [
+            PirithArtwork(index: artworkIndex, size: 64, radius: 10),
+            const SizedBox(height: 6),
+            Text(
+              item.titleSinhala,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              textAlign: TextAlign.center,
+              style: Theme.of(context).textTheme.labelSmall,
+            ),
+          ],
+        ),
       ),
     );
   }

@@ -6,6 +6,7 @@ import '../../../../app/theme/app_typography.dart';
 import '../../../../core/l10n/app_localizations.dart';
 import '../../../downloads/domain/entities/download_entity.dart';
 import '../../../downloads/presentation/bloc/download_bloc.dart';
+import '../../../favorites/presentation/widgets/favorite_button.dart';
 import '../../../player/presentation/bloc/player_bloc.dart';
 import '../../domain/entities/pirith_entity.dart';
 import 'pirith_artwork.dart';
@@ -13,9 +14,8 @@ import 'pirith_artwork.dart';
 /// List row matching the reference `PirithCard`: artwork, Sinhala title +
 /// English subtitle + duration, favorite/download/play actions. Tapping the
 /// row opens details ([onTap]); the gold play button starts playback right
-/// away via [PlayerBloc]; the download button reflects real
-/// [DownloadBloc] state. Favorite isn't implemented until Phase 7, so that
-/// button still shows a "coming soon" hint.
+/// away via [PlayerBloc]; the download and favorite buttons reflect real
+/// [DownloadBloc]/`FavoritesBloc` state.
 class PirithCard extends StatelessWidget {
   const PirithCard({
     required this.item,
@@ -32,7 +32,6 @@ class PirithCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
     final theme = Theme.of(context);
 
     return Card(
@@ -79,10 +78,7 @@ class PirithCard extends StatelessWidget {
                   ],
                 ),
               ),
-              IconButton(
-                icon: const Icon(Icons.favorite_outline),
-                onPressed: () => _showComingSoon(context, l10n),
-              ),
+              FavoriteButton(pirithId: item.id),
               _DownloadButton(item: item),
               _PlayButton(
                 onTap: () => context.read<PlayerBloc>().add(PlayerPlayRequested(item)),
@@ -92,12 +88,6 @@ class PirithCard extends StatelessWidget {
         ),
       ),
     );
-  }
-
-  void _showComingSoon(BuildContext context, AppLocalizations l10n) {
-    ScaffoldMessenger.of(context)
-      ..hideCurrentSnackBar()
-      ..showSnackBar(SnackBar(content: Text(l10n.comingSoon)));
   }
 }
 

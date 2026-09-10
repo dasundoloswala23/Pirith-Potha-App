@@ -1,4 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:pitithpotha/features/history/domain/usecases/record_played.dart';
 import 'package:pitithpotha/features/pirith/domain/entities/pirith_entity.dart';
 import 'package:pitithpotha/features/player/domain/entities/playback_status.dart';
 import 'package:pitithpotha/features/player/domain/usecases/pause_playback.dart';
@@ -9,6 +10,7 @@ import 'package:pitithpotha/features/player/domain/usecases/stop_playback.dart';
 import 'package:pitithpotha/features/player/presentation/bloc/player_bloc.dart';
 
 import '../../fakes/fake_audio_repository.dart';
+import '../../fakes/fake_history_repository.dart';
 
 const _item = PirithEntity(
   id: '1',
@@ -34,6 +36,7 @@ PlayerBloc _buildBloc(FakeAudioRepository repository) => PlayerBloc(
       resumePlayback: ResumePlayback(repository),
       seekPlayback: SeekPlayback(repository),
       stopPlayback: StopPlayback(repository),
+      recordPlayed: RecordPlayed(FakeHistoryRepository()),
     );
 
 void main() {

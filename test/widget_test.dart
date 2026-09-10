@@ -12,6 +12,10 @@ import 'package:pitithpotha/features/downloads/domain/usecases/cancel_download.d
 import 'package:pitithpotha/features/downloads/domain/usecases/delete_download.dart';
 import 'package:pitithpotha/features/downloads/domain/usecases/download_pirith.dart';
 import 'package:pitithpotha/features/downloads/presentation/bloc/download_bloc.dart';
+import 'package:pitithpotha/features/favorites/domain/usecases/toggle_favorite.dart';
+import 'package:pitithpotha/features/favorites/presentation/bloc/favorites_bloc.dart';
+import 'package:pitithpotha/features/history/domain/usecases/record_played.dart';
+import 'package:pitithpotha/features/history/presentation/bloc/history_bloc.dart';
 import 'package:pitithpotha/features/pirith/domain/usecases/get_active_pirith.dart';
 import 'package:pitithpotha/features/pirith/domain/usecases/get_categories.dart';
 import 'package:pitithpotha/features/pirith/presentation/bloc/catalogue_bloc.dart';
@@ -25,6 +29,8 @@ import 'package:pitithpotha/features/player/presentation/bloc/player_bloc.dart';
 import 'fakes/fake_audio_repository.dart';
 import 'fakes/fake_auth_repository.dart';
 import 'fakes/fake_download_repository.dart';
+import 'fakes/fake_favorites_repository.dart';
+import 'fakes/fake_history_repository.dart';
 import 'fakes/fake_pirith_repository.dart';
 
 void main() {
@@ -55,6 +61,10 @@ void main() {
     )..add(const CatalogueStarted());
     addTearDown(catalogueBloc.close);
 
+    final fakeHistoryRepository = FakeHistoryRepository();
+    final historyBloc = HistoryBloc(historyRepository: fakeHistoryRepository);
+    addTearDown(historyBloc.close);
+
     final fakeAudioRepository = FakeAudioRepository();
     final playerBloc = PlayerBloc(
       audioRepository: fakeAudioRepository,
@@ -63,6 +73,7 @@ void main() {
       resumePlayback: ResumePlayback(fakeAudioRepository),
       seekPlayback: SeekPlayback(fakeAudioRepository),
       stopPlayback: StopPlayback(fakeAudioRepository),
+      recordPlayed: RecordPlayed(fakeHistoryRepository),
     );
     addTearDown(playerBloc.close);
 
@@ -75,12 +86,21 @@ void main() {
     );
     addTearDown(downloadBloc.close);
 
+    final fakeFavoritesRepository = FavoritesRepositoryFake();
+    final favoritesBloc = FavoritesBloc(
+      favoritesRepository: fakeFavoritesRepository,
+      toggleFavorite: ToggleFavorite(fakeFavoritesRepository),
+    );
+    addTearDown(favoritesBloc.close);
+
     await tester.pumpWidget(
       PirithPothaApp(
         authBloc: authBloc,
         catalogueBloc: catalogueBloc,
         playerBloc: playerBloc,
         downloadBloc: downloadBloc,
+        favoritesBloc: favoritesBloc,
+        historyBloc: historyBloc,
       ),
     );
     expect(find.byType(PirithPothaApp), findsOneWidget);

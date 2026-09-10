@@ -4,6 +4,7 @@ abstract final class AppRoutePaths {
   static const home = '/home';
   static const categories = '/home/categories';
   static const categoryDetails = '/home/categories/:categoryId';
+  static const recentlyPlayed = '/home/recently-played';
   static const search = '/search';
   static const downloads = '/downloads';
   static const favorites = '/favorites';

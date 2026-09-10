@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../history/domain/usecases/record_played.dart';
 import '../../../pirith/domain/entities/pirith_entity.dart';
 import '../../domain/entities/playback_status.dart';
 import '../../domain/repositories/audio_repository.dart';
@@ -27,12 +28,14 @@ class PlayerBloc extends Bloc<PlayerEvent, PlayerState> {
     required ResumePlayback resumePlayback,
     required SeekPlayback seekPlayback,
     required StopPlayback stopPlayback,
+    required RecordPlayed recordPlayed,
   })  : _audioRepository = audioRepository,
         _playPirith = playPirith,
         _pausePlayback = pausePlayback,
         _resumePlayback = resumePlayback,
         _seekPlayback = seekPlayback,
         _stopPlayback = stopPlayback,
+        _recordPlayed = recordPlayed,
         super(const PlayerIdle()) {
     on<PlayerPlayRequested>(_onPlayRequested);
     on<PlayerPauseRequested>((event, emit) => _pausePlayback());
@@ -60,6 +63,7 @@ class PlayerBloc extends Bloc<PlayerEvent, PlayerState> {
   final ResumePlayback _resumePlayback;
   final SeekPlayback _seekPlayback;
   final StopPlayback _stopPlayback;
+  final RecordPlayed _recordPlayed;
 
   late final StreamSubscription<PlaybackStatus> _statusSubscription;
   late final StreamSubscription<Duration> _positionSubscription;
@@ -78,6 +82,7 @@ class PlayerBloc extends Bloc<PlayerEvent, PlayerState> {
       ),
     );
     await _playPirith(event.item);
+    unawaited(_recordPlayed(event.item.id));
   }
 
   Future<void> _onStopRequested(

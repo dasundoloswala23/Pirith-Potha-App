@@ -7,23 +7,23 @@ import '../../../../core/l10n/app_localizations.dart';
 import '../../../../core/widgets/pirith_mark.dart';
 import '../../../pirith/presentation/bloc/catalogue_bloc.dart';
 import '../../../pirith/presentation/widgets/pirith_card.dart';
-import '../bloc/favorites_bloc.dart';
+import '../bloc/history_bloc.dart';
 
-class FavoritesPage extends StatelessWidget {
-  const FavoritesPage({super.key});
+class RecentlyPlayedPage extends StatelessWidget {
+  const RecentlyPlayedPage({super.key});
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     return Scaffold(
-      appBar: AppBar(title: Text(l10n.favoritesTitle)),
-      body: BlocBuilder<FavoritesBloc, FavoritesState>(
-        builder: (context, favoritesState) {
-          if (favoritesState is! FavoritesLoaded) {
+      appBar: AppBar(title: Text(l10n.sectionRecentlyPlayed)),
+      body: BlocBuilder<HistoryBloc, HistoryState>(
+        builder: (context, historyState) {
+          if (historyState is! HistoryLoaded) {
             return const Center(child: CircularProgressIndicator());
           }
-          if (favoritesState.ids.isEmpty) {
-            return _EmptyFavorites(l10n: l10n);
+          if (historyState.entries.isEmpty) {
+            return _EmptyHistory(l10n: l10n);
           }
 
           return BlocBuilder<CatalogueBloc, CatalogueState>(
@@ -31,20 +31,18 @@ class FavoritesPage extends StatelessWidget {
               if (catalogueState is! CatalogueLoaded) {
                 return const Center(child: CircularProgressIndicator());
               }
-              // Preserve favoritesState.ids order (most-recently-favorited
-              // first) rather than catalogue order.
               final byId = {for (final p in catalogueState.pirith) p.id: p};
-              final pirithItems = [
-                for (final id in favoritesState.ids)
-                  if (byId[id] != null) byId[id]!,
+              final items = [
+                for (final entry in historyState.entries)
+                  if (byId[entry.pirithId] != null) byId[entry.pirithId]!,
               ];
 
               return ListView.separated(
                 padding: const EdgeInsets.all(16),
-                itemCount: pirithItems.length,
+                itemCount: items.length,
                 separatorBuilder: (_, _) => const SizedBox(height: 10),
                 itemBuilder: (context, index) {
-                  final item = pirithItems[index];
+                  final item = items[index];
                   return PirithCard(
                     item: item,
                     artworkIndex: index,
@@ -60,8 +58,8 @@ class FavoritesPage extends StatelessWidget {
   }
 }
 
-class _EmptyFavorites extends StatelessWidget {
-  const _EmptyFavorites({required this.l10n});
+class _EmptyHistory extends StatelessWidget {
+  const _EmptyHistory({required this.l10n});
 
   final AppLocalizations l10n;
 
@@ -76,13 +74,7 @@ class _EmptyFavorites extends StatelessWidget {
             color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.3),
           ),
           const SizedBox(height: 16),
-          Text(l10n.favoritesEmpty, style: Theme.of(context).textTheme.titleMedium),
-          const SizedBox(height: 4),
-          Text(
-            l10n.favoritesEmptySubtitle,
-            textAlign: TextAlign.center,
-            style: Theme.of(context).textTheme.bodySmall,
-          ),
+          Text(l10n.recentlyPlayedEmpty),
         ],
       ),
     );
