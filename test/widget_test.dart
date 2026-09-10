@@ -11,7 +11,14 @@ import 'package:pitithpotha/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:pitithpotha/features/pirith/domain/usecases/get_active_pirith.dart';
 import 'package:pitithpotha/features/pirith/domain/usecases/get_categories.dart';
 import 'package:pitithpotha/features/pirith/presentation/bloc/catalogue_bloc.dart';
+import 'package:pitithpotha/features/player/domain/usecases/pause_playback.dart';
+import 'package:pitithpotha/features/player/domain/usecases/play_pirith.dart';
+import 'package:pitithpotha/features/player/domain/usecases/resume_playback.dart';
+import 'package:pitithpotha/features/player/domain/usecases/seek_playback.dart';
+import 'package:pitithpotha/features/player/domain/usecases/stop_playback.dart';
+import 'package:pitithpotha/features/player/presentation/bloc/player_bloc.dart';
 
+import 'fakes/fake_audio_repository.dart';
 import 'fakes/fake_auth_repository.dart';
 import 'fakes/fake_pirith_repository.dart';
 
@@ -43,8 +50,23 @@ void main() {
     )..add(const CatalogueStarted());
     addTearDown(catalogueBloc.close);
 
+    final fakeAudioRepository = FakeAudioRepository();
+    final playerBloc = PlayerBloc(
+      audioRepository: fakeAudioRepository,
+      playPirith: PlayPirith(fakeAudioRepository),
+      pausePlayback: PausePlayback(fakeAudioRepository),
+      resumePlayback: ResumePlayback(fakeAudioRepository),
+      seekPlayback: SeekPlayback(fakeAudioRepository),
+      stopPlayback: StopPlayback(fakeAudioRepository),
+    );
+    addTearDown(playerBloc.close);
+
     await tester.pumpWidget(
-      PirithPothaApp(authBloc: authBloc, catalogueBloc: catalogueBloc),
+      PirithPothaApp(
+        authBloc: authBloc,
+        catalogueBloc: catalogueBloc,
+        playerBloc: playerBloc,
+      ),
     );
     expect(find.byType(PirithPothaApp), findsOneWidget);
 

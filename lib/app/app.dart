@@ -6,22 +6,24 @@ import '../core/l10n/app_localizations.dart';
 import '../core/l10n/locale_controller.dart';
 import '../features/auth/presentation/bloc/auth_bloc.dart';
 import '../features/pirith/presentation/bloc/catalogue_bloc.dart';
+import '../features/player/presentation/bloc/player_bloc.dart';
 import 'router/app_router.dart';
 import 'theme/app_theme.dart';
 
-/// [authBloc]/[catalogueBloc] are injected rather than pulled from the
-/// global service locator here, so widget tests can supply
-/// fake-repository-backed instances instead of needing a live Firebase
-/// connection.
+/// BLoCs are injected rather than pulled from the global service locator
+/// here, so widget tests can supply fake-repository-backed instances
+/// instead of needing a live Firebase/audio connection.
 class PirithPothaApp extends StatefulWidget {
   const PirithPothaApp({
     required this.authBloc,
     required this.catalogueBloc,
+    required this.playerBloc,
     super.key,
   });
 
   final AuthBloc authBloc;
   final CatalogueBloc catalogueBloc;
+  final PlayerBloc playerBloc;
 
   @override
   State<PirithPothaApp> createState() => _PirithPothaAppState();
@@ -43,6 +45,7 @@ class _PirithPothaAppState extends State<PirithPothaApp> {
       providers: [
         BlocProvider<AuthBloc>.value(value: widget.authBloc),
         BlocProvider<CatalogueBloc>.value(value: widget.catalogueBloc),
+        BlocProvider<PlayerBloc>.value(value: widget.playerBloc),
       ],
       child: ValueListenableBuilder<Locale>(
         valueListenable: _localeController,

@@ -20,6 +20,16 @@ import '../../features/pirith/domain/usecases/get_active_pirith.dart';
 import '../../features/pirith/domain/usecases/get_categories.dart';
 import '../../features/pirith/domain/usecases/get_pirith_by_id.dart';
 import '../../features/pirith/presentation/bloc/catalogue_bloc.dart';
+import '../../features/player/data/repositories/audio_repository_impl.dart';
+import '../../features/player/domain/repositories/audio_repository.dart';
+import '../../features/player/domain/usecases/pause_playback.dart';
+import '../../features/player/domain/usecases/play_pirith.dart';
+import '../../features/player/domain/usecases/resume_playback.dart';
+import '../../features/player/domain/usecases/seek_playback.dart';
+import '../../features/player/domain/usecases/stop_playback.dart';
+import '../../features/player/presentation/bloc/player_bloc.dart';
+import '../audio/audio_service_initializer.dart';
+import '../audio/pirith_audio_handler.dart';
 import '../firebase/analytics_service.dart';
 
 /// App-wide service locator. Repositories/data sources are registered as
@@ -40,8 +50,33 @@ Future<void> configureDependencies() async {
 
   _registerAuthFeature();
   _registerPirithFeature();
+  await _registerPlayerFeature();
 
-  // Phase 5+ will register audio/download repositories and BLoCs here.
+  // Phase 6+ will register download repositories and BLoCs here.
+}
+
+Future<void> _registerPlayerFeature() async {
+  final audioHandler = await initializeAudioService();
+  getIt
+    ..registerSingleton<PirithAudioHandler>(audioHandler)
+    ..registerLazySingleton<AudioRepository>(
+      () => AudioRepositoryImpl(getIt<PirithAudioHandler>()),
+    )
+    ..registerLazySingleton(() => PlayPirith(getIt<AudioRepository>()))
+    ..registerLazySingleton(() => PausePlayback(getIt<AudioRepository>()))
+    ..registerLazySingleton(() => ResumePlayback(getIt<AudioRepository>()))
+    ..registerLazySingleton(() => SeekPlayback(getIt<AudioRepository>()))
+    ..registerLazySingleton(() => StopPlayback(getIt<AudioRepository>()))
+    ..registerLazySingleton(
+      () => PlayerBloc(
+        audioRepository: getIt<AudioRepository>(),
+        playPirith: getIt<PlayPirith>(),
+        pausePlayback: getIt<PausePlayback>(),
+        resumePlayback: getIt<ResumePlayback>(),
+        seekPlayback: getIt<SeekPlayback>(),
+        stopPlayback: getIt<StopPlayback>(),
+      ),
+    );
 }
 
 void _registerPirithFeature() {

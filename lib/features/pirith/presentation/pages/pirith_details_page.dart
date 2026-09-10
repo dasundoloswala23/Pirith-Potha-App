@@ -1,14 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../../app/theme/app_typography.dart';
+import '../../../../core/constants/app_route_paths.dart';
 import '../../../../core/l10n/app_localizations.dart';
+import '../../../player/presentation/bloc/player_bloc.dart';
 import '../bloc/catalogue_bloc.dart';
 import '../widgets/pirith_artwork.dart';
 
-/// Real Pirith details, sourced from the already-loaded catalogue. Play/
-/// Download/Favorite are placeholders here — real playback lands in
-/// Phase 5, downloads in Phase 6, favorites in Phase 7 (see
+/// Real Pirith details, sourced from the already-loaded catalogue. Play
+/// starts real playback via [PlayerBloc] and opens the full player;
+/// Download/Favorite are still placeholders — those land in Phase 6/7 (see
 /// docs/09_development_roadmap.md).
 class PirithDetailsPage extends StatelessWidget {
   const PirithDetailsPage({required this.pirithId, super.key});
@@ -61,7 +64,10 @@ class PirithDetailsPage extends StatelessWidget {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           FilledButton.icon(
-                            onPressed: () => _comingSoon(context, l10n),
+                            onPressed: () {
+                              context.read<PlayerBloc>().add(PlayerPlayRequested(item));
+                              context.push(AppRoutePaths.player);
+                            },
                             icon: const Icon(Icons.play_arrow),
                             label: Text(l10n.actionPlay),
                           ),

@@ -1,15 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../app/theme/app_colors.dart';
 import '../../../../app/theme/app_typography.dart';
 import '../../../../core/l10n/app_localizations.dart';
+import '../../../player/presentation/bloc/player_bloc.dart';
 import '../../domain/entities/pirith_entity.dart';
 import 'pirith_artwork.dart';
 
 /// List row matching the reference `PirithCard`: artwork, Sinhala title +
-/// English subtitle + duration, favorite/download/play actions. Favorite
-/// and download aren't implemented until Phases 6-7, so those buttons show
-/// a "coming soon" hint instead of silently doing nothing.
+/// English subtitle + duration, favorite/download/play actions. Tapping the
+/// row opens details ([onTap]); the gold play button starts playback right
+/// away via [PlayerBloc]. Favorite and download aren't implemented until
+/// Phases 6-7, so those buttons show a "coming soon" hint instead of
+/// silently doing nothing.
 class PirithCard extends StatelessWidget {
   const PirithCard({
     required this.item,
@@ -81,7 +85,9 @@ class PirithCard extends StatelessWidget {
                 icon: const Icon(Icons.download_outlined),
                 onPressed: () => _showComingSoon(context, l10n),
               ),
-              _PlayButton(onTap: onTap),
+              _PlayButton(
+                onTap: () => context.read<PlayerBloc>().add(PlayerPlayRequested(item)),
+              ),
             ],
           ),
         ),

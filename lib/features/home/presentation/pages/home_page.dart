@@ -11,6 +11,7 @@ import '../../../pirith/presentation/bloc/catalogue_bloc.dart';
 import '../../../pirith/presentation/widgets/category_card.dart';
 import '../../../pirith/presentation/widgets/pirith_artwork.dart';
 import '../../../pirith/presentation/widgets/pirith_card.dart';
+import '../../../player/presentation/bloc/player_bloc.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -211,7 +212,10 @@ class _FeaturedCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return InkWell(
       borderRadius: BorderRadius.circular(18),
-      onTap: () => context.push(AppRoutePaths.pirithDetailsFor(item.id)),
+      onTap: () {
+        context.read<PlayerBloc>().add(PlayerPlayRequested(item));
+        context.push(AppRoutePaths.player);
+      },
       child: Container(
         height: 160,
         clipBehavior: Clip.antiAlias,
