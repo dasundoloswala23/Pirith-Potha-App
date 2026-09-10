@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../app/theme/app_typography.dart';
 import '../../../../core/l10n/app_localizations.dart';
+import '../../../downloads/presentation/bloc/download_bloc.dart';
 import '../../../pirith/presentation/widgets/pirith_artwork.dart';
 import '../../domain/entities/playback_status.dart';
 import '../bloc/player_bloc.dart';
@@ -60,7 +61,13 @@ class _NowPlaying extends StatelessWidget {
           const SizedBox(height: 24),
           Row(
             children: [
-              IconButton(icon: const Icon(Icons.favorite_outline), onPressed: () {}),
+              IconButton(
+                icon: const Icon(Icons.favorite_outline),
+                tooltip: l10n.actionAddFavorite,
+                onPressed: () => ScaffoldMessenger.of(context)
+                  ..hideCurrentSnackBar()
+                  ..showSnackBar(SnackBar(content: Text(l10n.comingSoon))),
+              ),
               Expanded(
                 child: Slider(
                   value: state.position.inMilliseconds
@@ -74,7 +81,12 @@ class _NowPlaying extends StatelessWidget {
                       .add(PlayerSeekRequested(Duration(milliseconds: value.round()))),
                 ),
               ),
-              IconButton(icon: const Icon(Icons.download_outlined), onPressed: () {}),
+              IconButton(
+                icon: const Icon(Icons.download_outlined),
+                tooltip: l10n.actionDownload,
+                onPressed: () =>
+                    context.read<DownloadBloc>().add(DownloadRequested(state.item)),
+              ),
             ],
           ),
           Padding(

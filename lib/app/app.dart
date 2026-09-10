@@ -3,7 +3,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 
 import '../core/l10n/app_localizations.dart';
-import '../core/l10n/locale_controller.dart';
 import '../features/auth/presentation/bloc/auth_bloc.dart';
 import '../features/downloads/presentation/bloc/download_bloc.dart';
 import '../features/pirith/presentation/bloc/catalogue_bloc.dart';
@@ -14,6 +13,12 @@ import 'theme/app_theme.dart';
 /// BLoCs are injected rather than pulled from the global service locator
 /// here, so widget tests can supply fake-repository-backed instances
 /// instead of needing a live Firebase/audio connection.
+///
+/// V1 is Sinhala-first with no in-app language switcher (see
+/// docs/08_ui_ux.md) — the locale is fixed rather than user-selectable.
+/// The English ARB file is kept as the data/reference locale so the
+/// architecture stays ready for a future language switch without a UI
+/// rewrite.
 class PirithPothaApp extends StatefulWidget {
   const PirithPothaApp({
     required this.authBloc,
@@ -33,14 +38,7 @@ class PirithPothaApp extends StatefulWidget {
 }
 
 class _PirithPothaAppState extends State<PirithPothaApp> {
-  final _localeController = LocaleController(LocaleController.sinhala);
-  late final _router = buildAppRouter(localeController: _localeController);
-
-  @override
-  void dispose() {
-    _localeController.dispose();
-    super.dispose();
-  }
+  late final _router = buildAppRouter();
 
   @override
   Widget build(BuildContext context) {
@@ -51,24 +49,19 @@ class _PirithPothaAppState extends State<PirithPothaApp> {
         BlocProvider<PlayerBloc>.value(value: widget.playerBloc),
         BlocProvider<DownloadBloc>.value(value: widget.downloadBloc),
       ],
-      child: ValueListenableBuilder<Locale>(
-        valueListenable: _localeController,
-        builder: (context, locale, _) {
-          return MaterialApp.router(
-            onGenerateTitle: (context) => AppLocalizations.of(context).appName,
-            theme: AppTheme.light,
-            darkTheme: AppTheme.dark,
-            locale: locale,
-            supportedLocales: AppLocalizations.supportedLocales,
-            localizationsDelegates: const [
-              AppLocalizations.delegate,
-              GlobalMaterialLocalizations.delegate,
-              GlobalWidgetsLocalizations.delegate,
-              GlobalCupertinoLocalizations.delegate,
-            ],
-            routerConfig: _router,
-          );
-        },
+      child: MaterialApp.router(
+        onGenerateTitle: (context) => AppLocalizations.of(context).appName,
+        theme: AppTheme.light,
+        darkTheme: AppTheme.dark,
+        locale: const Locale('si'),
+        supportedLocales: AppLocalizations.supportedLocales,
+        localizationsDelegates: const [
+          AppLocalizations.delegate,
+          GlobalMaterialLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+        ],
+        routerConfig: _router,
       ),
     );
   }

@@ -1,7 +1,6 @@
 import 'package:go_router/go_router.dart';
 
 import '../../core/constants/app_route_paths.dart';
-import '../../core/l10n/locale_controller.dart';
 import '../../features/downloads/presentation/pages/downloads_page.dart';
 import '../../features/favorites/presentation/pages/favorites_page.dart';
 import '../../features/home/presentation/pages/home_page.dart';
@@ -17,7 +16,7 @@ import '../widgets/splash_page.dart';
 /// App-wide route configuration. The five bottom-nav destinations are
 /// branches of a [StatefulShellRoute] so each keeps its own navigation
 /// stack; splash/details/player are pushed full-screen outside the shell.
-GoRouter buildAppRouter({required LocaleController localeController}) {
+GoRouter buildAppRouter() {
   return GoRouter(
     initialLocation: AppRoutePaths.splash,
     routes: [
@@ -85,8 +84,7 @@ GoRouter buildAppRouter({required LocaleController localeController}) {
             routes: [
               GoRoute(
                 path: AppRoutePaths.profile,
-                builder: (context, state) =>
-                    ProfilePage(localeController: localeController),
+                builder: (context, state) => const ProfilePage(),
               ),
             ],
           ),

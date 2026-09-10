@@ -2,13 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../core/l10n/app_localizations.dart';
-import '../../../../core/l10n/locale_controller.dart';
 import '../../../auth/presentation/bloc/auth_bloc.dart';
 
+/// V1 is Sinhala-first with no in-app language switcher (see
+/// docs/08_ui_ux.md) — the language row below is informational, not a
+/// control.
 class ProfilePage extends StatelessWidget {
-  const ProfilePage({required this.localeController, super.key});
-
-  final LocaleController localeController;
+  const ProfilePage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -30,22 +30,12 @@ class ProfilePage extends StatelessWidget {
               ListTile(
                 leading: const Icon(Icons.language),
                 title: Text(l10n.profileLanguage),
-                trailing: ValueListenableBuilder<Locale>(
-                  valueListenable: localeController,
-                  builder: (context, locale, _) => Text(
-                    locale == LocaleController.sinhala ? 'සිංහල' : 'English',
-                  ),
-                ),
-                onTap: localeController.toggle,
+                trailing: Text(l10n.profileLanguageValue),
               ),
               ListTile(
                 leading: const Icon(Icons.workspace_premium_outlined),
                 title: Text(l10n.profilePremium),
                 subtitle: Text(l10n.comingSoon),
-              ),
-              ListTile(
-                leading: const Icon(Icons.settings_outlined),
-                title: Text(l10n.profileSettings),
               ),
               ListTile(
                 leading: const Icon(Icons.info_outline),

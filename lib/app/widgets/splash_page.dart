@@ -140,7 +140,7 @@ class _SplashPageState extends State<SplashPage> with TickerProviderStateMixin {
                 bottom: 40,
                 child: Center(
                   child: Text(
-                    'BUDDHIST DEVOTIONAL AUDIO',
+                    l10n.splashTagline,
                     style: TextStyle(
                       fontSize: 11,
                       letterSpacing: 2,

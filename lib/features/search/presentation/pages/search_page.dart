@@ -54,7 +54,7 @@ class _SearchPageState extends State<SearchPage> {
 
           final results = state.search(_controller.text);
           if (results.isEmpty) {
-            return Center(child: Text(l10n.comingSoon));
+            return _NoResults(l10n: l10n);
           }
 
           return ListView.separated(
@@ -71,6 +71,35 @@ class _SearchPageState extends State<SearchPage> {
             },
           );
         },
+      ),
+    );
+  }
+}
+
+class _NoResults extends StatelessWidget {
+  const _NoResults({required this.l10n});
+
+  final AppLocalizations l10n;
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          PirithMark(
+            size: 56,
+            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.3),
+          ),
+          const SizedBox(height: 16),
+          Text(l10n.searchNoResultsTitle, style: Theme.of(context).textTheme.titleMedium),
+          const SizedBox(height: 4),
+          Text(
+            l10n.searchNoResultsSubtitle,
+            textAlign: TextAlign.center,
+            style: Theme.of(context).textTheme.bodySmall,
+          ),
+        ],
       ),
     );
   }

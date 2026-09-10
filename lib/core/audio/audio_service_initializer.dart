@@ -12,7 +12,9 @@ Future<PirithAudioHandler> initializeAudioService() {
     builder: () => PirithAudioHandler(AudioPlayer()),
     config: const AudioServiceConfig(
       androidNotificationChannelId: 'com.pirith.pitithpotha.audio',
-      androidNotificationChannelName: 'Pirith Playback',
+      // Shown to the user in Android's notification channel settings —
+      // V1 is Sinhala-first (see docs/08_ui_ux.md).
+      androidNotificationChannelName: 'පිරිත් ධාවනය',
       androidNotificationOngoing: true,
       androidStopForegroundOnPause: true,
     ),

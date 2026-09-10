@@ -12,6 +12,7 @@ import '../../../pirith/presentation/widgets/category_card.dart';
 import '../../../pirith/presentation/widgets/pirith_artwork.dart';
 import '../../../pirith/presentation/widgets/pirith_card.dart';
 import '../../../player/presentation/bloc/player_bloc.dart';
+import '../widgets/social_section.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -154,21 +155,26 @@ class _HomeContent extends StatelessWidget {
           ),
         ],
         if (featured == null && popular.isEmpty)
-          SliverFillRemaining(
-            child: Center(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  PirithMark(
-                    size: 64,
-                    color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.3),
-                  ),
-                  const SizedBox(height: 16),
-                  Text(l10n.comingSoon),
-                ],
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 32),
+              child: Center(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    PirithMark(
+                      size: 64,
+                      color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.3),
+                    ),
+                    const SizedBox(height: 16),
+                    Text(l10n.comingSoon),
+                  ],
+                ),
               ),
             ),
           ),
+        const SliverToBoxAdapter(child: SocialSection()),
+        const SliverToBoxAdapter(child: SizedBox(height: 16)),
       ],
     );
   }

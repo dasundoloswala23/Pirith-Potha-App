@@ -16,31 +16,40 @@ animation feel (ripple/scale press states, slide-up transitions, the
 gold-accent progress ring on the download button, the mini-player docked
 above the bottom nav) rather than redesigning from scratch.
 
-## Localization (Sinhala + English) — applies to the whole app
+## Localization — V1 mobile UI is Sinhala-first
 
-The entire app UI ships in **Sinhala and English**, not just chant content.
-This is a hard requirement, not a stretch goal.
+**Revised policy (supersedes the original "full bilingual UI" requirement
+below the original docs implied):** the V1 mobile app's visible UI is
+**Sinhala only** — natural, grammatically correct Sinhala, not literal
+machine-translation. English stays only for official brand/platform names
+(e.g. "Google", "YouTube", "Facebook"), genuinely untranslatable technical
+terms, and content where an English title is intentionally shown alongside
+the Sinhala one (e.g. a Pirith's English name shown smaller under its
+Sinhala title). There is **no in-app language switcher** in V1 — don't build
+one unless explicitly requested again.
 
 - Use Flutter's standard localization stack: `flutter_localizations` + `intl`,
-  with ARB files under `l10n/app_en.arb` and `l10n/app_si.arb`, code-generated
-  via `flutter gen-l10n` (configured in `l10n.yaml`).
-- Every user-facing string in every screen, dialog, snackbar, and error
-  message goes through the generated `AppLocalizations` — no hardcoded
-  English (or Sinhala) strings in widgets.
-- Language selection: default to the device locale if it's Sinhala or
-  English, otherwise default to Sinhala (primary audience). Persist the
-  user's explicit choice (`languagePreference`) in local settings, and mirror
-  it to `users/{uid}.languagePreference` once authenticated, so it's
-  consistent across devices.
-- A visible language switch belongs in Settings/Profile.
-- Sinhala text requires a font with full Sinhala glyph coverage (e.g. Noto
-  Sans Sinhala) bundled as an app asset — do not rely on the OS providing one
-  on all Android versions/devices.
+  with ARB files under `lib/core/l10n/arb/app_en.arb` and `app_si.arb`,
+  code-generated via `flutter gen-l10n` (configured in `l10n.yaml`).
+- Every user-facing string in every screen, dialog, snackbar, error message,
+  and Android notification channel name goes through the generated
+  `AppLocalizations` — no hardcoded literal strings in widgets, in either
+  language.
+- The app's `MaterialApp` pins `locale: const Locale('si')` directly rather
+  than resolving from the device locale or a mutable controller.
+- The `app_en.arb` file is **kept in sync** as the data/reference locale —
+  not shown in the V1 UI, but present so a future language switch is an
+  `AppLocalizations`/`locale` change, not a UI rewrite. Don't delete it or
+  let it drift out of sync with the Sinhala strings.
+- Sinhala text requires a font with full Sinhala glyph coverage; the app
+  loads Noto Serif Sinhala (titles) and Noto Sans Sinhala (body/UI) via
+  `google_fonts` — see `lib/app/theme/app_typography.dart`.
 - Content fields that are inherently bilingual (Pirith title/description) are
   modeled as separate fields (`title` + `titleSinhala`, etc. — see
-  [`03_database_schema.md`](03_database_schema.md)) and the UI picks the
-  right one based on active language, falling back to the other if a
-  translation is missing rather than showing blank text.
+  [`03_database_schema.md`](03_database_schema.md)); the UI displays the
+  Sinhala field, falling back to the English one if a Sinhala translation is
+  missing rather than showing blank text. Do not remove the English fields
+  from the data model — they're the future-bilingual-support path.
 
 ## Screens
 
@@ -71,11 +80,22 @@ List of downloaded items with offline indicator; works with no network.
 
 Simple list, same card style as Home.
 
-### Profile
+### Profile / Settings
 
-Auth state (guest vs. signed in), language switch, favorites/downloads/
+Auth state (guest vs. signed in), a read-only language row (shows "සිංහල",
+not a switch — see the localization policy above), favorites/downloads/
 history shortcuts, Premium entry point (placeholder until V2), settings,
 about, privacy policy.
+
+### Social / community section
+
+A warm, Sinhala-first community section (Home screen) inviting users to
+follow the official YouTube and Facebook presence — not a literal "Follow us
+on Facebook and YouTube" translation. Tapping a card opens the native app if
+installed, otherwise the official URL in the external browser
+(`url_launcher` with `LaunchMode.externalApplication`) — never an in-app
+WebView. URLs live in one centralized constants file, never hardcoded in a
+widget.
 
 ## Product framing
 
