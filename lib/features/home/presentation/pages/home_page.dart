@@ -14,6 +14,7 @@ import '../../../pirith/presentation/widgets/category_card.dart';
 import '../../../pirith/presentation/widgets/pirith_artwork.dart';
 import '../../../pirith/presentation/widgets/pirith_card.dart';
 import '../../../player/presentation/bloc/player_bloc.dart';
+import '../../../premium/presentation/widgets/premium_gate.dart';
 import '../widgets/social_section.dart';
 
 class HomePage extends StatelessWidget {
@@ -273,6 +274,7 @@ class _RecentTile extends StatelessWidget {
     return InkWell(
       borderRadius: BorderRadius.circular(10),
       onTap: () {
+        if (!ensurePremiumAccess(context, isPremiumItem: item.isPremium)) return;
         context.read<PlayerBloc>().add(PlayerPlayRequested(item));
         context.push(AppRoutePaths.player);
       },
@@ -307,6 +309,7 @@ class _FeaturedCard extends StatelessWidget {
     return InkWell(
       borderRadius: BorderRadius.circular(18),
       onTap: () {
+        if (!ensurePremiumAccess(context, isPremiumItem: item.isPremium)) return;
         context.read<PlayerBloc>().add(PlayerPlayRequested(item));
         context.push(AppRoutePaths.player);
       },

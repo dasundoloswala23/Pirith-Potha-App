@@ -92,6 +92,12 @@ to disable ads for Premium (no billing yet). See
 
 `PremiumBloc`, `PremiumRepository`, entitlement model, feature-access
 abstraction. No real billing integration yet — architecture only.
+`PremiumRepository` watches `users/{uid}.isPremium` (read-only from the
+app — nothing in the app ever writes it, so it stays a manually-set dev
+placeholder per docs/07_monetization.md until real billing lands); AdMob's
+`adsEnabled` and premium-Pirith gating (`ensurePremiumAccess`) both already
+read through it, so wiring up real entitlement later is a data-layer
+change under `PremiumRepositoryImpl`, not a redesign.
 
 ## Phase 10 — Testing & Production Hardening
 

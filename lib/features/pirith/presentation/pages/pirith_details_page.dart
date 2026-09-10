@@ -9,14 +9,15 @@ import '../../../downloads/domain/entities/download_entity.dart';
 import '../../../downloads/presentation/bloc/download_bloc.dart';
 import '../../../favorites/presentation/widgets/favorite_button.dart';
 import '../../../player/presentation/bloc/player_bloc.dart';
+import '../../../premium/presentation/widgets/premium_badge.dart';
+import '../../../premium/presentation/widgets/premium_gate.dart';
 import '../../domain/entities/pirith_entity.dart';
 import '../bloc/catalogue_bloc.dart';
 import '../widgets/pirith_artwork.dart';
 
-/// Real Pirith details, sourced from the already-loaded catalogue. Play
-/// starts real playback via [PlayerBloc] and opens the full player;
-/// Download/Favorite are still placeholders — those land in Phase 6/7 (see
-/// docs/09_development_roadmap.md).
+/// Real Pirith details, sourced from the already-loaded catalogue. Play/
+/// Download are gated behind [ensurePremiumAccess] for premium-only
+/// content (see docs/07_monetization.md).
 class PirithDetailsPage extends StatelessWidget {
   const PirithDetailsPage({required this.pirithId, super.key});
 
@@ -59,9 +60,18 @@ class PirithDetailsPage extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(height: 4),
-                      Text(
-                        '${item.title} · ${item.durationLabel()}',
-                        style: Theme.of(context).textTheme.bodyMedium,
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            '${item.title} · ${item.durationLabel()}',
+                            style: Theme.of(context).textTheme.bodyMedium,
+                          ),
+                          if (item.isPremium) ...[
+                            const SizedBox(width: 6),
+                            const PremiumBadge(),
+                          ],
+                        ],
                       ),
                       const SizedBox(height: 20),
                       Row(
@@ -69,6 +79,9 @@ class PirithDetailsPage extends StatelessWidget {
                         children: [
                           FilledButton.icon(
                             onPressed: () {
+                              if (!ensurePremiumAccess(context, isPremiumItem: item.isPremium)) {
+                                return;
+                              }
                               context.read<PlayerBloc>().add(PlayerPlayRequested(item));
                               context.push(AppRoutePaths.player);
                             },
@@ -155,7 +168,11 @@ class _DetailsDownloadButton extends StatelessWidget {
       case DownloadStatus.notDownloaded:
       case null:
         return OutlinedButton.icon(
-          onPressed: () => context.read<DownloadBloc>().add(DownloadRequested(item)),
+          onPressed: () {
+            if (ensurePremiumAccess(context, isPremiumItem: item.isPremium)) {
+              context.read<DownloadBloc>().add(DownloadRequested(item));
+            }
+          },
           icon: const Icon(Icons.download_outlined),
           label: Text(l10n.actionDownload),
         );

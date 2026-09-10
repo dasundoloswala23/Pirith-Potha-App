@@ -44,6 +44,9 @@ import '../../features/player/domain/usecases/resume_playback.dart';
 import '../../features/player/domain/usecases/seek_playback.dart';
 import '../../features/player/domain/usecases/stop_playback.dart';
 import '../../features/player/presentation/bloc/player_bloc.dart';
+import '../../features/premium/data/repositories/premium_repository_impl.dart';
+import '../../features/premium/domain/repositories/premium_repository.dart';
+import '../../features/premium/presentation/bloc/premium_bloc.dart';
 import '../ads/ad_service.dart';
 import '../ads/mobile_ads_service.dart';
 import '../audio/audio_service_initializer.dart';
@@ -70,6 +73,7 @@ Future<void> configureDependencies() async {
 
   _registerAuthFeature();
   _registerPirithFeature();
+  _registerPremiumFeature();
   await _registerDownloadFeature();
   await _registerFavoritesFeature(prefs);
   await _registerHistoryFeature(prefs);
@@ -77,8 +81,21 @@ Future<void> configureDependencies() async {
   await _registerAdsFeature();
 }
 
+void _registerPremiumFeature() {
+  getIt
+    ..registerLazySingleton<PremiumRepository>(
+      () => PremiumRepositoryImpl(
+        firestore: getIt<FirebaseFirestore>(),
+        authRepository: getIt<AuthRepository>(),
+      ),
+    )
+    ..registerLazySingleton(
+      () => PremiumBloc(premiumRepository: getIt<PremiumRepository>()),
+    );
+}
+
 Future<void> _registerAdsFeature() async {
-  final service = MobileAdsService();
+  final service = MobileAdsService(getIt<PremiumRepository>());
   await service.initialize();
   getIt.registerSingleton<AdService>(service);
 }

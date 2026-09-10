@@ -25,6 +25,7 @@ import 'package:pitithpotha/features/player/domain/usecases/resume_playback.dart
 import 'package:pitithpotha/features/player/domain/usecases/seek_playback.dart';
 import 'package:pitithpotha/features/player/domain/usecases/stop_playback.dart';
 import 'package:pitithpotha/features/player/presentation/bloc/player_bloc.dart';
+import 'package:pitithpotha/features/premium/presentation/bloc/premium_bloc.dart';
 
 import 'fakes/fake_audio_repository.dart';
 import 'fakes/fake_auth_repository.dart';
@@ -32,6 +33,7 @@ import 'fakes/fake_download_repository.dart';
 import 'fakes/fake_favorites_repository.dart';
 import 'fakes/fake_history_repository.dart';
 import 'fakes/fake_pirith_repository.dart';
+import 'fakes/fake_premium_repository.dart';
 
 void main() {
   setUpAll(() {
@@ -93,6 +95,9 @@ void main() {
     );
     addTearDown(favoritesBloc.close);
 
+    final premiumBloc = PremiumBloc(premiumRepository: FakePremiumRepository());
+    addTearDown(premiumBloc.close);
+
     await tester.pumpWidget(
       PirithPothaApp(
         authBloc: authBloc,
@@ -101,6 +106,7 @@ void main() {
         downloadBloc: downloadBloc,
         favoritesBloc: favoritesBloc,
         historyBloc: historyBloc,
+        premiumBloc: premiumBloc,
       ),
     );
     expect(find.byType(PirithPothaApp), findsOneWidget);

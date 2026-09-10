@@ -9,6 +9,7 @@ import 'features/favorites/presentation/bloc/favorites_bloc.dart';
 import 'features/history/presentation/bloc/history_bloc.dart';
 import 'features/pirith/presentation/bloc/catalogue_bloc.dart';
 import 'features/player/presentation/bloc/player_bloc.dart';
+import 'features/premium/presentation/bloc/premium_bloc.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -22,6 +23,7 @@ Future<void> main() async {
       downloadBloc: getIt<DownloadBloc>(),
       favoritesBloc: getIt<FavoritesBloc>(),
       historyBloc: getIt<HistoryBloc>(),
+      premiumBloc: getIt<PremiumBloc>(),
     ),
   );
 }

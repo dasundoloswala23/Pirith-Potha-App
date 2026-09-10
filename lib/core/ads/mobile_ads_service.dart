@@ -1,6 +1,8 @@
 import 'package:flutter/foundation.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 
+import '../../features/premium/domain/entities/premium_feature.dart';
+import '../../features/premium/domain/repositories/premium_repository.dart';
 import 'ad_service.dart';
 
 /// `google_mobile_ads` isn't available on web/desktop — every method here
@@ -8,6 +10,9 @@ import 'ad_service.dart';
 /// rest of the app (and its web build, used for quick verification) never
 /// needs to know AdMob exists.
 class MobileAdsService implements AdService {
+  MobileAdsService(this._premiumRepository);
+
+  final PremiumRepository _premiumRepository;
   bool _initialized = false;
 
   @override
@@ -23,5 +28,5 @@ class MobileAdsService implements AdService {
   bool get isInitialized => _initialized;
 
   @override
-  bool get adsEnabled => true;
+  bool get adsEnabled => !_premiumRepository.hasAccess(PremiumFeature.adsRemoved);
 }

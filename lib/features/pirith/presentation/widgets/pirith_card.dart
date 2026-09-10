@@ -8,6 +8,8 @@ import '../../../downloads/domain/entities/download_entity.dart';
 import '../../../downloads/presentation/bloc/download_bloc.dart';
 import '../../../favorites/presentation/widgets/favorite_button.dart';
 import '../../../player/presentation/bloc/player_bloc.dart';
+import '../../../premium/presentation/widgets/premium_badge.dart';
+import '../../../premium/presentation/widgets/premium_gate.dart';
 import '../../domain/entities/pirith_entity.dart';
 import 'pirith_artwork.dart';
 
@@ -74,14 +76,26 @@ class PirithCard extends StatelessWidget {
                       style: theme.textTheme.bodySmall,
                     ),
                     const SizedBox(height: 4),
-                    Text(item.durationLabel(), style: theme.textTheme.labelSmall),
+                    Row(
+                      children: [
+                        Text(item.durationLabel(), style: theme.textTheme.labelSmall),
+                        if (item.isPremium) ...[
+                          const SizedBox(width: 6),
+                          const PremiumBadge(),
+                        ],
+                      ],
+                    ),
                   ],
                 ),
               ),
               FavoriteButton(pirithId: item.id),
               _DownloadButton(item: item),
               _PlayButton(
-                onTap: () => context.read<PlayerBloc>().add(PlayerPlayRequested(item)),
+                onTap: () {
+                  if (ensurePremiumAccess(context, isPremiumItem: item.isPremium)) {
+                    context.read<PlayerBloc>().add(PlayerPlayRequested(item));
+                  }
+                },
               ),
             ],
           ),
@@ -132,7 +146,11 @@ class _DownloadButton extends StatelessWidget {
       case null:
         return IconButton(
           icon: const Icon(Icons.download_outlined),
-          onPressed: () => context.read<DownloadBloc>().add(DownloadRequested(item)),
+          onPressed: () {
+            if (ensurePremiumAccess(context, isPremiumItem: item.isPremium)) {
+              context.read<DownloadBloc>().add(DownloadRequested(item));
+            }
+          },
         );
     }
   }
