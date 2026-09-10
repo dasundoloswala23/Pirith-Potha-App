@@ -1,0 +1,62 @@
+rules_version = '2';
+
+// See docs/03_database_schema.md for the collection layout this mirrors.
+// Not yet deployed via the Firebase CLI (no firebase.json in this repo) —
+// tracked here as the reviewed source of truth; deploy manually or wire up
+// `firebase deploy --only firestore:rules` once a Firebase project alias is
+// configured locally.
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(uid) {
+      return isSignedIn() && request.auth.uid == uid;
+    }
+
+    // Public catalogue content: anyone can read, only server-side
+    // (Admin SDK / Cloud Functions, not the client app) can write.
+    match /pirith/{pirithId} {
+      allow read: if true;
+      allow write: if false;
+    }
+
+    match /categories/{categoryId} {
+      allow read: if true;
+      allow write: if false;
+    }
+
+    match /app_config/{docId} {
+      allow read: if true;
+      allow write: if false;
+    }
+
+    // premium/plans: readable by anyone so the client can show pricing;
+    // never writable by the client — entitlement itself lives server-side.
+    match /premium/{docId} {
+      allow read: if true;
+      allow write: if false;
+    }
+
+    // A user (including anonymous/guest) can only read/write their own
+    // profile document and its favorites/history subcollections.
+    match /users/{uid} {
+      allow read, write: if isOwner(uid);
+
+      match /favorites/{pirithId} {
+        allow read, write: if isOwner(uid);
+      }
+
+      match /history/{pirithId} {
+        allow read, write: if isOwner(uid);
+      }
+    }
+
+    match /playlists/{playlistId} {
+      allow read: if isSignedIn();
+      allow write: if false; // opened up per-owner once playlists ship (V1.1)
+    }
+  }
+}
