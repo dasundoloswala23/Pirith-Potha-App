@@ -2,11 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../app/theme/app_colors.dart';
 import '../../../../app/theme/app_spacing.dart';
 import '../../../../app/theme/app_typography.dart';
 import '../../../../core/constants/app_route_paths.dart';
 import '../../../../core/l10n/app_localizations.dart';
+import '../../../../core/l10n/bilingual.dart';
 import '../../../../core/ads/widgets/banner_ad_widget.dart';
+import '../../../../core/widgets/bilingual_text.dart';
 import '../../../../core/widgets/pirith_mark.dart';
 import '../../../history/presentation/bloc/history_bloc.dart';
 import '../../../pirith/domain/entities/pirith_entity.dart';
@@ -25,14 +28,19 @@ class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+    final bi = Bilingual.of(context);
     return Scaffold(
       appBar: AppBar(
         title: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Image.asset('assets/logo.png', width: 28, height: 28),
-            const SizedBox(width: 10),
-            Text(l10n.homeTitle),
+            Image.asset('assets/logo.png', width: 32, height: 32),
+            const SizedBox(width: AppSpacing.md),
+            BilingualLabel(
+              sinhala: bi.si.homeTitle,
+              english: bi.en.homeTitle,
+              sinhalaSize: 17,
+            ),
           ],
         ),
         actions: [
@@ -58,6 +66,7 @@ class _HomeContent extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+    final bi = Bilingual.of(context);
     final featured = state.featured.firstOrNull;
     final popular = state.popular.take(6).toList();
 
@@ -82,7 +91,7 @@ class _HomeContent extends StatelessWidget {
                 child: InputDecorator(
                   decoration: InputDecoration(
                     prefixIcon: const Icon(Icons.search),
-                    hintText: l10n.searchHint,
+                    hintText: '${bi.si.navSearch} · ${bi.en.searchHint}',
                     enabled: false,
                   ),
                   child: const SizedBox(height: 20),
@@ -92,7 +101,10 @@ class _HomeContent extends StatelessWidget {
           ),
           if (featured != null) ...[
             SliverToBoxAdapter(
-              child: _SectionHeader(title: l10n.sectionFeatured),
+              child: _SectionHeader(
+                title: bi.si.sectionFeatured,
+                englishTitle: bi.en.sectionFeatured,
+              ),
             ),
             SliverToBoxAdapter(
               child: Padding(
@@ -119,7 +131,8 @@ class _HomeContent extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     _SectionHeader(
-                      title: l10n.sectionRecentlyPlayed,
+                      title: bi.si.sectionRecentlyPlayed,
+                      englishTitle: bi.en.sectionRecentlyPlayed,
                       seeAllLabel: l10n.actionSeeAll,
                       onSeeAll: () =>
                           context.push(AppRoutePaths.recentlyPlayed),
@@ -146,7 +159,8 @@ class _HomeContent extends StatelessWidget {
           if (state.categories.isNotEmpty) ...[
             SliverToBoxAdapter(
               child: _SectionHeader(
-                title: l10n.sectionCategories,
+                title: bi.si.sectionCategories,
+                englishTitle: bi.en.sectionCategories,
                 seeAllLabel: l10n.actionSeeAll,
                 onSeeAll: () => context.push(AppRoutePaths.categories),
               ),
@@ -179,7 +193,10 @@ class _HomeContent extends StatelessWidget {
           ],
           if (popular.isNotEmpty) ...[
             SliverToBoxAdapter(
-              child: _SectionHeader(title: l10n.sectionPopular),
+              child: _SectionHeader(
+                title: bi.si.sectionPopular,
+                englishTitle: bi.en.sectionPopular,
+              ),
             ),
             SliverPadding(
               padding: const EdgeInsets.fromLTRB(
@@ -248,10 +265,19 @@ Future<void> _refreshCatalogue(BuildContext context) {
       .timeout(const Duration(seconds: 20), onTimeout: () => bloc.state);
 }
 
+/// Sinhala section name on the left; on the right either a "See all" action
+/// or, when there's nowhere to go, the English name of the same section —
+/// the pattern from the approved design.
 class _SectionHeader extends StatelessWidget {
-  const _SectionHeader({required this.title, this.seeAllLabel, this.onSeeAll});
+  const _SectionHeader({
+    required this.title,
+    required this.englishTitle,
+    this.seeAllLabel,
+    this.onSeeAll,
+  });
 
   final String title;
+  final String englishTitle;
   final String? seeAllLabel;
   final VoidCallback? onSeeAll;
 
@@ -267,17 +293,22 @@ class _SectionHeader extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          // Interface text uses the app's English type ramp; the Sinhala
-          // serif face is reserved for Pirith content itself.
           Text(
             title,
-            style: Theme.of(context).textTheme.titleMedium?.copyWith(
-              fontWeight: FontWeight.w600,
+            style: AppTypography.sinhalaTitle(
+              fontSize: 16,
               color: Theme.of(context).colorScheme.onSurface,
             ),
           ),
           if (onSeeAll != null)
-            TextButton(onPressed: onSeeAll, child: Text(seeAllLabel!)),
+            TextButton(onPressed: onSeeAll, child: Text(seeAllLabel!))
+          else
+            Text(
+              englishTitle,
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                color: Theme.of(context).colorScheme.primary,
+              ),
+            ),
         ],
       ),
     );
@@ -359,23 +390,73 @@ class _FeaturedCard extends StatelessWidget {
               ),
             ),
             Positioned(
-              left: 16,
-              right: 16,
-              bottom: 16,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+              left: AppSpacing.md,
+              top: AppSpacing.md,
+              child: Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: AppSpacing.sm,
+                  vertical: 3,
+                ),
+                decoration: BoxDecoration(
+                  color: AppColors.gold,
+                  borderRadius: BorderRadius.circular(AppRadius.sm),
+                ),
+                child: Text(
+                  AppLocalizations.of(context).labelFeatured.toUpperCase(),
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 10,
+                    fontWeight: FontWeight.w700,
+                    letterSpacing: 0.8,
+                  ),
+                ),
+              ),
+            ),
+            Positioned(
+              left: AppSpacing.lg,
+              right: AppSpacing.lg,
+              bottom: AppSpacing.lg,
+              child: Row(
                 children: [
-                  Text(
-                    item.titleSinhala,
-                    style: AppTypography.sinhalaTitle(
-                      fontSize: 18,
-                      color: Colors.white,
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          item.titleSinhala,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: AppTypography.sinhalaTitle(
+                            fontSize: 18,
+                            color: Colors.white,
+                          ),
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          '${item.title} · ${item.durationLabel()}',
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(
+                            color: Colors.white70,
+                            fontSize: 12,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
-                  const SizedBox(height: 2),
-                  Text(
-                    '${item.title} · ${item.durationLabel()}',
-                    style: const TextStyle(color: Colors.white70, fontSize: 12),
+                  const SizedBox(width: AppSpacing.md),
+                  Container(
+                    width: 44,
+                    height: 44,
+                    decoration: const BoxDecoration(
+                      color: AppColors.gold,
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Icon(
+                      Icons.play_arrow,
+                      color: Colors.white,
+                      size: 26,
+                    ),
                   ),
                 ],
               ),

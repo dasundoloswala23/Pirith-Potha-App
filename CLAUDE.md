@@ -10,11 +10,11 @@ Sri Lankan users. Users discover, search, play, and download Pirith audio, and
 listen to it offline. Audio must keep playing when the app is backgrounded or
 the phone screen is locked.
 
-**The interface is in English; Sinhala is reserved for Pirith content** (chant
-names and descriptions, which come from Firestore). The Sinhala ARB file is
-kept complete and in sync so a language switch stays a locale change rather
-than a UI rewrite. See [`docs/08_ui_ux.md`](docs/08_ui_ux.md) for the
-localization approach.
+**The UI shows Sinhala and English together** rather than switching between
+them — Sinhala leads on headers and content names, English sits beneath.
+Both ARB files are therefore load-bearing and must stay in sync; use
+`Bilingual.of(context)` when a screen needs both at once. See
+[`docs/08_ui_ux.md`](docs/08_ui_ux.md) for the localization approach.
 
 ## Technology
 

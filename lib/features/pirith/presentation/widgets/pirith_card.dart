@@ -81,6 +81,7 @@ class PirithCard extends StatelessWidget {
                           item.durationLabel(),
                           style: theme.textTheme.labelSmall,
                         ),
+                        _OfflineBadge(pirithId: item.id),
                         if (item.isPremium) ...[
                           const SizedBox(width: 6),
                           const PremiumBadge(),
@@ -105,6 +106,42 @@ class PirithCard extends StatelessWidget {
             ],
           ),
         ),
+      ),
+    );
+  }
+}
+
+/// "✓ Offline" next to the duration once a Pirith is downloaded, so the
+/// list itself shows what will still play without a connection.
+class _OfflineBadge extends StatelessWidget {
+  const _OfflineBadge({required this.pirithId});
+
+  final String pirithId;
+
+  @override
+  Widget build(BuildContext context) {
+    final isDownloaded = context.select<DownloadBloc, bool>((bloc) {
+      final state = bloc.state;
+      if (state is! DownloadsLoaded) return false;
+      return state.statusFor(pirithId)?.status == DownloadStatus.downloaded;
+    });
+    if (!isDownloaded) return const SizedBox.shrink();
+
+    final l10n = AppLocalizations.of(context);
+    return Padding(
+      padding: const EdgeInsets.only(left: AppSpacing.sm),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const Icon(Icons.check, size: 12, color: AppColors.green),
+          const SizedBox(width: 2),
+          Text(
+            l10n.labelOffline,
+            style: Theme.of(
+              context,
+            ).textTheme.labelSmall?.copyWith(color: AppColors.green),
+          ),
+        ],
       ),
     );
   }

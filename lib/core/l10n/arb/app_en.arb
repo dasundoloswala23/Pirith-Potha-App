@@ -70,6 +70,37 @@
   "socialFacebookCta": "Go to Facebook",
   "premiumRequiredMessage": "This is premium content. Premium is coming soon.",
   "categoryEmpty": "No Pirith in this category yet",
+  "settingsAppearance": "Appearance",
+  "settingsPlayback": "Playback",
+  "settingsStorage": "Storage",
+  "settingsAbout": "About",
+  "settingsDarkMode": "Dark Mode",
+  "settingsBackgroundPlayback": "Background Playback",
+  "settingsAudioQuality": "Audio Quality",
+  "settingsAutoDownloadWifi": "Auto-Download on Wi-Fi",
+  "settingsStorageUsed": "Storage Used",
+  "settingsClearDownloads": "Clear All Downloads",
+  "searchRecent": "Recent Searches",
+  "searchEmptyHint": "Search by Sinhala or English name",
+  "downloadsOfflineReady": "Offline ready",
+  "downloadsAvailableOffline": "{count} pirith available offline",
+  "@downloadsAvailableOffline": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "favoritesSavedCount": "{count} saved",
+  "@favoritesSavedCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "labelFeatured": "Featured",
+  "labelOffline": "Offline",
   "catalogueErrorGeneric": "Couldn't load the Pirith catalogue. Check your connection and try again.",
   "categoryPirithCount": "{count} Pirith",
   "@categoryPirithCount": {

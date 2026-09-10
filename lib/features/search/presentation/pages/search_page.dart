@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/constants/app_route_paths.dart';
+import '../../../../app/theme/app_typography.dart';
 import '../../../../core/l10n/app_localizations.dart';
+import '../../../../core/l10n/bilingual.dart';
 import '../../../../core/widgets/pirith_mark.dart';
 import '../../../pirith/presentation/widgets/catalogue_loaded_builder.dart';
 import '../../../pirith/presentation/widgets/pirith_card.dart';
@@ -36,7 +38,8 @@ class _SearchPageState extends State<SearchPage> {
           autofocus: true,
           decoration: InputDecoration(
             prefixIcon: const Icon(Icons.search),
-            hintText: l10n.searchHint,
+            hintText:
+                '${Bilingual.of(context).si.navSearch} · ${Bilingual.of(context).en.searchHint}',
           ),
           onChanged: (_) => setState(() {}),
         ),
@@ -123,7 +126,22 @@ class _EmptyHint extends StatelessWidget {
             ).colorScheme.onSurface.withValues(alpha: 0.3),
           ),
           const SizedBox(height: 16),
-          Text(l10n.searchHint),
+          Text(
+            Bilingual.of(context).si.searchEmptyHint,
+            textAlign: TextAlign.center,
+            style: AppTypography.sinhalaTitle(
+              fontSize: 15,
+              color: Theme.of(context).colorScheme.onSurface,
+            ),
+          ),
+          const SizedBox(height: 2),
+          Text(
+            Bilingual.of(context).en.searchEmptyHint,
+            textAlign: TextAlign.center,
+            style: Theme.of(
+              context,
+            ).textTheme.bodySmall?.copyWith(color: Theme.of(context).colorScheme.primary),
+          ),
         ],
       ),
     );

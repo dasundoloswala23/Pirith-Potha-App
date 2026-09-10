@@ -16,19 +16,31 @@ animation feel (ripple/scale press states, slide-up transitions, the
 gold-accent progress ring on the download button, the mini-player docked
 above the bottom nav) rather than redesigning from scratch.
 
-## Localization — English interface, Sinhala content
+## Localization — both languages shown together
 
-**Current policy (supersedes the earlier "Sinhala-first UI" policy, which in
-turn superseded the original "fully bilingual UI" requirement):** the app's
-**interface** is in **English** — navigation labels, buttons, section
-headings, settings rows, dialogs, and error messages. **Sinhala is reserved
-for Pirith content itself**: chant names and descriptions, which come from
-Firestore (`titleSinhala`, `descriptionSinhala`) rather than from the ARB
-files. So a Pirith card shows its Sinhala title with the English title
-beneath it, under English section headings.
+**Current policy (supersedes the earlier "English interface" and
+"Sinhala-first UI" policies):** the UI shows **Sinhala and English at the
+same time** rather than switching between them, per the approved design
+prototype:
 
-There is **no in-app language switcher** — don't build one unless explicitly
-requested again.
+- **Screen headers**: Sinhala large, English small and gold beneath it —
+  "සැකසුම්" over "Settings", "බාගත කළ" over "Downloads · 4 pirith".
+- **Settings rows**: the reverse — English label leading, Sinhala beneath.
+- **Section headers**: Sinhala on the left; on the right either a "See all"
+  action or the English name of the same section.
+- **Pirith and category names**: Sinhala from Firestore first, English
+  beneath.
+- **Search placeholder**: both, e.g. "සොයන්න · Search Pirith...".
+
+There is **no in-app language switcher** — both languages are always
+visible, so a switch would have nothing to do. Don't build one unless
+explicitly requested again.
+
+Because screens need *both* translations of a key at once,
+`AppLocalizations.of(context)` alone isn't enough. Use
+`Bilingual.of(context).si` / `.en` (`lib/core/l10n/bilingual.dart`), which
+pairs the two generated lookups. `AppLocalizations.of(context)` remains
+correct for anything shown in one language only.
 
 - Use Flutter's standard localization stack: `flutter_localizations` + `intl`,
   with ARB files under `lib/core/l10n/arb/app_en.arb` and `app_si.arb`,
@@ -38,11 +50,12 @@ requested again.
   `AppLocalizations` — no hardcoded literal strings in widgets, in either
   language.
 - The app's `MaterialApp` pins `locale: const Locale('en')` directly rather
-  than resolving from the device locale or a mutable controller.
-- The `app_si.arb` file is **kept in sync and complete** — not shown in the
-  current UI, but present so a future language switch is an
-  `AppLocalizations`/`locale` change, not a UI rewrite. Don't delete it or
-  let it drift out of sync with the English strings.
+  than resolving from the device locale or a mutable controller. This only
+  decides the fallback for single-language text and Material's own built-in
+  strings; bilingual pairs come from `Bilingual` regardless.
+- **Both ARB files must stay complete and in sync.** They are no longer a
+  primary/reference pair — each is half of what the UI renders, so a key
+  missing from either one leaves a blank on screen.
 - **Type ramp follows the language of the text, not the app.** Interface text
   uses the English ramp (Inter body/UI, Lora for serif accents). Sinhala
   *content* uses Noto Serif Sinhala (titles) via
