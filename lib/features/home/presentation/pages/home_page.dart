@@ -29,7 +29,7 @@ class HomePage extends StatelessWidget {
         title: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            PirithMark(size: 28, color: Theme.of(context).colorScheme.primary),
+            Image.asset('assets/logo.png', width: 28, height: 28),
             const SizedBox(width: 10),
             Text(l10n.homeTitle),
           ],

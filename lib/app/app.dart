@@ -62,6 +62,7 @@ class _PirithPothaAppState extends State<PirithPothaApp> {
         BlocProvider<PremiumBloc>.value(value: widget.premiumBloc),
       ],
       child: MaterialApp.router(
+        debugShowCheckedModeBanner: false,
         onGenerateTitle: (context) => AppLocalizations.of(context).appName,
         theme: AppTheme.light,
         darkTheme: AppTheme.dark,

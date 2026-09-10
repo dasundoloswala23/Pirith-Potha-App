@@ -7,18 +7,16 @@ import 'package:go_router/go_router.dart';
 
 import '../../core/constants/app_route_paths.dart';
 import '../../core/l10n/app_localizations.dart';
-import '../../core/widgets/pirith_mark.dart';
 import '../../features/auth/presentation/bloc/auth_bloc.dart';
 import '../theme/app_colors.dart';
 import '../theme/app_typography.dart';
 
 /// Branded splash screen shown while the initial guest/auth session is
-/// being established (see docs/06_authentication.md). Timing/visuals match
-/// `SplashScreen` in the approved UI reference
-/// (`Buddhist Audio App UI Design/src/App.tsx`): a slowly spinning dhamma
-/// mark, the title/subtitle fading in, then the loading dots. Moves on to
-/// Home once [AuthBloc] reaches a settled state and the entry sequence has
-/// had time to play out.
+/// being established (see docs/06_authentication.md). Timing/entrance
+/// sequence follows the approved UI reference (`Buddhist Audio App UI
+/// Design/src/App.tsx`): the logo fades in first, then the title/subtitle,
+/// then the loading dots. Moves on to Home once [AuthBloc] reaches a
+/// settled state and the entry sequence has had time to play out.
 class SplashPage extends StatefulWidget {
   const SplashPage({super.key});
 
@@ -29,16 +27,15 @@ class SplashPage extends StatefulWidget {
 class _SplashPageState extends State<SplashPage> with TickerProviderStateMixin {
   static const _minimumDisplayTime = Duration(milliseconds: 2600);
 
-  late final _rotationController = AnimationController(
-    vsync: this,
-    duration: const Duration(seconds: 8),
-  )..repeat();
-
   late final _entryController = AnimationController(
     vsync: this,
     duration: _minimumDisplayTime,
   )..forward();
 
+  late final _logoOpacity = CurvedAnimation(
+    parent: _entryController,
+    curve: const Interval(0, 0.35, curve: Curves.easeOut),
+  );
   late final _titleOpacity = CurvedAnimation(
     parent: _entryController,
     curve: const Interval(0.19, 0.58, curve: Curves.easeOut),
@@ -71,7 +68,6 @@ class _SplashPageState extends State<SplashPage> with TickerProviderStateMixin {
   @override
   void dispose() {
     _minimumTimeTimer?.cancel();
-    _rotationController.dispose();
     _entryController.dispose();
     super.dispose();
   }
@@ -97,12 +93,9 @@ class _SplashPageState extends State<SplashPage> with TickerProviderStateMixin {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    RotationTransition(
-                      turns: _rotationController,
-                      child: Opacity(
-                        opacity: 0.4,
-                        child: const PirithMark(size: 90, color: Color(0xFFD4961E)),
-                      ),
+                    FadeTransition(
+                      opacity: _logoOpacity,
+                      child: Image.asset('assets/logo.png', width: 96, height: 96),
                     ),
                     const SizedBox(height: 32),
                     FadeTransition(
