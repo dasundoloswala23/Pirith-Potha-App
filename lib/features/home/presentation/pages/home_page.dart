@@ -14,6 +14,7 @@ import '../../../pirith/presentation/widgets/category_card.dart';
 import '../../../pirith/presentation/widgets/pirith_artwork.dart';
 import '../../../pirith/presentation/widgets/pirith_card.dart';
 import '../../../player/presentation/bloc/player_bloc.dart';
+import '../../../pirith/presentation/widgets/catalogue_loaded_builder.dart';
 import '../../../premium/presentation/widgets/premium_gate.dart';
 import '../widgets/social_section.dart';
 
@@ -41,39 +42,8 @@ class HomePage extends StatelessWidget {
           ),
         ],
       ),
-      body: BlocBuilder<CatalogueBloc, CatalogueState>(
-        builder: (context, state) {
-          return switch (state) {
-            CatalogueLoading() || CatalogueInitial() =>
-              const Center(child: CircularProgressIndicator()),
-            CatalogueError() => _HomeError(
-                onRetry: () =>
-                    context.read<CatalogueBloc>().add(const CatalogueRefreshRequested()),
-              ),
-            CatalogueLoaded() => _HomeContent(state: state),
-          };
-        },
-      ),
-    );
-  }
-}
-
-class _HomeError extends StatelessWidget {
-  const _HomeError({required this.onRetry});
-
-  final VoidCallback onRetry;
-
-  @override
-  Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
-    return Center(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text(l10n.authErrorGeneric),
-          const SizedBox(height: 12),
-          FilledButton(onPressed: onRetry, child: Text(l10n.actionRetry)),
-        ],
+      body: CatalogueLoadedBuilder(
+        builder: (context, state) => _HomeContent(state: state),
       ),
     );
   }

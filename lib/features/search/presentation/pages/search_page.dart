@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/constants/app_route_paths.dart';
 import '../../../../core/l10n/app_localizations.dart';
 import '../../../../core/widgets/pirith_mark.dart';
-import '../../../pirith/presentation/bloc/catalogue_bloc.dart';
+import '../../../pirith/presentation/widgets/catalogue_loaded_builder.dart';
 import '../../../pirith/presentation/widgets/pirith_card.dart';
 
 /// Client-side substring search over the catalogue already loaded by
@@ -42,12 +41,8 @@ class _SearchPageState extends State<SearchPage> {
           onChanged: (_) => setState(() {}),
         ),
       ),
-      body: BlocBuilder<CatalogueBloc, CatalogueState>(
+      body: CatalogueLoadedBuilder(
         builder: (context, state) {
-          if (state is! CatalogueLoaded) {
-            return const Center(child: CircularProgressIndicator());
-          }
-
           if (_controller.text.trim().isEmpty) {
             return _EmptyHint(l10n: l10n);
           }

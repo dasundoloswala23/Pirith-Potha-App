@@ -29,6 +29,7 @@ import '../../features/history/data/repositories/history_repository_impl.dart';
 import '../../features/history/domain/repositories/history_repository.dart';
 import '../../features/history/domain/usecases/record_played.dart';
 import '../../features/history/presentation/bloc/history_bloc.dart';
+import '../../features/pirith/data/datasources/pirith_local_data_source.dart';
 import '../../features/pirith/data/datasources/pirith_remote_data_source.dart';
 import '../../features/pirith/data/repositories/pirith_repository_impl.dart';
 import '../../features/pirith/domain/repositories/pirith_repository.dart';
@@ -72,7 +73,7 @@ Future<void> configureDependencies() async {
   final prefs = await SharedPreferences.getInstance();
 
   _registerAuthFeature();
-  _registerPirithFeature();
+  _registerPirithFeature(prefs);
   _registerPremiumFeature();
   await _registerDownloadFeature();
   await _registerFavoritesFeature(prefs);
@@ -166,13 +167,17 @@ Future<void> _registerPlayerFeature() async {
     );
 }
 
-void _registerPirithFeature() {
+void _registerPirithFeature(SharedPreferences prefs) {
   getIt
     ..registerLazySingleton<PirithRemoteDataSource>(
       () => FirestorePirithRemoteDataSource(getIt<FirebaseFirestore>()),
     )
+    ..registerLazySingleton<PirithLocalDataSource>(() => PirithLocalDataSource(prefs))
     ..registerLazySingleton<PirithRepository>(
-      () => PirithRepositoryImpl(getIt<PirithRemoteDataSource>()),
+      () => PirithRepositoryImpl(
+        getIt<PirithRemoteDataSource>(),
+        getIt<PirithLocalDataSource>(),
+      ),
     )
     ..registerLazySingleton(() => GetCategories(getIt<PirithRepository>()))
     ..registerLazySingleton(() => GetActivePirith(getIt<PirithRepository>()))

@@ -12,7 +12,7 @@ import '../../../player/presentation/bloc/player_bloc.dart';
 import '../../../premium/presentation/widgets/premium_badge.dart';
 import '../../../premium/presentation/widgets/premium_gate.dart';
 import '../../domain/entities/pirith_entity.dart';
-import '../bloc/catalogue_bloc.dart';
+import '../widgets/catalogue_loaded_builder.dart';
 import '../widgets/pirith_artwork.dart';
 
 /// Real Pirith details, sourced from the already-loaded catalogue. Play/
@@ -27,16 +27,15 @@ class PirithDetailsPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     return Scaffold(
-      body: BlocBuilder<CatalogueBloc, CatalogueState>(
+      body: CatalogueLoadedBuilder(
         builder: (context, state) {
-          if (state is! CatalogueLoaded) {
-            return const Center(child: CircularProgressIndicator());
-          }
           final item = state.pirith.where((p) => p.id == pirithId).firstOrNull;
           if (item == null) {
-            return Scaffold(
-              appBar: AppBar(),
-              body: Center(child: Text(l10n.comingSoon)),
+            return Column(
+              children: [
+                AppBar(),
+                Expanded(child: Center(child: Text(l10n.comingSoon))),
+              ],
             );
           }
           final index = state.pirith.indexOf(item);

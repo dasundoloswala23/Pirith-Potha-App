@@ -5,7 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/constants/app_route_paths.dart';
 import '../../../../core/l10n/app_localizations.dart';
 import '../../../../core/widgets/pirith_mark.dart';
-import '../../../pirith/presentation/bloc/catalogue_bloc.dart';
+import '../../../pirith/presentation/widgets/catalogue_loaded_builder.dart';
 import '../../../pirith/presentation/widgets/pirith_card.dart';
 import '../bloc/favorites_bloc.dart';
 
@@ -26,11 +26,8 @@ class FavoritesPage extends StatelessWidget {
             return _EmptyFavorites(l10n: l10n);
           }
 
-          return BlocBuilder<CatalogueBloc, CatalogueState>(
+          return CatalogueLoadedBuilder(
             builder: (context, catalogueState) {
-              if (catalogueState is! CatalogueLoaded) {
-                return const Center(child: CircularProgressIndicator());
-              }
               // Preserve favoritesState.ids order (most-recently-favorited
               // first) rather than catalogue order.
               final byId = {for (final p in catalogueState.pirith) p.id: p};

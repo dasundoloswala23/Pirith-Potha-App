@@ -68,5 +68,6 @@
   "socialFacebookTitle": "Facebook",
   "socialFacebookSubtitle": "Join our Pirith Potha community",
   "socialFacebookCta": "Go to Facebook",
-  "premiumRequiredMessage": "This is premium content. Premium is coming soon."
+  "premiumRequiredMessage": "This is premium content. Premium is coming soon.",
+  "categoryEmpty": "No Pirith in this category yet"
 }

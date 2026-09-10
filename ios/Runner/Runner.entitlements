@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<!-- Required for sign_in_with_apple (see docs/06_authentication.md).
+	     This file is NOT yet wired into the Xcode project — on a Mac,
+	     open ios/Runner.xcworkspace, select the Runner target, and add
+	     the "Sign in with Apple" capability under Signing & Capabilities;
+	     Xcode will create/link this file (and update project.pbxproj's
+	     CODE_SIGN_ENTITLEMENTS) safely. Hand-editing project.pbxproj from
+	     outside Xcode risks corrupting it, so that step isn't done here. -->
+	<key>com.apple.developer.applesignin</key>
+	<array>
+		<string>Default</string>
+	</array>
+</dict>
+</plist>

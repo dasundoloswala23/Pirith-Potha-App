@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/constants/app_route_paths.dart';
 import '../../../../core/l10n/app_localizations.dart';
-import '../bloc/catalogue_bloc.dart';
+import '../widgets/catalogue_loaded_builder.dart';
 import '../widgets/category_card.dart';
 
 class CategoriesPage extends StatelessWidget {
@@ -15,11 +14,8 @@ class CategoriesPage extends StatelessWidget {
     final l10n = AppLocalizations.of(context);
     return Scaffold(
       appBar: AppBar(title: Text(l10n.sectionCategories)),
-      body: BlocBuilder<CatalogueBloc, CatalogueState>(
+      body: CatalogueLoadedBuilder(
         builder: (context, state) {
-          if (state is! CatalogueLoaded) {
-            return const Center(child: CircularProgressIndicator());
-          }
           return GridView.builder(
             padding: const EdgeInsets.all(16),
             gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(

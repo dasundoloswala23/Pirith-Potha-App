@@ -39,4 +39,43 @@ class PirithModel extends PirithEntity {
       downloadCount: (data['downloadCount'] as num?)?.toInt() ?? 0,
     );
   }
+
+  /// Local on-disk cache (see PirithLocalDataSource) uses the same shape
+  /// as Firestore, so the app can keep showing the catalogue — and
+  /// downloaded Pirith stay properly titled — with no network at all.
+  factory PirithModel.fromJson(Map<String, dynamic> json) {
+    return PirithModel(
+      id: json['id'] as String,
+      title: json['title'] as String,
+      titleSinhala: json['titleSinhala'] as String,
+      description: json['description'] as String,
+      descriptionSinhala: json['descriptionSinhala'] as String,
+      coverUrl: json['coverUrl'] as String,
+      audioUrl: json['audioUrl'] as String,
+      duration: json['duration'] as int,
+      categoryId: json['categoryId'] as String,
+      isPremium: json['isPremium'] as bool,
+      isFeatured: json['isFeatured'] as bool,
+      sortOrder: json['sortOrder'] as int,
+      playCount: json['playCount'] as int,
+      downloadCount: json['downloadCount'] as int,
+    );
+  }
+
+  Map<String, dynamic> toJson() => {
+        'id': id,
+        'title': title,
+        'titleSinhala': titleSinhala,
+        'description': description,
+        'descriptionSinhala': descriptionSinhala,
+        'coverUrl': coverUrl,
+        'audioUrl': audioUrl,
+        'duration': duration,
+        'categoryId': categoryId,
+        'isPremium': isPremium,
+        'isFeatured': isFeatured,
+        'sortOrder': sortOrder,
+        'playCount': playCount,
+        'downloadCount': downloadCount,
+      };
 }

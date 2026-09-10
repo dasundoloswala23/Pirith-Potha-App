@@ -9,6 +9,13 @@
     <uses-permission android:name="android.permission.WAKE_LOCK"/>
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK"/>
+    <!-- Android 13+ requires this to show the playback notification (media
+         controls, lock screen). Declaring it here is necessary but not
+         sufficient — Android also requires a runtime permission request,
+         which isn't implemented yet (see docs/10_testing_checklist.md
+         production-readiness notes); without it, audio still plays, it
+         just has no visible system notification on API 33+. -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
 
     <application
         android:label="pitithpotha"

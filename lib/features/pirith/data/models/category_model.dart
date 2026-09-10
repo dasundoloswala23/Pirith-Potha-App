@@ -19,4 +19,21 @@ class CategoryModel extends CategoryEntity {
       sortOrder: (data['sortOrder'] as num?)?.toInt() ?? 0,
     );
   }
+
+  /// See PirithModel.fromJson — same local-cache purpose.
+  factory CategoryModel.fromJson(Map<String, dynamic> json) {
+    return CategoryModel(
+      id: json['id'] as String,
+      name: json['name'] as String,
+      nameSinhala: json['nameSinhala'] as String,
+      sortOrder: json['sortOrder'] as int,
+    );
+  }
+
+  Map<String, dynamic> toJson() => {
+        'id': id,
+        'name': name,
+        'nameSinhala': nameSinhala,
+        'sortOrder': sortOrder,
+      };
 }

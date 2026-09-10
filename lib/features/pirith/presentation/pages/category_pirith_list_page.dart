@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/constants/app_route_paths.dart';
 import '../../../../core/l10n/app_localizations.dart';
-import '../bloc/catalogue_bloc.dart';
+import '../widgets/catalogue_loaded_builder.dart';
 import '../widgets/pirith_card.dart';
 
 class CategoryPirithListPage extends StatelessWidget {
@@ -16,11 +15,8 @@ class CategoryPirithListPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     return Scaffold(
-      body: BlocBuilder<CatalogueBloc, CatalogueState>(
+      body: CatalogueLoadedBuilder(
         builder: (context, state) {
-          if (state is! CatalogueLoaded) {
-            return const Center(child: CircularProgressIndicator());
-          }
           final category = state.categories.where((c) => c.id == categoryId).firstOrNull;
           final items = state.forCategory(categoryId);
 
@@ -31,7 +27,7 @@ class CategoryPirithListPage extends StatelessWidget {
                 pinned: true,
               ),
               if (items.isEmpty)
-                SliverFillRemaining(child: Center(child: Text(l10n.comingSoon)))
+                SliverFillRemaining(child: Center(child: Text(l10n.categoryEmpty)))
               else
                 SliverPadding(
                   padding: const EdgeInsets.all(16),
