@@ -3,21 +3,21 @@ import 'package:flutter/material.dart';
 import '../../../../core/l10n/app_localizations.dart';
 import '../../../../core/widgets/pirith_mark.dart';
 
-class HomePage extends StatelessWidget {
-  const HomePage({super.key});
+/// Placeholder search screen. Real search is wired up in Phase 4 (Pirith
+/// Catalogue) — see docs/09_development_roadmap.md.
+class SearchPage extends StatelessWidget {
+  const SearchPage({super.key});
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     return Scaffold(
       appBar: AppBar(
-        title: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            PirithMark(size: 28, color: Theme.of(context).colorScheme.primary),
-            const SizedBox(width: 10),
-            Text(l10n.homeTitle),
-          ],
+        title: TextField(
+          decoration: InputDecoration(
+            prefixIcon: const Icon(Icons.search),
+            hintText: l10n.searchHint,
+          ),
         ),
       ),
       body: Center(
@@ -25,7 +25,7 @@ class HomePage extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             PirithMark(
-              size: 64,
+              size: 56,
               color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.3),
             ),
             const SizedBox(height: 16),

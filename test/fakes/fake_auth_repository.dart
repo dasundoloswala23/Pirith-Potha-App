@@ -26,23 +26,27 @@ class FakeAuthRepository implements AuthRepository {
   @override
   Future<AppUser> signInAnonymously() async {
     _user ??= const AppUser(uid: 'guest-1', isAnonymous: true);
+    _controller.add(_user);
     return _user!;
   }
 
   @override
   Future<AppUser> signInWithGoogle() async {
     _user = const AppUser(uid: 'google-user-1', isAnonymous: false, email: 'test@example.com');
+    _controller.add(_user);
     return _user!;
   }
 
   @override
   Future<AppUser> signInWithApple() async {
     _user = const AppUser(uid: 'apple-user-1', isAnonymous: false, email: 'test@example.com');
+    _controller.add(_user);
     return _user!;
   }
 
   @override
   Future<void> signOut() async {
     _user = null;
+    _controller.add(null);
   }
 }

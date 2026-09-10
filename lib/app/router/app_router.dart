@@ -8,15 +8,21 @@ import '../../features/home/presentation/pages/home_page.dart';
 import '../../features/pirith/presentation/pages/pirith_details_page.dart';
 import '../../features/player/presentation/pages/player_page.dart';
 import '../../features/profile/presentation/pages/profile_page.dart';
+import '../../features/search/presentation/pages/search_page.dart';
 import '../widgets/home_shell.dart';
+import '../widgets/splash_page.dart';
 
-/// App-wide route configuration. The four bottom-nav destinations are
+/// App-wide route configuration. The five bottom-nav destinations are
 /// branches of a [StatefulShellRoute] so each keeps its own navigation
-/// stack; details/player are pushed on top full-screen.
+/// stack; splash/details/player are pushed full-screen outside the shell.
 GoRouter buildAppRouter({required LocaleController localeController}) {
   return GoRouter(
-    initialLocation: AppRoutePaths.home,
+    initialLocation: AppRoutePaths.splash,
     routes: [
+      GoRoute(
+        path: AppRoutePaths.splash,
+        builder: (context, state) => const SplashPage(),
+      ),
       StatefulShellRoute.indexedStack(
         builder: (context, state, navigationShell) =>
             HomeShell(navigationShell: navigationShell),
@@ -34,6 +40,14 @@ GoRouter buildAppRouter({required LocaleController localeController}) {
                     ),
                   ),
                 ],
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: AppRoutePaths.search,
+                builder: (context, state) => const SearchPage(),
               ),
             ],
           ),

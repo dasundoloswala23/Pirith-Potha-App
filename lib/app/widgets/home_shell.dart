@@ -3,8 +3,10 @@ import 'package:go_router/go_router.dart';
 
 import '../../core/l10n/app_localizations.dart';
 
-/// Bottom-navigation shell wrapping the four primary top-level destinations.
-/// Used as the [StatefulShellRoute] branch container from the router.
+/// Bottom-navigation shell wrapping the five primary top-level destinations
+/// (Home, Search, Downloads, Favorites, Profile), matching the approved UI
+/// reference's tab order. Used as the [StatefulShellRoute] branch container
+/// from the router.
 class HomeShell extends StatelessWidget {
   const HomeShell({required this.navigationShell, super.key});
 
@@ -26,6 +28,11 @@ class HomeShell extends StatelessWidget {
             icon: const Icon(Icons.home_outlined),
             selectedIcon: const Icon(Icons.home),
             label: l10n.navHome,
+          ),
+          NavigationDestination(
+            icon: const Icon(Icons.search_outlined),
+            selectedIcon: const Icon(Icons.search),
+            label: l10n.navSearch,
           ),
           NavigationDestination(
             icon: const Icon(Icons.download_outlined),

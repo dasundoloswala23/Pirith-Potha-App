@@ -1,5 +1,21 @@
 # 08 — UI/UX
 
+## Visual reference
+
+The approved visual design is a Figma Make prototype at
+`C:\Users\thari\Downloads\Buddhist Audio App UI Design` (React/Tailwind
+source in `src/App.tsx` / `src/index.css`). It is the canonical source for
+exact colors, fonts, spacing, corner radii, and per-screen layout —
+`lib/app/theme/app_colors.dart`, `app_theme.dart`, and `app_typography.dart`
+already port its color tokens and font choices (Noto Serif Sinhala titles,
+Noto Sans Sinhala body, Lora for English serif accents, Inter for UI text)
+and the `PirithMark` widget reproduces its "dhamma wheel" logo exactly.
+When Phases 4–7 build the real Home, Search, Categories, Player, Downloads,
+Favorites, and Settings screens, match this prototype's layout and
+animation feel (ripple/scale press states, slide-up transitions, the
+gold-accent progress ring on the download button, the mini-player docked
+above the bottom nav) rather than redesigning from scratch.
+
 ## Localization (Sinhala + English) — applies to the whole app
 
 The entire app UI ships in **Sinhala and English**, not just chant content.

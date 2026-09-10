@@ -58,6 +58,7 @@ dependencies:
   google_sign_in: ^7.2.0
   sign_in_with_apple: ^8.2.0
   crypto: ^3.0.7
+  google_fonts: ^8.2.1
 
 dev_dependencies:
   flutter_test:
@@ -82,9 +83,11 @@ flutter:
   # the material Icons class.
   uses-material-design: true
 
-  # TODO(phase-ui-polish): bundle a Noto Sans Sinhala font under
-  # assets/fonts/ and register it here once real UI/typography work starts
-  # (see docs/08_ui_ux.md) — system fallback is used for now.
+  # Sinhala/English typography (Noto Serif/Sans Sinhala, Lora, Inter) is
+  # loaded at runtime via the google_fonts package — see
+  # lib/app/theme/app_typography.dart — rather than bundled here. Switch to
+  # google_fonts' bundled-asset mode if guaranteed-offline-on-first-run
+  # typography becomes a requirement.
 
   # To add assets to your application, add an assets section, like this:
   # assets:

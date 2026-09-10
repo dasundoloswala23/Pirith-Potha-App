@@ -5,6 +5,7 @@
     "description": "The application name"
   },
   "navHome": "Home",
+  "navSearch": "Search",
   "navDownloads": "Downloads",
   "navFavorites": "Favorites",
   "navProfile": "Profile",
