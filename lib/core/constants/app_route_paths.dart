@@ -2,6 +2,8 @@
 abstract final class AppRoutePaths {
   static const splash = '/';
   static const home = '/home';
+  static const categories = '/home/categories';
+  static const categoryDetails = '/home/categories/:categoryId';
   static const search = '/search';
   static const downloads = '/downloads';
   static const favorites = '/favorites';
@@ -10,4 +12,5 @@ abstract final class AppRoutePaths {
   static const player = '/player';
 
   static String pirithDetailsFor(String pirithId) => '/pirith/$pirithId';
+  static String categoryDetailsFor(String categoryId) => '/home/categories/$categoryId';
 }

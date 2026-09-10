@@ -13,6 +13,13 @@ import '../../features/auth/domain/usecases/sign_in_with_apple.dart';
 import '../../features/auth/domain/usecases/sign_in_with_google.dart';
 import '../../features/auth/domain/usecases/sign_out.dart';
 import '../../features/auth/presentation/bloc/auth_bloc.dart';
+import '../../features/pirith/data/datasources/pirith_remote_data_source.dart';
+import '../../features/pirith/data/repositories/pirith_repository_impl.dart';
+import '../../features/pirith/domain/repositories/pirith_repository.dart';
+import '../../features/pirith/domain/usecases/get_active_pirith.dart';
+import '../../features/pirith/domain/usecases/get_categories.dart';
+import '../../features/pirith/domain/usecases/get_pirith_by_id.dart';
+import '../../features/pirith/presentation/bloc/catalogue_bloc.dart';
 import '../firebase/analytics_service.dart';
 
 /// App-wide service locator. Repositories/data sources are registered as
@@ -32,9 +39,28 @@ Future<void> configureDependencies() async {
     );
 
   _registerAuthFeature();
+  _registerPirithFeature();
 
-  // Phase 4+ will register catalogue/audio/download repositories and BLoCs
-  // here.
+  // Phase 5+ will register audio/download repositories and BLoCs here.
+}
+
+void _registerPirithFeature() {
+  getIt
+    ..registerLazySingleton<PirithRemoteDataSource>(
+      () => FirestorePirithRemoteDataSource(getIt<FirebaseFirestore>()),
+    )
+    ..registerLazySingleton<PirithRepository>(
+      () => PirithRepositoryImpl(getIt<PirithRemoteDataSource>()),
+    )
+    ..registerLazySingleton(() => GetCategories(getIt<PirithRepository>()))
+    ..registerLazySingleton(() => GetActivePirith(getIt<PirithRepository>()))
+    ..registerLazySingleton(() => GetPirithById(getIt<PirithRepository>()))
+    ..registerLazySingleton(
+      () => CatalogueBloc(
+        getCategories: getIt<GetCategories>(),
+        getActivePirith: getIt<GetActivePirith>(),
+      )..add(const CatalogueStarted()),
+    );
 }
 
 void _registerAuthFeature() {

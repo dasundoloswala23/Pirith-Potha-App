@@ -34,5 +34,7 @@
   "actionPause": "විරාමය",
   "actionDownload": "බාගන්න",
   "actionFavorite": "ප්‍රියතම",
-  "comingSoon": "ඉක්මනින් පැමිණේ"
+  "comingSoon": "ඉක්මනින් පැමිණේ",
+  "actionRetry": "නැවත උත්සාහ කරන්න",
+  "actionSeeAll": "සියල්ල බලන්න"
 }

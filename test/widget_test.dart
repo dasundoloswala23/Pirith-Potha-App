@@ -8,8 +8,12 @@ import 'package:pitithpotha/features/auth/domain/usecases/sign_in_with_apple.dar
 import 'package:pitithpotha/features/auth/domain/usecases/sign_in_with_google.dart';
 import 'package:pitithpotha/features/auth/domain/usecases/sign_out.dart';
 import 'package:pitithpotha/features/auth/presentation/bloc/auth_bloc.dart';
+import 'package:pitithpotha/features/pirith/domain/usecases/get_active_pirith.dart';
+import 'package:pitithpotha/features/pirith/domain/usecases/get_categories.dart';
+import 'package:pitithpotha/features/pirith/presentation/bloc/catalogue_bloc.dart';
 
 import 'fakes/fake_auth_repository.dart';
+import 'fakes/fake_pirith_repository.dart';
 
 void main() {
   setUpAll(() {
@@ -32,7 +36,16 @@ void main() {
     )..add(const AuthStarted());
     addTearDown(authBloc.close);
 
-    await tester.pumpWidget(PirithPothaApp(authBloc: authBloc));
+    final fakePirithRepository = FakePirithRepository();
+    final catalogueBloc = CatalogueBloc(
+      getCategories: GetCategories(fakePirithRepository),
+      getActivePirith: GetActivePirith(fakePirithRepository),
+    )..add(const CatalogueStarted());
+    addTearDown(catalogueBloc.close);
+
+    await tester.pumpWidget(
+      PirithPothaApp(authBloc: authBloc, catalogueBloc: catalogueBloc),
+    );
     expect(find.byType(PirithPothaApp), findsOneWidget);
 
     // The splash screen holds for a minimum display time and drives a

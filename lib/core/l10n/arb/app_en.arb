@@ -37,5 +37,7 @@
   "actionPause": "Pause",
   "actionDownload": "Download",
   "actionFavorite": "Favorite",
-  "comingSoon": "Coming soon"
+  "comingSoon": "Coming soon",
+  "actionRetry": "Retry",
+  "actionSeeAll": "See all"
 }

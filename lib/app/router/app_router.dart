@@ -5,6 +5,8 @@ import '../../core/l10n/locale_controller.dart';
 import '../../features/downloads/presentation/pages/downloads_page.dart';
 import '../../features/favorites/presentation/pages/favorites_page.dart';
 import '../../features/home/presentation/pages/home_page.dart';
+import '../../features/pirith/presentation/pages/categories_page.dart';
+import '../../features/pirith/presentation/pages/category_pirith_list_page.dart';
 import '../../features/pirith/presentation/pages/pirith_details_page.dart';
 import '../../features/player/presentation/pages/player_page.dart';
 import '../../features/profile/presentation/pages/profile_page.dart';
@@ -38,6 +40,18 @@ GoRouter buildAppRouter({required LocaleController localeController}) {
                     builder: (context, state) => PirithDetailsPage(
                       pirithId: state.pathParameters['pirithId']!,
                     ),
+                  ),
+                  GoRoute(
+                    path: 'categories',
+                    builder: (context, state) => const CategoriesPage(),
+                    routes: [
+                      GoRoute(
+                        path: ':categoryId',
+                        builder: (context, state) => CategoryPirithListPage(
+                          categoryId: state.pathParameters['categoryId']!,
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),

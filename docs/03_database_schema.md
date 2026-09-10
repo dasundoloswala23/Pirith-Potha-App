@@ -36,10 +36,18 @@ premium/plans
   "isFeatured": false,
   "isActive": true,
   "sortOrder": 1,
+  "playCount": 0,
+  "downloadCount": 0,
   "createdAt": "timestamp",
   "updatedAt": "timestamp"
 }
 ```
+
+`playCount`/`downloadCount` are aggregate counters (written server-side, e.g.
+by a Cloud Function reacting to play/download analytics events — never
+incremented directly by the client) used to sort "Popular" sections; they
+default to `0` and are read-only from the mobile app. Kept in sync with the
+admin app's schema doc, which introduced them first.
 
 ### `categories/{categoryId}`
 

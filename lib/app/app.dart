@@ -5,16 +5,23 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import '../core/l10n/app_localizations.dart';
 import '../core/l10n/locale_controller.dart';
 import '../features/auth/presentation/bloc/auth_bloc.dart';
+import '../features/pirith/presentation/bloc/catalogue_bloc.dart';
 import 'router/app_router.dart';
 import 'theme/app_theme.dart';
 
-/// [authBloc] is injected rather than pulled from the global service
-/// locator here, so widget tests can supply a fake-repository-backed
-/// instance instead of needing a live Firebase connection.
+/// [authBloc]/[catalogueBloc] are injected rather than pulled from the
+/// global service locator here, so widget tests can supply
+/// fake-repository-backed instances instead of needing a live Firebase
+/// connection.
 class PirithPothaApp extends StatefulWidget {
-  const PirithPothaApp({required this.authBloc, super.key});
+  const PirithPothaApp({
+    required this.authBloc,
+    required this.catalogueBloc,
+    super.key,
+  });
 
   final AuthBloc authBloc;
+  final CatalogueBloc catalogueBloc;
 
   @override
   State<PirithPothaApp> createState() => _PirithPothaAppState();
@@ -32,8 +39,11 @@ class _PirithPothaAppState extends State<PirithPothaApp> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider<AuthBloc>.value(
-      value: widget.authBloc,
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider<AuthBloc>.value(value: widget.authBloc),
+        BlocProvider<CatalogueBloc>.value(value: widget.catalogueBloc),
+      ],
       child: ValueListenableBuilder<Locale>(
         valueListenable: _localeController,
         builder: (context, locale, _) {
