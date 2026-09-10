@@ -56,6 +56,13 @@
             <action android:name="android.intent.action.MEDIA_BUTTON" />
           </intent-filter>
         </receiver>
+
+        <!-- AdMob: Google's public test App ID (see lib/core/constants/ad_unit_ids.dart).
+             TODO(admob-production): replace with the real App ID from your
+             AdMob console before release. -->
+        <meta-data
+            android:name="com.google.android.gms.ads.APPLICATION_ID"
+            android:value="ca-app-pub-3940256099942544~3347511713"/>
     </application>
     <!-- Required to query activities that can process text, see:
          https://developer.android.com/training/package-visibility and

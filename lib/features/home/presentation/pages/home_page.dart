@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../../../app/theme/app_typography.dart';
 import '../../../../core/constants/app_route_paths.dart';
 import '../../../../core/l10n/app_localizations.dart';
+import '../../../../core/ads/widgets/banner_ad_widget.dart';
 import '../../../../core/widgets/pirith_mark.dart';
 import '../../../history/presentation/bloc/history_bloc.dart';
 import '../../../pirith/domain/entities/pirith_entity.dart';
@@ -201,6 +202,12 @@ class _HomeContent extends StatelessWidget {
             ),
           ),
         ],
+        const SliverToBoxAdapter(
+          child: Padding(
+            padding: EdgeInsets.symmetric(vertical: 8),
+            child: BannerAdWidget(),
+          ),
+        ),
         if (featured == null && popular.isEmpty)
           SliverToBoxAdapter(
             child: Padding(

@@ -44,6 +44,8 @@ import '../../features/player/domain/usecases/resume_playback.dart';
 import '../../features/player/domain/usecases/seek_playback.dart';
 import '../../features/player/domain/usecases/stop_playback.dart';
 import '../../features/player/presentation/bloc/player_bloc.dart';
+import '../ads/ad_service.dart';
+import '../ads/mobile_ads_service.dart';
 import '../audio/audio_service_initializer.dart';
 import '../audio/pirith_audio_handler.dart';
 import '../firebase/analytics_service.dart';
@@ -72,6 +74,13 @@ Future<void> configureDependencies() async {
   await _registerFavoritesFeature(prefs);
   await _registerHistoryFeature(prefs);
   await _registerPlayerFeature();
+  await _registerAdsFeature();
+}
+
+Future<void> _registerAdsFeature() async {
+  final service = MobileAdsService();
+  await service.initialize();
+  getIt.registerSingleton<AdService>(service);
 }
 
 Future<void> _registerFavoritesFeature(SharedPreferences prefs) async {
