@@ -49,6 +49,7 @@ class PirithDetailsPage extends StatelessWidget {
                     children: [
                       PirithArtwork(
                         pirithId: item.id,
+                        coverUrl: item.coverUrl,
                         size: 160,
                         radius: AppRadius.lg,
                       ),

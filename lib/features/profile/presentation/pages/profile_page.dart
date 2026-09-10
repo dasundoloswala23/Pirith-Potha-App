@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
+
+import '../../../../core/constants/app_route_paths.dart';
 
 import '../../../../core/l10n/app_localizations.dart';
 import '../../../../core/l10n/bilingual.dart';
@@ -119,6 +122,15 @@ class ProfilePage extends StatelessWidget {
                 SettingsSection(
                   title: bi.en.settingsAbout,
                   children: [
+                    // Favorites lost its bottom-nav tab in the five-tab
+                    // layout, so it needs a home here as well as on Home.
+                    SettingsRow(
+                      icon: Icons.favorite_outline,
+                      english: bi.en.favoritesTitle,
+                      sinhala: bi.si.favoritesTitle,
+                      trailing: const Icon(Icons.chevron_right, size: 20),
+                      onTap: () => context.push(AppRoutePaths.favorites),
+                    ),
                     SettingsRow(
                       icon: Icons.workspace_premium_outlined,
                       english: bi.en.profilePremium,

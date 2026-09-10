@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 
 import '../../../../app/theme/app_spacing.dart';
+import '../../../../app/theme/app_typography.dart';
 import '../../../../core/constants/social_links.dart';
 import '../../../../core/l10n/app_localizations.dart';
+import '../../../../core/l10n/bilingual.dart';
 import '../../../../core/services/external_link_launcher.dart';
 
 /// Invitation to follow the official YouTube/Facebook presence — see
@@ -14,6 +16,7 @@ class SocialSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+    final bi = Bilingual.of(context);
     final theme = Theme.of(context);
 
     if (SocialLinks.youTubeUrl.isEmpty && SocialLinks.facebookUrl.isEmpty) {
@@ -25,23 +28,28 @@ class SocialSection extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Interface text, so it uses the English type ramp rather than
-          // the Sinhala serif face reserved for Pirith content.
           Text(
-            l10n.socialHeading,
-            style: theme.textTheme.titleMedium?.copyWith(
-              fontWeight: FontWeight.w600,
+            bi.si.socialHeading,
+            style: AppTypography.sinhalaTitle(
+              fontSize: 17,
               color: theme.colorScheme.onSurface,
             ),
           ),
-          const SizedBox(height: AppSpacing.xs),
-          Text(l10n.socialSubtitle, style: theme.textTheme.bodySmall),
+          Text(
+            bi.en.socialHeading,
+            style: theme.textTheme.bodySmall?.copyWith(
+              color: theme.colorScheme.primary,
+            ),
+          ),
+          const SizedBox(height: AppSpacing.sm),
+          Text(bi.si.socialSubtitle, style: theme.textTheme.bodySmall),
           const SizedBox(height: AppSpacing.lg),
           if (SocialLinks.youTubeUrl.isNotEmpty)
             _SocialCard(
               icon: Icons.play_circle_fill,
               iconColor: const Color(0xFFFF0000),
               title: l10n.socialYouTubeTitle,
+              sinhalaTitle: bi.si.socialYouTubeTitle,
               subtitle: l10n.socialYouTubeSubtitle,
               cta: l10n.socialYouTubeCta,
               url: SocialLinks.youTubeUrl,
@@ -54,6 +62,7 @@ class SocialSection extends StatelessWidget {
               icon: Icons.facebook,
               iconColor: const Color(0xFF1877F2),
               title: l10n.socialFacebookTitle,
+              sinhalaTitle: bi.si.socialFacebookTitle,
               subtitle: l10n.socialFacebookSubtitle,
               cta: l10n.socialFacebookCta,
               url: SocialLinks.facebookUrl,
@@ -69,6 +78,7 @@ class _SocialCard extends StatelessWidget {
     required this.icon,
     required this.iconColor,
     required this.title,
+    required this.sinhalaTitle,
     required this.subtitle,
     required this.cta,
     required this.url,
@@ -77,6 +87,7 @@ class _SocialCard extends StatelessWidget {
   final IconData icon;
   final Color iconColor;
   final String title;
+  final String sinhalaTitle;
   final String subtitle;
   final String cta;
   final String url;
@@ -101,10 +112,16 @@ class _SocialCard extends StatelessWidget {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Text(
-                      title,
-                      style: theme.textTheme.bodyMedium?.copyWith(
-                        fontWeight: FontWeight.w600,
+                      sinhalaTitle,
+                      style: AppTypography.sinhalaTitle(
+                        fontSize: 14,
                         color: theme.colorScheme.onSurface,
+                      ),
+                    ),
+                    Text(
+                      title,
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: theme.colorScheme.primary,
                       ),
                     ),
                     const SizedBox(height: AppSpacing.xs),

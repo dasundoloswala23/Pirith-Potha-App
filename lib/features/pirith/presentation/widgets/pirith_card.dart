@@ -49,6 +49,7 @@ class PirithCard extends StatelessWidget {
             children: [
               PirithArtwork(
                 pirithId: item.id,
+                coverUrl: item.coverUrl,
                 size: compact ? 44 : 56,
                 radius: AppRadius.sm,
               ),

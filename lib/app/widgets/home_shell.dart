@@ -36,9 +36,14 @@ class HomeShell extends StatelessWidget {
                 label: l10n.navHome,
               ),
               NavigationDestination(
-                icon: const Icon(Icons.search_outlined),
-                selectedIcon: const Icon(Icons.search),
-                label: l10n.navSearch,
+                icon: const Icon(Icons.menu_book_outlined),
+                selectedIcon: const Icon(Icons.menu_book),
+                label: l10n.navPirith,
+              ),
+              NavigationDestination(
+                icon: const Icon(Icons.grid_view_outlined),
+                selectedIcon: const Icon(Icons.grid_view),
+                label: l10n.navCategories,
               ),
               NavigationDestination(
                 icon: const Icon(Icons.download_outlined),
@@ -46,13 +51,8 @@ class HomeShell extends StatelessWidget {
                 label: l10n.navDownloads,
               ),
               NavigationDestination(
-                icon: const Icon(Icons.favorite_outline),
-                selectedIcon: const Icon(Icons.favorite),
-                label: l10n.navFavorites,
-              ),
-              NavigationDestination(
-                icon: const Icon(Icons.person_outline),
-                selectedIcon: const Icon(Icons.person),
+                icon: const Icon(Icons.settings_outlined),
+                selectedIcon: const Icon(Icons.settings),
                 label: l10n.navProfile,
               ),
             ],

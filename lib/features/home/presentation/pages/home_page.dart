@@ -45,6 +45,11 @@ class HomePage extends StatelessWidget {
         ),
         actions: [
           IconButton(
+            icon: const Icon(Icons.favorite_outline),
+            tooltip: l10n.favoritesTitle,
+            onPressed: () => context.push(AppRoutePaths.favorites),
+          ),
+          IconButton(
             icon: const Icon(Icons.history),
             tooltip: l10n.sectionRecentlyPlayed,
             onPressed: () => context.push(AppRoutePaths.recentlyPlayed),
@@ -85,20 +90,52 @@ class _HomeContent extends StatelessWidget {
                 AppSpacing.lg,
                 0,
               ),
+              // A tappable mock of a search field rather than a disabled
+              // TextField: `enabled: false` suppresses the hint entirely, so
+              // the bar rendered blank.
               child: InkWell(
                 borderRadius: BorderRadius.circular(AppRadius.md),
-                onTap: () => context.push(AppRoutePaths.search),
-                child: InputDecorator(
-                  decoration: InputDecoration(
-                    prefixIcon: const Icon(Icons.search),
-                    hintText: '${bi.si.navSearch} · ${bi.en.searchHint}',
-                    enabled: false,
+                onTap: () => context.go(AppRoutePaths.pirithList),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: AppSpacing.md,
+                    vertical: AppSpacing.md,
                   ),
-                  child: const SizedBox(height: 20),
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).colorScheme.surface,
+                    borderRadius: BorderRadius.circular(AppRadius.md),
+                    border: Border.all(color: AppColors.lightBorder),
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(
+                        Icons.search,
+                        size: 20,
+                        color: Theme.of(
+                          context,
+                        ).colorScheme.onSurface.withValues(alpha: 0.5),
+                      ),
+                      const SizedBox(width: AppSpacing.sm),
+                      Expanded(
+                        child: Text(
+                          '${bi.si.navSearch} · ${bi.en.searchHint}',
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: Theme.of(context).textTheme.bodyMedium
+                              ?.copyWith(
+                                color: Theme.of(
+                                  context,
+                                ).colorScheme.onSurface.withValues(alpha: 0.5),
+                              ),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
           ),
+          const SliverToBoxAdapter(child: SocialSection()),
           if (featured != null) ...[
             SliverToBoxAdapter(
               child: _SectionHeader(
@@ -162,7 +199,7 @@ class _HomeContent extends StatelessWidget {
                 title: bi.si.sectionCategories,
                 englishTitle: bi.en.sectionCategories,
                 seeAllLabel: l10n.actionSeeAll,
-                onSeeAll: () => context.push(AppRoutePaths.categories),
+                onSeeAll: () => context.go(AppRoutePaths.categories),
               ),
             ),
             SliverToBoxAdapter(
@@ -247,8 +284,7 @@ class _HomeContent extends StatelessWidget {
                 ),
               ),
             ),
-          const SliverToBoxAdapter(child: SocialSection()),
-          const SliverToBoxAdapter(child: SizedBox(height: 16)),
+          const SliverToBoxAdapter(child: SizedBox(height: AppSpacing.lg)),
         ],
       ),
     );
@@ -335,7 +371,12 @@ class _RecentTile extends StatelessWidget {
         width: 72,
         child: Column(
           children: [
-            PirithArtwork(pirithId: item.id, size: 64, radius: AppRadius.sm),
+            PirithArtwork(
+              pirithId: item.id,
+              coverUrl: item.coverUrl,
+              size: 64,
+              radius: AppRadius.sm,
+            ),
             const SizedBox(height: AppSpacing.sm),
             Text(
               item.titleSinhala,
@@ -376,7 +417,12 @@ class _FeaturedCard extends StatelessWidget {
         child: Stack(
           fit: StackFit.expand,
           children: [
-            PirithArtwork(pirithId: item.id, size: 400, radius: 0),
+            PirithArtwork(
+              pirithId: item.id,
+              coverUrl: item.coverUrl,
+              size: 400,
+              radius: 0,
+            ),
             Container(
               decoration: BoxDecoration(
                 gradient: LinearGradient(

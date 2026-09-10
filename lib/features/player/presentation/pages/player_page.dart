@@ -51,7 +51,12 @@ class _NowPlaying extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          PirithArtwork(pirithId: state.item.id, size: 220, radius: 24),
+          PirithArtwork(
+            pirithId: state.item.id,
+            coverUrl: state.item.coverUrl,
+            size: 220,
+            radius: 24,
+          ),
           const SizedBox(height: 28),
           Text(
             state.item.titleSinhala,

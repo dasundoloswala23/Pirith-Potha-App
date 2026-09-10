@@ -10,9 +10,9 @@ import '../../features/home/presentation/pages/home_page.dart';
 import '../../features/pirith/presentation/pages/categories_page.dart';
 import '../../features/pirith/presentation/pages/category_pirith_list_page.dart';
 import '../../features/pirith/presentation/pages/pirith_details_page.dart';
+import '../../features/pirith/presentation/pages/pirith_list_page.dart';
 import '../../features/player/presentation/pages/player_page.dart';
 import '../../features/profile/presentation/pages/profile_page.dart';
-import '../../features/search/presentation/pages/search_page.dart';
 import '../widgets/home_shell.dart';
 import '../widgets/splash_page.dart';
 
@@ -42,26 +42,14 @@ GoRouter buildAppRouter({NavigatorObserver? adObserver}) {
                 builder: (context, state) => const HomePage(),
                 routes: [
                   GoRoute(
-                    path: 'pirith/:pirithId',
-                    builder: (context, state) => PirithDetailsPage(
-                      pirithId: state.pathParameters['pirithId']!,
-                    ),
-                  ),
-                  GoRoute(
                     path: 'recently-played',
                     builder: (context, state) => const RecentlyPlayedPage(),
                   ),
+                  // Favorites is no longer a bottom-nav destination (five
+                  // tabs already), so it's reached from Home and Settings.
                   GoRoute(
-                    path: 'categories',
-                    builder: (context, state) => const CategoriesPage(),
-                    routes: [
-                      GoRoute(
-                        path: ':categoryId',
-                        builder: (context, state) => CategoryPirithListPage(
-                          categoryId: state.pathParameters['categoryId']!,
-                        ),
-                      ),
-                    ],
+                    path: 'favorites',
+                    builder: (context, state) => const FavoritesPage(),
                   ),
                 ],
               ),
@@ -70,8 +58,32 @@ GoRouter buildAppRouter({NavigatorObserver? adObserver}) {
           StatefulShellBranch(
             routes: [
               GoRoute(
-                path: AppRoutePaths.search,
-                builder: (context, state) => const SearchPage(),
+                path: AppRoutePaths.pirithList,
+                builder: (context, state) => const PirithListPage(),
+                routes: [
+                  GoRoute(
+                    path: ':pirithId',
+                    builder: (context, state) => PirithDetailsPage(
+                      pirithId: state.pathParameters['pirithId']!,
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: AppRoutePaths.categories,
+                builder: (context, state) => const CategoriesPage(),
+                routes: [
+                  GoRoute(
+                    path: ':categoryId',
+                    builder: (context, state) => CategoryPirithListPage(
+                      categoryId: state.pathParameters['categoryId']!,
+                    ),
+                  ),
+                ],
               ),
             ],
           ),
@@ -80,14 +92,6 @@ GoRouter buildAppRouter({NavigatorObserver? adObserver}) {
               GoRoute(
                 path: AppRoutePaths.downloads,
                 builder: (context, state) => const DownloadsPage(),
-              ),
-            ],
-          ),
-          StatefulShellBranch(
-            routes: [
-              GoRoute(
-                path: AppRoutePaths.favorites,
-                builder: (context, state) => const FavoritesPage(),
               ),
             ],
           ),

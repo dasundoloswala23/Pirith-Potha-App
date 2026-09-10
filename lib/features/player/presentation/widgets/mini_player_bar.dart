@@ -45,6 +45,7 @@ class MiniPlayerBar extends StatelessWidget {
                     children: [
                       PirithArtwork(
                         pirithId: state.item.id,
+                        coverUrl: state.item.coverUrl,
                         size: 36,
                         radius: 8,
                       ),
