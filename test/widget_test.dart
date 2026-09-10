@@ -8,6 +8,10 @@ import 'package:pitithpotha/features/auth/domain/usecases/sign_in_with_apple.dar
 import 'package:pitithpotha/features/auth/domain/usecases/sign_in_with_google.dart';
 import 'package:pitithpotha/features/auth/domain/usecases/sign_out.dart';
 import 'package:pitithpotha/features/auth/presentation/bloc/auth_bloc.dart';
+import 'package:pitithpotha/features/downloads/domain/usecases/cancel_download.dart';
+import 'package:pitithpotha/features/downloads/domain/usecases/delete_download.dart';
+import 'package:pitithpotha/features/downloads/domain/usecases/download_pirith.dart';
+import 'package:pitithpotha/features/downloads/presentation/bloc/download_bloc.dart';
 import 'package:pitithpotha/features/pirith/domain/usecases/get_active_pirith.dart';
 import 'package:pitithpotha/features/pirith/domain/usecases/get_categories.dart';
 import 'package:pitithpotha/features/pirith/presentation/bloc/catalogue_bloc.dart';
@@ -20,6 +24,7 @@ import 'package:pitithpotha/features/player/presentation/bloc/player_bloc.dart';
 
 import 'fakes/fake_audio_repository.dart';
 import 'fakes/fake_auth_repository.dart';
+import 'fakes/fake_download_repository.dart';
 import 'fakes/fake_pirith_repository.dart';
 
 void main() {
@@ -61,11 +66,21 @@ void main() {
     );
     addTearDown(playerBloc.close);
 
+    final fakeDownloadRepository = FakeDownloadRepository();
+    final downloadBloc = DownloadBloc(
+      downloadRepository: fakeDownloadRepository,
+      downloadPirith: DownloadPirith(fakeDownloadRepository),
+      cancelDownload: CancelDownload(fakeDownloadRepository),
+      deleteDownload: DeleteDownload(fakeDownloadRepository),
+    );
+    addTearDown(downloadBloc.close);
+
     await tester.pumpWidget(
       PirithPothaApp(
         authBloc: authBloc,
         catalogueBloc: catalogueBloc,
         playerBloc: playerBloc,
+        downloadBloc: downloadBloc,
       ),
     );
     expect(find.byType(PirithPothaApp), findsOneWidget);

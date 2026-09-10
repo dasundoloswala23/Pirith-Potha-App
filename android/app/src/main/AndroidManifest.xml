@@ -1,5 +1,10 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
+    <!-- Required for Firebase (Auth/Firestore/Storage), audio streaming,
+         and downloads — previously only present in the debug/profile
+         manifests, which isn't enough once the app actually needs network
+         access in release builds too. -->
+    <uses-permission android:name="android.permission.INTERNET"/>
     <!-- Required for background audio playback (audio_service) -->
     <uses-permission android:name="android.permission.WAKE_LOCK"/>
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>

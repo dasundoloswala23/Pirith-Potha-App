@@ -3,14 +3,16 @@ import 'package:audio_service/audio_service.dart';
 import '../../../../core/audio/pirith_audio_handler.dart';
 import '../../../../core/errors/app_exception.dart';
 import '../../../../core/errors/failure.dart';
+import '../../../downloads/domain/repositories/download_repository.dart';
 import '../../../pirith/domain/entities/pirith_entity.dart';
 import '../../domain/entities/playback_status.dart';
 import '../../domain/repositories/audio_repository.dart';
 
 class AudioRepositoryImpl implements AudioRepository {
-  AudioRepositoryImpl(this._handler);
+  AudioRepositoryImpl(this._handler, this._downloadRepository);
 
   final PirithAudioHandler _handler;
+  final DownloadRepository _downloadRepository;
 
   PirithEntity? _currentItem;
 
@@ -29,18 +31,27 @@ class AudioRepositoryImpl implements AudioRepository {
   @override
   Future<void> play(PirithEntity item) async {
     _currentItem = item;
+    // Prefer the local file when this Pirith is downloaded, so playback
+    // needs zero network calls — see docs/05_offline_download.md.
+    final localPath = _downloadRepository.localAudioPathFor(item.id);
+    final source = localPath != null ? Uri.file(localPath).toString() : item.audioUrl;
+
     final mediaItem = MediaItem(
       id: item.id,
       title: item.titleSinhala,
       artist: item.title,
       duration: Duration(seconds: item.duration),
       artUri: item.coverUrl.isNotEmpty ? Uri.tryParse(item.coverUrl) : null,
-      extras: {'audioUrl': item.audioUrl},
+      extras: {'audioUrl': source},
     );
     try {
       await _handler.playMediaItem(mediaItem);
     } catch (_) {
-      throw const AppException(NetworkFailure('Could not play this Pirith'));
+      throw AppException(
+        localPath != null
+            ? const UnknownFailure('Could not play this Pirith')
+            : const NetworkFailure('Could not play this Pirith'),
+      );
     }
   }
 

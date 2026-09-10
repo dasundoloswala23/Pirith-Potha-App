@@ -36,5 +36,10 @@
   "actionFavorite": "ප්‍රියතම",
   "comingSoon": "ඉක්මනින් පැමිණේ",
   "actionRetry": "නැවත උත්සාහ කරන්න",
-  "actionSeeAll": "සියල්ල බලන්න"
+  "actionSeeAll": "සියල්ල බලන්න",
+  "actionCancel": "අවලංගු කරන්න",
+  "actionDelete": "මකන්න",
+  "downloadDeleteConfirmTitle": "බාගත කිරීම ඉවත් කරන්නද?",
+  "downloadDeleteConfirmBody": "නොබැඳි සවන්දීමට මෙම පිරිත නැවත බාගත කළ යුතුය.",
+  "downloadFailed": "බාගත කිරීම අසාර්ථක විය. නැවත උත්සාහ කිරීමට තට්ටු කරන්න."
 }

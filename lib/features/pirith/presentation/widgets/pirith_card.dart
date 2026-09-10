@@ -4,6 +4,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../app/theme/app_colors.dart';
 import '../../../../app/theme/app_typography.dart';
 import '../../../../core/l10n/app_localizations.dart';
+import '../../../downloads/domain/entities/download_entity.dart';
+import '../../../downloads/presentation/bloc/download_bloc.dart';
 import '../../../player/presentation/bloc/player_bloc.dart';
 import '../../domain/entities/pirith_entity.dart';
 import 'pirith_artwork.dart';
@@ -11,9 +13,9 @@ import 'pirith_artwork.dart';
 /// List row matching the reference `PirithCard`: artwork, Sinhala title +
 /// English subtitle + duration, favorite/download/play actions. Tapping the
 /// row opens details ([onTap]); the gold play button starts playback right
-/// away via [PlayerBloc]. Favorite and download aren't implemented until
-/// Phases 6-7, so those buttons show a "coming soon" hint instead of
-/// silently doing nothing.
+/// away via [PlayerBloc]; the download button reflects real
+/// [DownloadBloc] state. Favorite isn't implemented until Phase 7, so that
+/// button still shows a "coming soon" hint.
 class PirithCard extends StatelessWidget {
   const PirithCard({
     required this.item,
@@ -81,10 +83,7 @@ class PirithCard extends StatelessWidget {
                 icon: const Icon(Icons.favorite_outline),
                 onPressed: () => _showComingSoon(context, l10n),
               ),
-              IconButton(
-                icon: const Icon(Icons.download_outlined),
-                onPressed: () => _showComingSoon(context, l10n),
-              ),
+              _DownloadButton(item: item),
               _PlayButton(
                 onTap: () => context.read<PlayerBloc>().add(PlayerPlayRequested(item)),
               ),
@@ -99,6 +98,76 @@ class PirithCard extends StatelessWidget {
     ScaffoldMessenger.of(context)
       ..hideCurrentSnackBar()
       ..showSnackBar(SnackBar(content: Text(l10n.comingSoon)));
+  }
+}
+
+class _DownloadButton extends StatelessWidget {
+  const _DownloadButton({required this.item});
+
+  final PirithEntity item;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final entry = context.select<DownloadBloc, DownloadEntity?>(
+      (bloc) {
+        final state = bloc.state;
+        return state is DownloadsLoaded ? state.statusFor(item.id) : null;
+      },
+    );
+
+    switch (entry?.status) {
+      case DownloadStatus.downloading:
+        return IconButton(
+          icon: SizedBox(
+            width: 20,
+            height: 20,
+            child: CircularProgressIndicator(strokeWidth: 2, value: entry!.progress),
+          ),
+          tooltip: l10n.actionCancel,
+          onPressed: () => context.read<DownloadBloc>().add(DownloadCancelRequested(item.id)),
+        );
+      case DownloadStatus.downloaded:
+        return IconButton(
+          icon: const Icon(Icons.download_done, color: AppColors.green),
+          onPressed: () => _confirmDelete(context, l10n),
+        );
+      case DownloadStatus.failed:
+        return IconButton(
+          icon: const Icon(Icons.error_outline, color: AppColors.maroon),
+          tooltip: l10n.downloadFailed,
+          onPressed: () => context.read<DownloadBloc>().add(DownloadRequested(item)),
+        );
+      case DownloadStatus.notDownloaded:
+      case null:
+        return IconButton(
+          icon: const Icon(Icons.download_outlined),
+          onPressed: () => context.read<DownloadBloc>().add(DownloadRequested(item)),
+        );
+    }
+  }
+
+  Future<void> _confirmDelete(BuildContext context, AppLocalizations l10n) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(l10n.downloadDeleteConfirmTitle),
+        content: Text(l10n.downloadDeleteConfirmBody),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: Text(l10n.actionCancel),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            child: Text(l10n.actionDelete),
+          ),
+        ],
+      ),
+    );
+    if (confirmed == true && context.mounted) {
+      context.read<DownloadBloc>().add(DownloadDeleteRequested(item.id));
+    }
   }
 }
 

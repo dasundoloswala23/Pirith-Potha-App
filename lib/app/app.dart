@@ -5,6 +5,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import '../core/l10n/app_localizations.dart';
 import '../core/l10n/locale_controller.dart';
 import '../features/auth/presentation/bloc/auth_bloc.dart';
+import '../features/downloads/presentation/bloc/download_bloc.dart';
 import '../features/pirith/presentation/bloc/catalogue_bloc.dart';
 import '../features/player/presentation/bloc/player_bloc.dart';
 import 'router/app_router.dart';
@@ -18,12 +19,14 @@ class PirithPothaApp extends StatefulWidget {
     required this.authBloc,
     required this.catalogueBloc,
     required this.playerBloc,
+    required this.downloadBloc,
     super.key,
   });
 
   final AuthBloc authBloc;
   final CatalogueBloc catalogueBloc;
   final PlayerBloc playerBloc;
+  final DownloadBloc downloadBloc;
 
   @override
   State<PirithPothaApp> createState() => _PirithPothaAppState();
@@ -46,6 +49,7 @@ class _PirithPothaAppState extends State<PirithPothaApp> {
         BlocProvider<AuthBloc>.value(value: widget.authBloc),
         BlocProvider<CatalogueBloc>.value(value: widget.catalogueBloc),
         BlocProvider<PlayerBloc>.value(value: widget.playerBloc),
+        BlocProvider<DownloadBloc>.value(value: widget.downloadBloc),
       ],
       child: ValueListenableBuilder<Locale>(
         valueListenable: _localeController,

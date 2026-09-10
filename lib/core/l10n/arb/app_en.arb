@@ -39,5 +39,10 @@
   "actionFavorite": "Favorite",
   "comingSoon": "Coming soon",
   "actionRetry": "Retry",
-  "actionSeeAll": "See all"
+  "actionSeeAll": "See all",
+  "actionCancel": "Cancel",
+  "actionDelete": "Delete",
+  "downloadDeleteConfirmTitle": "Remove download?",
+  "downloadDeleteConfirmBody": "This Pirith will need to be downloaded again to listen offline.",
+  "downloadFailed": "Download failed. Tap to retry."
 }
