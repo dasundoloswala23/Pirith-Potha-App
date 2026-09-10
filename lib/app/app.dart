@@ -1,13 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 
 import '../core/l10n/app_localizations.dart';
 import '../core/l10n/locale_controller.dart';
+import '../features/auth/presentation/bloc/auth_bloc.dart';
 import 'router/app_router.dart';
 import 'theme/app_theme.dart';
 
+/// [authBloc] is injected rather than pulled from the global service
+/// locator here, so widget tests can supply a fake-repository-backed
+/// instance instead of needing a live Firebase connection.
 class PirithPothaApp extends StatefulWidget {
-  const PirithPothaApp({super.key});
+  const PirithPothaApp({required this.authBloc, super.key});
+
+  final AuthBloc authBloc;
 
   @override
   State<PirithPothaApp> createState() => _PirithPothaAppState();
@@ -25,24 +32,27 @@ class _PirithPothaAppState extends State<PirithPothaApp> {
 
   @override
   Widget build(BuildContext context) {
-    return ValueListenableBuilder<Locale>(
-      valueListenable: _localeController,
-      builder: (context, locale, _) {
-        return MaterialApp.router(
-          onGenerateTitle: (context) => AppLocalizations.of(context).appName,
-          theme: AppTheme.light,
-          darkTheme: AppTheme.dark,
-          locale: locale,
-          supportedLocales: AppLocalizations.supportedLocales,
-          localizationsDelegates: const [
-            AppLocalizations.delegate,
-            GlobalMaterialLocalizations.delegate,
-            GlobalWidgetsLocalizations.delegate,
-            GlobalCupertinoLocalizations.delegate,
-          ],
-          routerConfig: _router,
-        );
-      },
+    return BlocProvider<AuthBloc>.value(
+      value: widget.authBloc,
+      child: ValueListenableBuilder<Locale>(
+        valueListenable: _localeController,
+        builder: (context, locale, _) {
+          return MaterialApp.router(
+            onGenerateTitle: (context) => AppLocalizations.of(context).appName,
+            theme: AppTheme.light,
+            darkTheme: AppTheme.dark,
+            locale: locale,
+            supportedLocales: AppLocalizations.supportedLocales,
+            localizationsDelegates: const [
+              AppLocalizations.delegate,
+              GlobalMaterialLocalizations.delegate,
+              GlobalWidgetsLocalizations.delegate,
+              GlobalCupertinoLocalizations.delegate,
+            ],
+            routerConfig: _router,
+          );
+        },
+      ),
     );
   }
 }
