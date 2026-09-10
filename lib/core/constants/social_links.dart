@@ -1,11 +1,10 @@
 /// Centralized official social/community URLs — see docs/08_ui_ux.md.
 /// Never hardcode these inside a widget.
 ///
-/// TODO(social-links): placeholder — replace with Pirith Potha's real
-/// official YouTube channel and Facebook page URLs before release. The
-/// social section hides a card whose URL is empty rather than linking
-/// nowhere.
+/// Facebook is intentionally left empty for now (hides that card — see
+/// SocialSection) until there's a real official Facebook page to link;
+/// TODO(social-links): add it and un-hide once one exists.
 abstract final class SocialLinks {
-  static const youTubeUrl = '';
+  static const youTubeUrl = 'https://www.youtube.com/channel/UC4Ug5ybW6tJS3DKgtKJui3A';
   static const facebookUrl = '';
 }
