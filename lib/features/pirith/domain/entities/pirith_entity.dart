@@ -10,6 +10,7 @@ class PirithEntity extends Equatable {
     required this.descriptionSinhala,
     required this.coverUrl,
     required this.audioUrl,
+    this.youtubeUrl = '',
     required this.duration,
     required this.categoryId,
     required this.isPremium,
@@ -26,6 +27,10 @@ class PirithEntity extends Equatable {
   final String descriptionSinhala;
   final String coverUrl;
   final String audioUrl;
+
+  /// Optional companion video, set per-Pirith in the admin app. Empty when
+  /// there isn't one, which is the common case.
+  final String youtubeUrl;
 
   /// Duration in seconds.
   final int duration;
@@ -51,6 +56,7 @@ class PirithEntity extends Equatable {
         descriptionSinhala,
         coverUrl,
         audioUrl,
+        youtubeUrl,
         duration,
         categoryId,
         isPremium,

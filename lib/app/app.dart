@@ -5,6 +5,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import '../core/ads/ad_service.dart';
 import '../core/ads/player_exit_ad_observer.dart';
 import '../core/l10n/app_localizations.dart';
+import '../core/l10n/language_cubit.dart';
 import '../features/auth/presentation/bloc/auth_bloc.dart';
 import '../features/downloads/presentation/bloc/download_bloc.dart';
 import '../features/favorites/presentation/bloc/favorites_bloc.dart';
@@ -33,6 +34,7 @@ class PirithPothaApp extends StatefulWidget {
     required this.favoritesBloc,
     required this.historyBloc,
     required this.premiumBloc,
+    required this.languageCubit,
     this.adService,
     super.key,
   });
@@ -44,6 +46,7 @@ class PirithPothaApp extends StatefulWidget {
   final FavoritesBloc favoritesBloc;
   final HistoryBloc historyBloc;
   final PremiumBloc premiumBloc;
+  final LanguageCubit languageCubit;
 
   /// Null in widget tests, which build the app without the ad SDK; the
   /// player-exit interstitial is simply not wired up in that case.
@@ -77,6 +80,7 @@ class _PirithPothaAppState extends State<PirithPothaApp> {
         BlocProvider<FavoritesBloc>.value(value: widget.favoritesBloc),
         BlocProvider<HistoryBloc>.value(value: widget.historyBloc),
         BlocProvider<PremiumBloc>.value(value: widget.premiumBloc),
+        BlocProvider<LanguageCubit>.value(value: widget.languageCubit),
       ],
       child: MaterialApp.router(
         debugShowCheckedModeBanner: false,

@@ -6,13 +6,14 @@ import '../../../../core/constants/app_route_paths.dart';
 
 import '../../../../core/l10n/app_localizations.dart';
 import '../../../../core/l10n/bilingual.dart';
+import '../../../../core/l10n/language_cubit.dart';
 import '../../../../core/widgets/bilingual_text.dart';
 import '../../../auth/presentation/bloc/auth_bloc.dart';
 import '../widgets/settings_section.dart';
 
 /// Settings, grouped per the approved design. Sinhala and English are shown
-/// together rather than switched between (see docs/08_ui_ux.md), so there is
-/// no language control here — the Language row states what the app shows.
+/// together rather than switched between (see docs/08_ui_ux.md); the
+/// Language row chooses which of the two *leads*, and never hides either.
 ///
 /// Google/Apple sign-in is intentionally not offered for now. The AuthBloc
 /// events and repository still support it and are left intact; only the
@@ -66,10 +67,7 @@ class ProfilePage extends StatelessWidget {
                       icon: Icons.language,
                       english: bi.en.profileLanguage,
                       sinhala: bi.si.profileLanguage,
-                      trailing: Text(
-                        '${bi.si.profileLanguageValue} · ${bi.en.profileLanguageValue}',
-                        style: Theme.of(context).textTheme.labelSmall,
-                      ),
+                      trailing: const _LanguageToggle(),
                     ),
                   ],
                 ),
@@ -158,6 +156,31 @@ class ProfilePage extends StatelessWidget {
           },
         ),
       ),
+    );
+  }
+}
+
+/// Chooses which language leads in the bilingual UI. Both languages stay
+/// visible either way, so this reorders rather than hides anything.
+class _LanguageToggle extends StatelessWidget {
+  const _LanguageToggle();
+
+  @override
+  Widget build(BuildContext context) {
+    final sinhalaFirst = context.watch<LanguageCubit>().state;
+    return SegmentedButton<bool>(
+      segments: const [
+        ButtonSegment(value: true, label: Text('සිං')),
+        ButtonSegment(value: false, label: Text('EN')),
+      ],
+      selected: {sinhalaFirst},
+      showSelectedIcon: false,
+      style: const ButtonStyle(
+        visualDensity: VisualDensity.compact,
+        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+      ),
+      onSelectionChanged: (selection) =>
+          context.read<LanguageCubit>().setSinhalaFirst(selection.first),
     );
   }
 }

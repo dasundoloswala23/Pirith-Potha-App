@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../app/theme/app_typography.dart';
 import '../../../../core/l10n/app_localizations.dart';
+import '../../../../core/services/external_link_launcher.dart';
 import '../../../downloads/presentation/bloc/download_bloc.dart';
 import '../../../favorites/presentation/widgets/favorite_button.dart';
 import '../../../pirith/presentation/widgets/pirith_artwork.dart';
@@ -68,6 +69,20 @@ class _NowPlaying extends StatelessWidget {
           ),
           const SizedBox(height: 4),
           Text(state.item.title, style: theme.textTheme.bodyMedium),
+          if (state.item.youtubeUrl.isNotEmpty) ...[
+            const SizedBox(height: 12),
+            // Opens in the YouTube app when it's installed, otherwise the
+            // browser — launchExternalUrl already forces an external launch
+            // rather than an in-app webview.
+            OutlinedButton.icon(
+              onPressed: () => launchExternalUrl(state.item.youtubeUrl),
+              icon: const Icon(
+                Icons.play_circle_fill,
+                color: Color(0xFFFF0000),
+              ),
+              label: Text(l10n.actionWatchOnYouTube),
+            ),
+          ],
           const SizedBox(height: 24),
           Row(
             children: [

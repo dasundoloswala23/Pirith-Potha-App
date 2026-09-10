@@ -6,6 +6,8 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:get_it/get_it.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../l10n/language_cubit.dart';
+
 import '../../features/auth/data/datasources/auth_remote_data_source.dart';
 import '../../features/auth/data/datasources/firebase_auth_remote_data_source.dart';
 import '../../features/auth/data/repositories/auth_repository_impl.dart';
@@ -71,6 +73,7 @@ Future<void> configureDependencies() async {
     );
 
   final prefs = await SharedPreferences.getInstance();
+  getIt.registerLazySingleton(() => LanguageCubit(prefs));
 
   _registerAuthFeature();
   _registerPirithFeature(prefs);

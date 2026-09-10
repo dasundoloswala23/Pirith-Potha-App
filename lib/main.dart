@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'app/app.dart';
 import 'core/ads/ad_service.dart';
 import 'core/di/injection_container.dart';
+import 'core/l10n/language_cubit.dart';
 import 'core/firebase/firebase_initializer.dart';
 import 'features/auth/presentation/bloc/auth_bloc.dart';
 import 'features/downloads/presentation/bloc/download_bloc.dart';
@@ -25,6 +26,7 @@ Future<void> main() async {
       favoritesBloc: getIt<FavoritesBloc>(),
       historyBloc: getIt<HistoryBloc>(),
       premiumBloc: getIt<PremiumBloc>(),
+      languageCubit: getIt<LanguageCubit>(),
       adService: getIt<AdService>(),
     ),
   );

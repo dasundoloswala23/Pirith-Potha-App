@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../../app/theme/app_spacing.dart';
 import '../../../../app/theme/app_typography.dart';
+import '../../../../core/l10n/bilingual.dart';
 
 /// Uppercase group heading above a run of settings rows ("APPEARANCE",
 /// "PLAYBACK", "STORAGE") — the grouping from the approved design, which
@@ -68,28 +69,30 @@ class SettingsRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final bi = Bilingual.of(context);
     final color = destructive
         ? theme.colorScheme.error
         : theme.colorScheme.onSurface;
-    final opacity = enabled ? 1.0 : 0.45;
+    final subColor = theme.colorScheme.onSurface.withValues(alpha: 0.6);
+    final (lead, sub) = bi.order(sinhala, english);
+
+    // Font follows the language, not the line, so flipping the leading
+    // language never renders Latin glyphs in the Sinhala serif.
+    final leadStyle = bi.sinhalaFirst
+        ? AppTypography.sinhalaTitle(fontSize: 16, color: color)
+        : theme.textTheme.bodyLarge?.copyWith(color: color);
+    final subStyle = bi.sinhalaFirst
+        ? theme.textTheme.bodySmall?.copyWith(color: subColor)
+        : AppTypography.sinhalaBody(fontSize: 12, color: subColor);
 
     return Opacity(
-      opacity: opacity,
+      opacity: enabled ? 1.0 : 0.45,
       child: ListTile(
         enabled: enabled && onTap != null,
         onTap: onTap,
         leading: Icon(icon, color: color),
-        title: Text(
-          english,
-          style: theme.textTheme.bodyLarge?.copyWith(color: color),
-        ),
-        subtitle: Text(
-          sinhala,
-          style: AppTypography.sinhalaBody(
-            fontSize: 12,
-            color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
-          ),
-        ),
+        title: Text(lead, style: leadStyle),
+        subtitle: Text(sub, style: subStyle),
         trailing: trailing,
       ),
     );

@@ -1,4 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:pitithpotha/core/l10n/language_cubit.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import 'package:pitithpotha/app/app.dart';
@@ -98,6 +100,10 @@ void main() {
     final premiumBloc = PremiumBloc(premiumRepository: FakePremiumRepository());
     addTearDown(premiumBloc.close);
 
+    SharedPreferences.setMockInitialValues({});
+    final languageCubit = LanguageCubit(await SharedPreferences.getInstance());
+    addTearDown(languageCubit.close);
+
     await tester.pumpWidget(
       PirithPothaApp(
         authBloc: authBloc,
@@ -107,6 +113,7 @@ void main() {
         favoritesBloc: favoritesBloc,
         historyBloc: historyBloc,
         premiumBloc: premiumBloc,
+        languageCubit: languageCubit,
       ),
     );
     expect(find.byType(PirithPothaApp), findsOneWidget);
