@@ -44,8 +44,8 @@ class FavoritesPage extends StatelessWidget {
                   final item = pirithItems[index];
                   return PirithCard(
                     item: item,
-                    artworkIndex: index,
-                    onTap: () => context.push(AppRoutePaths.pirithDetailsFor(item.id)),
+                    onTap: () =>
+                        context.push(AppRoutePaths.pirithDetailsFor(item.id)),
                   );
                 },
               );
@@ -70,10 +70,15 @@ class _EmptyFavorites extends StatelessWidget {
         children: [
           PirithMark(
             size: 64,
-            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.3),
+            color: Theme.of(
+              context,
+            ).colorScheme.onSurface.withValues(alpha: 0.3),
           ),
           const SizedBox(height: 16),
-          Text(l10n.favoritesEmpty, style: Theme.of(context).textTheme.titleMedium),
+          Text(
+            l10n.favoritesEmpty,
+            style: Theme.of(context).textTheme.titleMedium,
+          ),
           const SizedBox(height: 4),
           Text(
             l10n.favoritesEmptySubtitle,

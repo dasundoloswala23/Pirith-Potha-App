@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 
 import '../../../../app/theme/app_colors.dart';
+import '../../../../app/theme/app_spacing.dart';
 import '../../../../app/theme/app_typography.dart';
+import '../../../../core/l10n/app_localizations.dart';
 import '../../domain/entities/category_entity.dart';
 
 /// Gradient category tile matching the reference `CategoryCard`.
@@ -21,16 +23,17 @@ class CategoryCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final (start, end) = AppColors.categoryGradientFor(index);
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(16),
+      borderRadius: BorderRadius.circular(AppRadius.md),
       child: Ink(
         width: 140,
         height: 120,
-        padding: const EdgeInsets.all(14),
+        padding: const EdgeInsets.all(AppSpacing.md),
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(AppRadius.md),
           gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
@@ -51,9 +54,9 @@ class CategoryCard extends StatelessWidget {
                 weight: FontWeight.w700,
               ),
             ),
-            const SizedBox(height: 2),
+            const SizedBox(height: AppSpacing.xs),
             Text(
-              '$count pirith',
+              l10n.categoryPirithCount(count),
               style: const TextStyle(color: Colors.white70, fontSize: 11),
             ),
           ],

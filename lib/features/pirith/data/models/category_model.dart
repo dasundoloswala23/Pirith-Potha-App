@@ -10,11 +10,13 @@ class CategoryModel extends CategoryEntity {
     required super.sortOrder,
   });
 
-  factory CategoryModel.fromFirestore(DocumentSnapshot<Map<String, dynamic>> doc) {
+  factory CategoryModel.fromFirestore(
+    DocumentSnapshot<Map<String, dynamic>> doc,
+  ) {
     final data = doc.data() ?? const {};
     return CategoryModel(
       id: doc.id,
-      name: (data['name'] as String?) ?? '',
+      name: (data['nameEnglish'] as String?) ?? '',
       nameSinhala: (data['nameSinhala'] as String?) ?? '',
       sortOrder: (data['sortOrder'] as num?)?.toInt() ?? 0,
     );
@@ -31,9 +33,9 @@ class CategoryModel extends CategoryEntity {
   }
 
   Map<String, dynamic> toJson() => {
-        'id': id,
-        'name': name,
-        'nameSinhala': nameSinhala,
-        'sortOrder': sortOrder,
-      };
+    'id': id,
+    'name': name,
+    'nameSinhala': nameSinhala,
+    'sortOrder': sortOrder,
+  };
 }

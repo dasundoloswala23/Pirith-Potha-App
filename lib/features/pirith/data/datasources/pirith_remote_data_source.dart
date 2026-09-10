@@ -16,12 +16,20 @@ class FirestorePirithRemoteDataSource implements PirithRemoteDataSource {
 
   final FirebaseFirestore _firestore;
 
+  /// Server-only: when Firestore can't reach the backend it resolves reads
+  /// from its own (empty) offline cache *without throwing*, which makes an
+  /// unreachable backend look identical to "no content published yet". This
+  /// app keeps its own on-disk cache in PirithLocalDataSource, so it wants
+  /// the failure instead — PirithRepositoryImpl turns that into a cache
+  /// fallback, or a retryable error when there's nothing cached.
+  static const _serverOnly = GetOptions(source: Source.server);
+
   @override
   Future<List<CategoryModel>> getCategories() async {
     final snapshot = await _firestore
         .collection('categories')
         .orderBy('sortOrder')
-        .get();
+        .get(_serverOnly);
     return snapshot.docs.map(CategoryModel.fromFirestore).toList();
   }
 
@@ -31,7 +39,7 @@ class FirestorePirithRemoteDataSource implements PirithRemoteDataSource {
         .collection('pirith')
         .where('isActive', isEqualTo: true)
         .orderBy('sortOrder')
-        .get();
+        .get(_serverOnly);
     return snapshot.docs.map(PirithModel.fromFirestore).toList();
   }
 

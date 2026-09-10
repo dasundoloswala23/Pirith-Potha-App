@@ -60,8 +60,8 @@ class _SearchPageState extends State<SearchPage> {
               final item = results[index];
               return PirithCard(
                 item: item,
-                artworkIndex: index,
-                onTap: () => context.push(AppRoutePaths.pirithDetailsFor(item.id)),
+                onTap: () =>
+                    context.push(AppRoutePaths.pirithDetailsFor(item.id)),
               );
             },
           );
@@ -84,10 +84,15 @@ class _NoResults extends StatelessWidget {
         children: [
           PirithMark(
             size: 56,
-            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.3),
+            color: Theme.of(
+              context,
+            ).colorScheme.onSurface.withValues(alpha: 0.3),
           ),
           const SizedBox(height: 16),
-          Text(l10n.searchNoResultsTitle, style: Theme.of(context).textTheme.titleMedium),
+          Text(
+            l10n.searchNoResultsTitle,
+            style: Theme.of(context).textTheme.titleMedium,
+          ),
           const SizedBox(height: 4),
           Text(
             l10n.searchNoResultsSubtitle,
@@ -113,7 +118,9 @@ class _EmptyHint extends StatelessWidget {
         children: [
           PirithMark(
             size: 56,
-            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.3),
+            color: Theme.of(
+              context,
+            ).colorScheme.onSurface.withValues(alpha: 0.3),
           ),
           const SizedBox(height: 16),
           Text(l10n.searchHint),

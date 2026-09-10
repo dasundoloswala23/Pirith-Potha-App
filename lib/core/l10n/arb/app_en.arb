@@ -27,7 +27,7 @@
   "profileSignIn": "Sign in",
   "profileSignOut": "Sign out",
   "profileLanguage": "Language",
-  "profileLanguageValue": "Sinhala",
+  "profileLanguageValue": "English",
   "profileSettings": "Settings",
   "profileAbout": "About",
   "profilePrivacyPolicy": "Privacy Policy",
@@ -36,8 +36,8 @@
   "profileSignInWithApple": "Sign in with Apple",
   "authSigningIn": "Signing in...",
   "authErrorGeneric": "Something went wrong. Please try again.",
-  "actionPlay": "Listen",
-  "actionPause": "Stop",
+  "actionPlay": "Play",
+  "actionPause": "Pause",
   "actionDownload": "Download",
   "actionFavorite": "Favorite",
   "actionAddFavorite": "Add to favorites",
@@ -69,5 +69,15 @@
   "socialFacebookSubtitle": "Join our Pirith Potha community",
   "socialFacebookCta": "Go to Facebook",
   "premiumRequiredMessage": "This is premium content. Premium is coming soon.",
-  "categoryEmpty": "No Pirith in this category yet"
+  "categoryEmpty": "No Pirith in this category yet",
+  "catalogueErrorGeneric": "Couldn't load the Pirith catalogue. Check your connection and try again.",
+  "categoryPirithCount": "{count} Pirith",
+  "@categoryPirithCount": {
+    "description": "Number of Pirith in a category, shown on the category card",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  }
 }

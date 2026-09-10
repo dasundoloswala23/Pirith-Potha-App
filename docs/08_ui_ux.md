@@ -16,17 +16,19 @@ animation feel (ripple/scale press states, slide-up transitions, the
 gold-accent progress ring on the download button, the mini-player docked
 above the bottom nav) rather than redesigning from scratch.
 
-## Localization — V1 mobile UI is Sinhala-first
+## Localization — English interface, Sinhala content
 
-**Revised policy (supersedes the original "full bilingual UI" requirement
-below the original docs implied):** the V1 mobile app's visible UI is
-**Sinhala only** — natural, grammatically correct Sinhala, not literal
-machine-translation. English stays only for official brand/platform names
-(e.g. "Google", "YouTube", "Facebook"), genuinely untranslatable technical
-terms, and content where an English title is intentionally shown alongside
-the Sinhala one (e.g. a Pirith's English name shown smaller under its
-Sinhala title). There is **no in-app language switcher** in V1 — don't build
-one unless explicitly requested again.
+**Current policy (supersedes the earlier "Sinhala-first UI" policy, which in
+turn superseded the original "fully bilingual UI" requirement):** the app's
+**interface** is in **English** — navigation labels, buttons, section
+headings, settings rows, dialogs, and error messages. **Sinhala is reserved
+for Pirith content itself**: chant names and descriptions, which come from
+Firestore (`titleSinhala`, `descriptionSinhala`) rather than from the ARB
+files. So a Pirith card shows its Sinhala title with the English title
+beneath it, under English section headings.
+
+There is **no in-app language switcher** — don't build one unless explicitly
+requested again.
 
 - Use Flutter's standard localization stack: `flutter_localizations` + `intl`,
   with ARB files under `lib/core/l10n/arb/app_en.arb` and `app_si.arb`,
@@ -35,15 +37,18 @@ one unless explicitly requested again.
   and Android notification channel name goes through the generated
   `AppLocalizations` — no hardcoded literal strings in widgets, in either
   language.
-- The app's `MaterialApp` pins `locale: const Locale('si')` directly rather
+- The app's `MaterialApp` pins `locale: const Locale('en')` directly rather
   than resolving from the device locale or a mutable controller.
-- The `app_en.arb` file is **kept in sync** as the data/reference locale —
-  not shown in the V1 UI, but present so a future language switch is an
+- The `app_si.arb` file is **kept in sync and complete** — not shown in the
+  current UI, but present so a future language switch is an
   `AppLocalizations`/`locale` change, not a UI rewrite. Don't delete it or
-  let it drift out of sync with the Sinhala strings.
-- Sinhala text requires a font with full Sinhala glyph coverage; the app
-  loads Noto Serif Sinhala (titles) and Noto Sans Sinhala (body/UI) via
-  `google_fonts` — see `lib/app/theme/app_typography.dart`.
+  let it drift out of sync with the English strings.
+- **Type ramp follows the language of the text, not the app.** Interface text
+  uses the English ramp (Inter body/UI, Lora for serif accents). Sinhala
+  *content* uses Noto Serif Sinhala (titles) via
+  `AppTypography.sinhalaTitle` — see `lib/app/theme/app_typography.dart`.
+  Don't style English UI chrome with the Sinhala serif face: it has Latin
+  glyphs, but they read as a different typeface next to the rest of the UI.
 - Content fields that are inherently bilingual (Pirith title/description) are
   modeled as separate fields (`title` + `titleSinhala`, etc. — see
   [`03_database_schema.md`](03_database_schema.md)); the UI displays the

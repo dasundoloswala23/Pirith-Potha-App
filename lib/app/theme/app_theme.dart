@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'app_colors.dart';
+import 'app_spacing.dart';
 import 'app_typography.dart';
 
 /// Light/dark themes for Pirith Potha, matching the approved warm
@@ -8,26 +9,26 @@ import 'app_typography.dart';
 /// accent) — see `Buddhist Audio App UI Design/src/index.css`.
 abstract final class AppTheme {
   static ThemeData get light => _build(
-        brightness: Brightness.light,
-        background: AppColors.lightBackground,
-        surface: AppColors.lightSurface,
-        textPrimary: AppColors.lightTextPrimary,
-        textSecondary: AppColors.lightTextSecondary,
-        border: AppColors.lightBorder,
-        border2: AppColors.lightBorder2,
-        gold: AppColors.gold,
-      );
+    brightness: Brightness.light,
+    background: AppColors.lightBackground,
+    surface: AppColors.lightSurface,
+    textPrimary: AppColors.lightTextPrimary,
+    textSecondary: AppColors.lightTextSecondary,
+    border: AppColors.lightBorder,
+    border2: AppColors.lightBorder2,
+    gold: AppColors.gold,
+  );
 
   static ThemeData get dark => _build(
-        brightness: Brightness.dark,
-        background: AppColors.darkBackground,
-        surface: AppColors.darkSurface,
-        textPrimary: AppColors.darkTextPrimary,
-        textSecondary: AppColors.darkTextSecondary,
-        border: AppColors.darkBorder,
-        border2: AppColors.darkBorder2,
-        gold: AppColors.goldDark,
-      );
+    brightness: Brightness.dark,
+    background: AppColors.darkBackground,
+    surface: AppColors.darkSurface,
+    textPrimary: AppColors.darkTextPrimary,
+    textSecondary: AppColors.darkTextSecondary,
+    border: AppColors.darkBorder,
+    border2: AppColors.darkBorder2,
+    gold: AppColors.goldDark,
+  );
 
   static ThemeData _build({
     required Brightness brightness,
@@ -68,7 +69,7 @@ abstract final class AppTheme {
         color: surface,
         elevation: 0,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(AppRadius.md),
           side: BorderSide(color: border2),
         ),
       ),
@@ -77,15 +78,15 @@ abstract final class AppTheme {
         fillColor: surface,
         hintStyle: TextStyle(color: textSecondary),
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(14),
+          borderRadius: BorderRadius.circular(AppRadius.md),
           borderSide: BorderSide(color: border),
         ),
         enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(14),
+          borderRadius: BorderRadius.circular(AppRadius.md),
           borderSide: BorderSide(color: border),
         ),
         focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(14),
+          borderRadius: BorderRadius.circular(AppRadius.md),
           borderSide: BorderSide(color: gold),
         ),
       ),

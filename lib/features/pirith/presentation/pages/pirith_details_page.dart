@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../app/theme/app_spacing.dart';
 import '../../../../app/theme/app_typography.dart';
 import '../../../../core/constants/app_route_paths.dart';
 import '../../../../core/l10n/app_localizations.dart';
@@ -38,8 +39,6 @@ class PirithDetailsPage extends StatelessWidget {
               ],
             );
           }
-          final index = state.pirith.indexOf(item);
-
           return CustomScrollView(
             slivers: [
               SliverAppBar(pinned: true, title: const SizedBox.shrink()),
@@ -48,7 +47,11 @@ class PirithDetailsPage extends StatelessWidget {
                   padding: const EdgeInsets.all(20),
                   child: Column(
                     children: [
-                      PirithArtwork(index: index, size: 160, radius: 20),
+                      PirithArtwork(
+                        pirithId: item.id,
+                        size: 160,
+                        radius: AppRadius.lg,
+                      ),
                       const SizedBox(height: 20),
                       Text(
                         item.titleSinhala,
@@ -78,10 +81,15 @@ class PirithDetailsPage extends StatelessWidget {
                         children: [
                           FilledButton.icon(
                             onPressed: () {
-                              if (!ensurePremiumAccess(context, isPremiumItem: item.isPremium)) {
+                              if (!ensurePremiumAccess(
+                                context,
+                                isPremiumItem: item.isPremium,
+                              )) {
                                 return;
                               }
-                              context.read<PlayerBloc>().add(PlayerPlayRequested(item));
+                              context.read<PlayerBloc>().add(
+                                PlayerPlayRequested(item),
+                              );
                               context.push(AppRoutePaths.player);
                             },
                             icon: const Icon(Icons.play_arrow),
@@ -93,7 +101,8 @@ class PirithDetailsPage extends StatelessWidget {
                           FavoriteButton(pirithId: item.id, outlined: true),
                         ],
                       ),
-                      if (item.description.isNotEmpty || item.descriptionSinhala.isNotEmpty) ...[
+                      if (item.description.isNotEmpty ||
+                          item.descriptionSinhala.isNotEmpty) ...[
                         const SizedBox(height: 24),
                         Align(
                           alignment: Alignment.centerLeft,
@@ -144,11 +153,16 @@ class _DetailsDownloadButton extends StatelessWidget {
     switch (entry?.status) {
       case DownloadStatus.downloading:
         return OutlinedButton.icon(
-          onPressed: () => context.read<DownloadBloc>().add(DownloadCancelRequested(item.id)),
+          onPressed: () => context.read<DownloadBloc>().add(
+            DownloadCancelRequested(item.id),
+          ),
           icon: SizedBox(
             width: 16,
             height: 16,
-            child: CircularProgressIndicator(strokeWidth: 2, value: entry!.progress),
+            child: CircularProgressIndicator(
+              strokeWidth: 2,
+              value: entry!.progress,
+            ),
           ),
           label: Text(l10n.downloadInProgress),
         );
@@ -160,7 +174,8 @@ class _DetailsDownloadButton extends StatelessWidget {
         );
       case DownloadStatus.failed:
         return OutlinedButton.icon(
-          onPressed: () => context.read<DownloadBloc>().add(DownloadRequested(item)),
+          onPressed: () =>
+              context.read<DownloadBloc>().add(DownloadRequested(item)),
           icon: const Icon(Icons.error_outline),
           label: Text(l10n.actionRetry),
         );
@@ -178,7 +193,10 @@ class _DetailsDownloadButton extends StatelessWidget {
     }
   }
 
-  Future<void> _confirmDelete(BuildContext context, AppLocalizations l10n) async {
+  Future<void> _confirmDelete(
+    BuildContext context,
+    AppLocalizations l10n,
+  ) async {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(

@@ -43,19 +43,23 @@ class _NowPlaying extends StatelessWidget {
     final l10n = AppLocalizations.of(context);
     final theme = Theme.of(context);
     final isBuffering =
-        state.status == PlaybackStatus.loading || state.status == PlaybackStatus.buffering;
+        state.status == PlaybackStatus.loading ||
+        state.status == PlaybackStatus.buffering;
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          PirithArtwork(index: 0, size: 220, radius: 24),
+          PirithArtwork(pirithId: state.item.id, size: 220, radius: 24),
           const SizedBox(height: 28),
           Text(
             state.item.titleSinhala,
             textAlign: TextAlign.center,
-            style: AppTypography.sinhalaTitle(fontSize: 22, color: theme.colorScheme.onSurface),
+            style: AppTypography.sinhalaTitle(
+              fontSize: 22,
+              color: theme.colorScheme.onSurface,
+            ),
           ),
           const SizedBox(height: 4),
           Text(state.item.title, style: theme.textTheme.bodyMedium),
@@ -71,16 +75,17 @@ class _NowPlaying extends StatelessWidget {
                   max: state.duration.inMilliseconds > 0
                       ? state.duration.inMilliseconds.toDouble()
                       : 1,
-                  onChanged: (value) => context
-                      .read<PlayerBloc>()
-                      .add(PlayerSeekRequested(Duration(milliseconds: value.round()))),
+                  onChanged: (value) => context.read<PlayerBloc>().add(
+                    PlayerSeekRequested(Duration(milliseconds: value.round())),
+                  ),
                 ),
               ),
               IconButton(
                 icon: const Icon(Icons.download_outlined),
                 tooltip: l10n.actionDownload,
-                onPressed: () =>
-                    context.read<DownloadBloc>().add(DownloadRequested(state.item)),
+                onPressed: () => context.read<DownloadBloc>().add(
+                  DownloadRequested(state.item),
+                ),
               ),
             ],
           ),
@@ -89,8 +94,14 @@ class _NowPlaying extends StatelessWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(_format(state.position), style: theme.textTheme.labelSmall),
-                Text(_format(state.duration), style: theme.textTheme.labelSmall),
+                Text(
+                  _format(state.position),
+                  style: theme.textTheme.labelSmall,
+                ),
+                Text(
+                  _format(state.duration),
+                  style: theme.textTheme.labelSmall,
+                ),
               ],
             ),
           ),
@@ -116,12 +127,14 @@ class _NowPlaying extends StatelessWidget {
                     )
                   : IconButton.filled(
                       iconSize: 32,
-                      icon: Icon(state.isPlaying ? Icons.pause : Icons.play_arrow),
+                      icon: Icon(
+                        state.isPlaying ? Icons.pause : Icons.play_arrow,
+                      ),
                       onPressed: () => context.read<PlayerBloc>().add(
-                            state.isPlaying
-                                ? const PlayerPauseRequested()
-                                : const PlayerResumeRequested(),
-                          ),
+                        state.isPlaying
+                            ? const PlayerPauseRequested()
+                            : const PlayerResumeRequested(),
+                      ),
                     ),
               const SizedBox(width: 16),
               IconButton(

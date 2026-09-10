@@ -22,7 +22,9 @@ class DownloadsPage extends StatelessWidget {
           if (downloadState is! DownloadsLoaded) {
             return const Center(child: CircularProgressIndicator());
           }
-          final downloadedIds = downloadState.completed.map((d) => d.pirithId).toSet();
+          final downloadedIds = downloadState.completed
+              .map((d) => d.pirithId)
+              .toSet();
           if (downloadedIds.isEmpty) {
             return _EmptyDownloads(l10n: l10n);
           }
@@ -32,8 +34,9 @@ class DownloadsPage extends StatelessWidget {
               if (catalogueState is! CatalogueLoaded) {
                 return const Center(child: CircularProgressIndicator());
               }
-              final items =
-                  catalogueState.pirith.where((p) => downloadedIds.contains(p.id)).toList();
+              final items = catalogueState.pirith
+                  .where((p) => downloadedIds.contains(p.id))
+                  .toList();
 
               return ListView.separated(
                 padding: const EdgeInsets.all(16),
@@ -43,8 +46,8 @@ class DownloadsPage extends StatelessWidget {
                   final item = items[index];
                   return PirithCard(
                     item: item,
-                    artworkIndex: index,
-                    onTap: () => context.push(AppRoutePaths.pirithDetailsFor(item.id)),
+                    onTap: () =>
+                        context.push(AppRoutePaths.pirithDetailsFor(item.id)),
                   );
                 },
               );
@@ -69,7 +72,9 @@ class _EmptyDownloads extends StatelessWidget {
         children: [
           PirithMark(
             size: 64,
-            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.3),
+            color: Theme.of(
+              context,
+            ).colorScheme.onSurface.withValues(alpha: 0.3),
           ),
           const SizedBox(height: 16),
           Text(l10n.downloadsEmpty),

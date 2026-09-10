@@ -74,6 +74,17 @@ abstract final class AppColors {
   static (Color, Color) categoryGradientFor(int index) =>
       categoryGradients[index % categoryGradients.length];
 
-  static Color artworkColorFor(int index) =>
-      artworkPalette[index % artworkPalette.length];
+  /// Picks a stable artwork color from a Pirith's id.
+  ///
+  /// Keyed on the id rather than a list position so one Pirith keeps the same
+  /// color everywhere it appears — Home, search results, the player — and
+  /// across app launches. `String.hashCode` isn't guaranteed stable between
+  /// Dart versions, so this uses FNV-1a explicitly.
+  static Color artworkColorForId(String id) {
+    var hash = 0x811c9dc5;
+    for (final unit in id.codeUnits) {
+      hash = ((hash ^ unit) * 0x01000193) & 0xFFFFFFFF;
+    }
+    return artworkPalette[hash % artworkPalette.length];
+  }
 }

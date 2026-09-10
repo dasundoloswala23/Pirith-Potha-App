@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 
-import '../../../../app/theme/app_typography.dart';
+import '../../../../app/theme/app_spacing.dart';
 import '../../../../core/constants/social_links.dart';
 import '../../../../core/l10n/app_localizations.dart';
 import '../../../../core/services/external_link_launcher.dart';
 
-/// Warm, Sinhala-first invitation to follow the official YouTube/Facebook
-/// presence — see docs/08_ui_ux.md. A card is hidden if its URL isn't
-/// configured yet (see core/constants/social_links.dart).
+/// Invitation to follow the official YouTube/Facebook presence — see
+/// docs/08_ui_ux.md. A card is hidden if its URL isn't configured yet (see
+/// core/constants/social_links.dart).
 class SocialSection extends StatelessWidget {
   const SocialSection({super.key});
 
@@ -25,13 +25,18 @@ class SocialSection extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // Interface text, so it uses the English type ramp rather than
+          // the Sinhala serif face reserved for Pirith content.
           Text(
             l10n.socialHeading,
-            style: AppTypography.sinhalaTitle(fontSize: 17, color: theme.colorScheme.onSurface),
+            style: theme.textTheme.titleMedium?.copyWith(
+              fontWeight: FontWeight.w600,
+              color: theme.colorScheme.onSurface,
+            ),
           ),
-          const SizedBox(height: 4),
+          const SizedBox(height: AppSpacing.xs),
           Text(l10n.socialSubtitle, style: theme.textTheme.bodySmall),
-          const SizedBox(height: 14),
+          const SizedBox(height: AppSpacing.lg),
           if (SocialLinks.youTubeUrl.isNotEmpty)
             _SocialCard(
               icon: Icons.play_circle_fill,
@@ -41,7 +46,8 @@ class SocialSection extends StatelessWidget {
               cta: l10n.socialYouTubeCta,
               url: SocialLinks.youTubeUrl,
             ),
-          if (SocialLinks.youTubeUrl.isNotEmpty && SocialLinks.facebookUrl.isNotEmpty)
+          if (SocialLinks.youTubeUrl.isNotEmpty &&
+              SocialLinks.facebookUrl.isNotEmpty)
             const SizedBox(height: 10),
           if (SocialLinks.facebookUrl.isNotEmpty)
             _SocialCard(
@@ -96,12 +102,12 @@ class _SocialCard extends StatelessWidget {
                   children: [
                     Text(
                       title,
-                      style: AppTypography.sinhalaTitle(
-                        fontSize: 14,
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                        fontWeight: FontWeight.w600,
                         color: theme.colorScheme.onSurface,
                       ),
                     ),
-                    const SizedBox(height: 2),
+                    const SizedBox(height: AppSpacing.xs),
                     Text(subtitle, style: theme.textTheme.bodySmall),
                     const SizedBox(height: 6),
                     Text(
@@ -114,7 +120,10 @@ class _SocialCard extends StatelessWidget {
                   ],
                 ),
               ),
-              Icon(Icons.chevron_right, color: theme.colorScheme.onSurface.withValues(alpha: 0.4)),
+              Icon(
+                Icons.chevron_right,
+                color: theme.colorScheme.onSurface.withValues(alpha: 0.4),
+              ),
             ],
           ),
         ),

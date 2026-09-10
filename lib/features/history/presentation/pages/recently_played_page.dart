@@ -42,8 +42,8 @@ class RecentlyPlayedPage extends StatelessWidget {
                   final item = items[index];
                   return PirithCard(
                     item: item,
-                    artworkIndex: index,
-                    onTap: () => context.push(AppRoutePaths.pirithDetailsFor(item.id)),
+                    onTap: () =>
+                        context.push(AppRoutePaths.pirithDetailsFor(item.id)),
                   );
                 },
               );
@@ -68,7 +68,9 @@ class _EmptyHistory extends StatelessWidget {
         children: [
           PirithMark(
             size: 64,
-            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.3),
+            color: Theme.of(
+              context,
+            ).colorScheme.onSurface.withValues(alpha: 0.3),
           ),
           const SizedBox(height: 16),
           Text(l10n.recentlyPlayedEmpty),

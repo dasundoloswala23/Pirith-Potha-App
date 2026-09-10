@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../../app/theme/app_spacing.dart';
 import '../../../../core/l10n/app_localizations.dart';
 import '../bloc/catalogue_bloc.dart';
 
@@ -22,11 +23,13 @@ class CatalogueLoadedBuilder extends StatelessWidget {
         return switch (state) {
           CatalogueLoaded() => builder(context, state),
           CatalogueError() => CatalogueErrorView(
-              onRetry: () =>
-                  context.read<CatalogueBloc>().add(const CatalogueRefreshRequested()),
+            onRetry: () => context.read<CatalogueBloc>().add(
+              const CatalogueRefreshRequested(),
             ),
-          CatalogueLoading() || CatalogueInitial() =>
-            const Center(child: CircularProgressIndicator()),
+          ),
+          CatalogueLoading() || CatalogueInitial() => const Center(
+            child: CircularProgressIndicator(),
+          ),
         };
       },
     );
@@ -42,13 +45,24 @@ class CatalogueErrorView extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     return Center(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text(l10n.authErrorGeneric),
-          const SizedBox(height: 12),
-          FilledButton(onPressed: onRetry, child: Text(l10n.actionRetry)),
-        ],
+      child: Padding(
+        padding: const EdgeInsets.all(AppSpacing.xl),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              Icons.cloud_off_outlined,
+              size: 48,
+              color: Theme.of(
+                context,
+              ).colorScheme.onSurface.withValues(alpha: 0.4),
+            ),
+            const SizedBox(height: AppSpacing.lg),
+            Text(l10n.catalogueErrorGeneric, textAlign: TextAlign.center),
+            const SizedBox(height: AppSpacing.md),
+            FilledButton(onPressed: onRetry, child: Text(l10n.actionRetry)),
+          ],
+        ),
       ),
     );
   }

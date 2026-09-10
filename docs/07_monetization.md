@@ -4,12 +4,27 @@
 
 - `google_mobile_ads`, wrapped behind an `AdService` abstraction — UI never
   calls the AdMob SDK directly.
-- Banner ads only for MVP.
-- Placement: below/within content lists (e.g. home feed), never overlaid on
+- **Banner**: below/within content lists (e.g. home feed), never overlaid on
   or adjacent to the audio player screen. This is a devotional app; ads must
   not feel intrusive on the core listening experience.
-- Use AdMob test ad unit IDs during development; production IDs come from a
-  single configurable location (not hardcoded across multiple widgets).
+- **Interstitial**: fires only when the user navigates *out* of the player,
+  and **never while audio is playing**. A video interstitial takes Android
+  audio focus, so showing one mid-playback would duck or pause the chant and
+  flip the media notification to paused with no user action. Because the
+  mini-player means many exits happen mid-playback, this deliberately trades
+  impressions away rather than interrupt a chant. Implemented as a
+  `NavigatorObserver` (`lib/core/ads/player_exit_ad_observer.dart`) so no
+  screen has to know about ads.
+- There is no frequency cap beyond the not-while-playing rule. If impressions
+  turn out high in practice, revisit before release — AdMob policy
+  discourages interstitials on every navigation.
+- Production IDs come from a single configurable location
+  (`lib/core/constants/ad_unit_ids.dart`), never hardcoded across widgets.
+  Android is on production IDs; iOS has no AdMob app registered yet, so its
+  production slots are empty and it falls back to Google's test IDs.
+  `AdUnitIds.isUsingTestIds` reports that state. The Android app ID is
+  necessarily duplicated in `AndroidManifest.xml` — keep the two in sync,
+  since production units don't fill against a test app ID.
 - Architecture must allow disabling ads entirely when `isPremium == true`,
   even though Premium itself isn't implemented in the AdMob phase.
 

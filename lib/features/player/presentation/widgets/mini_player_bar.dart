@@ -37,10 +37,17 @@ class MiniPlayerBar extends StatelessWidget {
                   backgroundColor: theme.colorScheme.surfaceContainerHighest,
                 ),
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 8,
+                  ),
                   child: Row(
                     children: [
-                      PirithArtwork(index: 0, size: 36, radius: 8),
+                      PirithArtwork(
+                        pirithId: state.item.id,
+                        size: 36,
+                        radius: 8,
+                      ),
                       const SizedBox(width: 10),
                       Expanded(
                         child: Column(
@@ -66,12 +73,14 @@ class MiniPlayerBar extends StatelessWidget {
                         ),
                       ),
                       IconButton(
-                        icon: Icon(state.isPlaying ? Icons.pause : Icons.play_arrow),
+                        icon: Icon(
+                          state.isPlaying ? Icons.pause : Icons.play_arrow,
+                        ),
                         onPressed: () => context.read<PlayerBloc>().add(
-                              state.isPlaying
-                                  ? const PlayerPauseRequested()
-                                  : const PlayerResumeRequested(),
-                            ),
+                          state.isPlaying
+                              ? const PlayerPauseRequested()
+                              : const PlayerResumeRequested(),
+                        ),
                       ),
                     ],
                   ),

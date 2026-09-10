@@ -16,17 +16,28 @@ class CatalogueLoading extends CatalogueState {
 }
 
 class CatalogueLoaded extends CatalogueState {
-  const CatalogueLoaded({required this.categories, required this.pirith});
+  const CatalogueLoaded({
+    required this.categories,
+    required this.pirith,
+    this.fetchedAt,
+  });
 
   final List<CategoryEntity> categories;
   final List<PirithEntity> pirith;
+
+  /// Part of [props] so that a refresh returning byte-identical data still
+  /// emits a distinct state — otherwise Equatable suppresses the emit and
+  /// anything awaiting the next state (the pull-to-refresh indicator on
+  /// Home) would wait forever.
+  final DateTime? fetchedAt;
 
   List<PirithEntity> get featured => pirith.where((p) => p.isFeatured).toList();
 
   /// No real play-count data yet in most catalogues, so this falls back to
   /// catalogue order — see docs/03_database_schema.md on `playCount`.
   List<PirithEntity> get popular {
-    final sorted = [...pirith]..sort((a, b) => b.playCount.compareTo(a.playCount));
+    final sorted = [...pirith]
+      ..sort((a, b) => b.playCount.compareTo(a.playCount));
     return sorted;
   }
 
@@ -46,7 +57,7 @@ class CatalogueLoaded extends CatalogueState {
   }
 
   @override
-  List<Object?> get props => [categories, pirith];
+  List<Object?> get props => [categories, pirith, fetchedAt];
 }
 
 class CatalogueError extends CatalogueState {

@@ -1,5 +1,7 @@
+import 'package:flutter/widgets.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../core/ads/player_exit_ad_observer.dart';
 import '../../core/constants/app_route_paths.dart';
 import '../../features/downloads/presentation/pages/downloads_page.dart';
 import '../../features/favorites/presentation/pages/favorites_page.dart';
@@ -17,9 +19,13 @@ import '../widgets/splash_page.dart';
 /// App-wide route configuration. The five bottom-nav destinations are
 /// branches of a [StatefulShellRoute] so each keeps its own navigation
 /// stack; splash/details/player are pushed full-screen outside the shell.
-GoRouter buildAppRouter() {
+///
+/// [adObserver] is optional so widget tests can build the router without a
+/// configured ad SDK.
+GoRouter buildAppRouter({NavigatorObserver? adObserver}) {
   return GoRouter(
     initialLocation: AppRoutePaths.splash,
+    observers: [?adObserver],
     routes: [
       GoRoute(
         path: AppRoutePaths.splash,
@@ -96,6 +102,9 @@ GoRouter buildAppRouter() {
         ],
       ),
       GoRoute(
+        // Named so PlayerExitAdObserver can recognise this route without
+        // depending on the path string.
+        name: PlayerExitAdObserver.playerRouteName,
         path: AppRoutePaths.player,
         builder: (context, state) => const PlayerPage(),
       ),

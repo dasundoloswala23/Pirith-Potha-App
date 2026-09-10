@@ -4,9 +4,12 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/l10n/app_localizations.dart';
 import '../../../auth/presentation/bloc/auth_bloc.dart';
 
-/// V1 is Sinhala-first with no in-app language switcher (see
-/// docs/08_ui_ux.md) — the language row below is informational, not a
-/// control.
+/// There is no in-app language switcher (see docs/08_ui_ux.md) — the
+/// language row below is informational, not a control.
+///
+/// Google/Apple sign-in is intentionally not offered here for now. The
+/// AuthBloc events and repository support it and are left intact; only the
+/// entry points are hidden, so re-enabling it is a UI-only change.
 class ProfilePage extends StatelessWidget {
   const ProfilePage({super.key});
 
@@ -76,38 +79,30 @@ class _AccountTile extends StatelessWidget {
     final isGuest = user == null || user.isAnonymous;
 
     if (isGuest) {
-      return Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          ListTile(
-            leading: const Icon(Icons.person_outline),
-            title: Text(l10n.profileGuest),
-          ),
-          ListTile(
-            leading: const Icon(Icons.login),
-            title: Text(l10n.profileSignInWithGoogle),
-            onTap: () => context
-                .read<AuthBloc>()
-                .add(const AuthSignInWithGoogleRequested()),
-          ),
-          ListTile(
-            leading: const Icon(Icons.apple),
-            title: Text(l10n.profileSignInWithApple),
-            onTap: () => context
-                .read<AuthBloc>()
-                .add(const AuthSignInWithAppleRequested()),
-          ),
-        ],
+      return ListTile(
+        leading: const Icon(Icons.person_outline),
+        title: Text(l10n.profileGuest),
       );
     }
 
-    return ListTile(
-      leading: user.photoUrl != null
-          ? CircleAvatar(backgroundImage: NetworkImage(user.photoUrl!))
-          : const Icon(Icons.person),
-      title: Text(user.displayName ?? user.email ?? user.uid),
-      subtitle: Text(l10n.profileSignOut),
-      onTap: () => context.read<AuthBloc>().add(const AuthSignOutRequested()),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        ListTile(
+          leading: user.photoUrl != null
+              ? CircleAvatar(backgroundImage: NetworkImage(user.photoUrl!))
+              : const Icon(Icons.person),
+          title: Text(user.displayName ?? user.email ?? user.uid),
+        ),
+        // Its own row rather than a subtitle under the name, so the
+        // destructive action isn't disguised as account status.
+        ListTile(
+          leading: const Icon(Icons.logout),
+          title: Text(l10n.profileSignOut),
+          onTap: () =>
+              context.read<AuthBloc>().add(const AuthSignOutRequested()),
+        ),
+      ],
     );
   }
 }

@@ -20,13 +20,15 @@ class PirithModel extends PirithEntity {
     required super.downloadCount,
   });
 
-  factory PirithModel.fromFirestore(DocumentSnapshot<Map<String, dynamic>> doc) {
+  factory PirithModel.fromFirestore(
+    DocumentSnapshot<Map<String, dynamic>> doc,
+  ) {
     final data = doc.data() ?? const {};
     return PirithModel(
       id: doc.id,
-      title: (data['title'] as String?) ?? '',
+      title: (data['titleEnglish'] as String?) ?? '',
       titleSinhala: (data['titleSinhala'] as String?) ?? '',
-      description: (data['description'] as String?) ?? '',
+      description: (data['descriptionEnglish'] as String?) ?? '',
       descriptionSinhala: (data['descriptionSinhala'] as String?) ?? '',
       coverUrl: (data['coverUrl'] as String?) ?? '',
       audioUrl: (data['audioUrl'] as String?) ?? '',
@@ -40,9 +42,12 @@ class PirithModel extends PirithEntity {
     );
   }
 
-  /// Local on-disk cache (see PirithLocalDataSource) uses the same shape
-  /// as Firestore, so the app can keep showing the catalogue — and
-  /// downloaded Pirith stay properly titled — with no network at all.
+  /// Local on-disk cache (see PirithLocalDataSource), so the app can keep
+  /// showing the catalogue — and downloaded Pirith stay properly titled —
+  /// with no network at all. Keys here are this class's own field names,
+  /// deliberately independent of the Firestore document keys read above
+  /// (`titleEnglish`/`descriptionEnglish`), so a schema rename on the
+  /// Firestore side can't invalidate every existing install's cache.
   factory PirithModel.fromJson(Map<String, dynamic> json) {
     return PirithModel(
       id: json['id'] as String,
@@ -63,19 +68,19 @@ class PirithModel extends PirithEntity {
   }
 
   Map<String, dynamic> toJson() => {
-        'id': id,
-        'title': title,
-        'titleSinhala': titleSinhala,
-        'description': description,
-        'descriptionSinhala': descriptionSinhala,
-        'coverUrl': coverUrl,
-        'audioUrl': audioUrl,
-        'duration': duration,
-        'categoryId': categoryId,
-        'isPremium': isPremium,
-        'isFeatured': isFeatured,
-        'sortOrder': sortOrder,
-        'playCount': playCount,
-        'downloadCount': downloadCount,
-      };
+    'id': id,
+    'title': title,
+    'titleSinhala': titleSinhala,
+    'description': description,
+    'descriptionSinhala': descriptionSinhala,
+    'coverUrl': coverUrl,
+    'audioUrl': audioUrl,
+    'duration': duration,
+    'categoryId': categoryId,
+    'isPremium': isPremium,
+    'isFeatured': isFeatured,
+    'sortOrder': sortOrder,
+    'playCount': playCount,
+    'downloadCount': downloadCount,
+  };
 }

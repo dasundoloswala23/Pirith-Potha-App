@@ -24,9 +24,9 @@ premium/plans
 
 ```json
 {
-  "title": "Rathana Sutta",
+  "titleEnglish": "Rathana Sutta",
   "titleSinhala": "රතන සූත්‍රය",
-  "description": "...",
+  "descriptionEnglish": "...",
   "descriptionSinhala": "...",
   "coverUrl": "...",
   "audioUrl": "...",
@@ -53,12 +53,19 @@ admin app's schema doc, which introduced them first.
 
 ```json
 {
-  "name": "Sutta",
+  "nameEnglish": "Sutta",
   "nameSinhala": "සූත්‍ර",
-  "icon": "...",
-  "sortOrder": 1
+  "imageUrl": "...",
+  "sortOrder": 1,
+  "isActive": true
 }
 ```
+
+The `*English`/`*Sinhala` field pairs are written by the admin web app and
+must stay symmetric — the Dart models map them onto shorter property names
+(`title`, `description`, `name`), so the property name and the Firestore key
+deliberately differ. `imageUrl` and the category `isActive` flag are written
+by the admin but not yet consumed by the mobile app.
 
 ### `users/{uid}`
 
@@ -117,3 +124,16 @@ local DB record plus the local file are sufficient.
   authenticated user (including anonymous/guest uids).
 - No collection should ever use `allow read, write: if true;` in production
   rules.
+
+The actual `firestore.rules`, `storage.rules`, and `firestore.indexes.json`
+are **not** kept in this repo — they live in, and are deployed from, the
+admin web app repo (`Pirith Potha Admin React`), which owns the shared
+Firebase backend config for the `pithi-potha` project. This repo's
+`firebase.json` is FlutterFire-generated and gets rewritten by
+`flutterfire configure`, so it is not a safe place for them. Duplicating
+them here previously left a stale copy that denied all admin writes.
+
+Note the composite index that the catalogue query
+(`where isActive == true` + `orderBy sortOrder`) depends on is declared
+there — without it that query fails with `failed-precondition` and the app
+falls back to an empty catalogue.

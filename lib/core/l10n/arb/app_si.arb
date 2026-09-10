@@ -66,5 +66,7 @@
   "socialFacebookSubtitle": "පිරිත් පොත සමඟ අපගේ ප්‍රජාවට එක්වන්න",
   "socialFacebookCta": "ෆේස්බුක් වෙත යන්න",
   "premiumRequiredMessage": "මෙය ප්‍රිමියම් අන්තර්ගතයකි. ප්‍රිමියම් ඉක්මනින් පැමිණේ.",
-  "categoryEmpty": "මෙම කාණ්ඩයේ පිරිත් තවම නොමැත"
+  "categoryEmpty": "මෙම කාණ්ඩයේ පිරිත් තවම නොමැත",
+  "catalogueErrorGeneric": "පිරිත් ලැයිස්තුව පූරණය කළ නොහැකි විය. සම්බන්ධතාවය පරීක්ෂා කර නැවත උත්සාහ කරන්න.",
+  "categoryPirithCount": "පිරිත් {count}"
 }

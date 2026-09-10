@@ -17,7 +17,9 @@ class CategoryPirithListPage extends StatelessWidget {
     return Scaffold(
       body: CatalogueLoadedBuilder(
         builder: (context, state) {
-          final category = state.categories.where((c) => c.id == categoryId).firstOrNull;
+          final category = state.categories
+              .where((c) => c.id == categoryId)
+              .firstOrNull;
           final items = state.forCategory(categoryId);
 
           return CustomScrollView(
@@ -27,7 +29,9 @@ class CategoryPirithListPage extends StatelessWidget {
                 pinned: true,
               ),
               if (items.isEmpty)
-                SliverFillRemaining(child: Center(child: Text(l10n.categoryEmpty)))
+                SliverFillRemaining(
+                  child: Center(child: Text(l10n.categoryEmpty)),
+                )
               else
                 SliverPadding(
                   padding: const EdgeInsets.all(16),
@@ -38,9 +42,9 @@ class CategoryPirithListPage extends StatelessWidget {
                       final item = items[index];
                       return PirithCard(
                         item: item,
-                        artworkIndex: index,
-                        onTap: () =>
-                            context.push(AppRoutePaths.pirithDetailsFor(item.id)),
+                        onTap: () => context.push(
+                          AppRoutePaths.pirithDetailsFor(item.id),
+                        ),
                       );
                     },
                   ),

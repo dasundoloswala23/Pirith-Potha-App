@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import '../../../../core/errors/app_exception.dart';
+import '../../../../core/errors/error_reporter.dart';
 import '../../../../core/errors/failure.dart';
 import '../../../../core/errors/firebase_error_mapper.dart';
 import '../../domain/entities/category_entity.dart';
@@ -15,6 +16,11 @@ import '../datasources/pirith_remote_data_source.dart';
 /// resolve titles against it — keeps working with no connection after the
 /// first successful load. Only surfaces a [Failure] when both the network
 /// call and the cache come up empty (e.g. the very first launch offline).
+///
+/// An *empty* cache is deliberately not treated as a usable fallback: an
+/// early launch caches `[]`, and returning that would turn every later
+/// hard failure (missing index, permission denied) into a silent, empty
+/// catalogue indistinguishable from "no content published yet".
 class PirithRepositoryImpl implements PirithRepository {
   PirithRepositoryImpl(this._remoteDataSource, this._localDataSource);
 
@@ -25,11 +31,17 @@ class PirithRepositoryImpl implements PirithRepository {
   Future<List<CategoryEntity>> getCategories() async {
     try {
       final categories = await _remoteDataSource.getCategories();
-      unawaited(_localDataSource.cacheCategories(categories).catchError((_) {}));
+      unawaited(
+        _localDataSource.cacheCategories(categories).catchError((_) {}),
+      );
       return categories;
-    } catch (e) {
-      final cached = _localDataSource.getCachedCategories();
-      if (cached != null) return cached;
+    } catch (e, st) {
+      final cached = _cachedCategories();
+      if (cached != null && cached.isNotEmpty) {
+        reportNonFatal(e, st, reason: 'Category fetch failed — serving cache');
+        return cached;
+      }
+      reportNonFatal(e, st, reason: 'Category fetch failed, no usable cache');
       throw AppException(mapFirebaseError(e));
     }
   }
@@ -40,9 +52,13 @@ class PirithRepositoryImpl implements PirithRepository {
       final pirith = await _remoteDataSource.getActivePirith();
       unawaited(_localDataSource.cachePirith(pirith).catchError((_) {}));
       return pirith;
-    } catch (e) {
-      final cached = _localDataSource.getCachedPirith();
-      if (cached != null) return cached;
+    } catch (e, st) {
+      final cached = _cachedPirith();
+      if (cached != null && cached.isNotEmpty) {
+        reportNonFatal(e, st, reason: 'Pirith fetch failed — serving cache');
+        return cached;
+      }
+      reportNonFatal(e, st, reason: 'Pirith fetch failed, no usable cache');
       throw AppException(mapFirebaseError(e));
     }
   }
@@ -51,11 +67,33 @@ class PirithRepositoryImpl implements PirithRepository {
   Future<PirithEntity> getPirithById(String id) async {
     try {
       return await _remoteDataSource.getPirithById(id);
-    } catch (e) {
-      final cached = _localDataSource.getCachedPirith()?.where((p) => p.id == id).firstOrNull;
+    } catch (e, st) {
+      final cached = _cachedPirith()?.where((p) => p.id == id).firstOrNull;
       if (cached != null) return cached;
+      reportNonFatal(e, st, reason: 'Pirith $id fetch failed, not cached');
       if (e is AppException) rethrow;
       throw AppException(mapFirebaseError(e));
+    }
+  }
+
+  /// Reading the cache happens inside a `catch`, where a corrupt payload
+  /// would otherwise escape as a raw `FormatException`/`TypeError` and
+  /// bypass the [AppException] mapping entirely.
+  List<CategoryEntity>? _cachedCategories() {
+    try {
+      return _localDataSource.getCachedCategories();
+    } catch (e, st) {
+      reportNonFatal(e, st, reason: 'Corrupt category cache');
+      return null;
+    }
+  }
+
+  List<PirithEntity>? _cachedPirith() {
+    try {
+      return _localDataSource.getCachedPirith();
+    } catch (e, st) {
+      reportNonFatal(e, st, reason: 'Corrupt Pirith cache');
+      return null;
     }
   }
 }

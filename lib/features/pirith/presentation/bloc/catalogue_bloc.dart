@@ -20,9 +20,9 @@ class CatalogueBloc extends Bloc<CatalogueEvent, CatalogueState> {
   CatalogueBloc({
     required GetCategories getCategories,
     required GetActivePirith getActivePirith,
-  })  : _getCategories = getCategories,
-        _getActivePirith = getActivePirith,
-        super(const CatalogueInitial()) {
+  }) : _getCategories = getCategories,
+       _getActivePirith = getActivePirith,
+       super(const CatalogueInitial()) {
     on<CatalogueStarted>(_onLoad);
     on<CatalogueRefreshRequested>(_onLoad);
   }
@@ -30,12 +30,26 @@ class CatalogueBloc extends Bloc<CatalogueEvent, CatalogueState> {
   final GetCategories _getCategories;
   final GetActivePirith _getActivePirith;
 
-  Future<void> _onLoad(CatalogueEvent event, Emitter<CatalogueState> emit) async {
-    emit(const CatalogueLoading());
+  Future<void> _onLoad(
+    CatalogueEvent event,
+    Emitter<CatalogueState> emit,
+  ) async {
+    // A pull-to-refresh over already-loaded content keeps that content on
+    // screen instead of replacing it with a full-screen spinner. Retrying
+    // from the error view still shows one, since the state isn't Loaded.
+    if (!(event is CatalogueRefreshRequested && state is CatalogueLoaded)) {
+      emit(const CatalogueLoading());
+    }
     try {
       final categories = await _getCategories();
       final pirith = await _getActivePirith();
-      emit(CatalogueLoaded(categories: categories, pirith: pirith));
+      emit(
+        CatalogueLoaded(
+          categories: categories,
+          pirith: pirith,
+          fetchedAt: DateTime.now(),
+        ),
+      );
     } catch (e) {
       final failure = e is AppException ? e.failure : const UnknownFailure();
       emit(CatalogueError(failure));

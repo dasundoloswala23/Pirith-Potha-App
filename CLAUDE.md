@@ -10,9 +10,11 @@ Sri Lankan users. Users discover, search, play, and download Pirith audio, and
 listen to it offline. Audio must keep playing when the app is backgrounded or
 the phone screen is locked.
 
-**The entire app UI must be fully bilingual: Sinhala and English**, with Sinhala
-treated as a first-class language throughout (not just chant titles). See
-[`docs/08_ui_ux.md`](docs/08_ui_ux.md) for the localization approach.
+**The interface is in English; Sinhala is reserved for Pirith content** (chant
+names and descriptions, which come from Firestore). The Sinhala ARB file is
+kept complete and in sync so a language switch stays a locale change rather
+than a UI rewrite. See [`docs/08_ui_ux.md`](docs/08_ui_ux.md) for the
+localization approach.
 
 ## Technology
 
@@ -53,9 +55,10 @@ Full eventual feature set (see [`docs/01_product_requirements.md`](docs/01_produ
 for MVP vs. future split): Home, Pirith catalogue, categories, search, Pirith
 details, cover images, audio playback, background/lock-screen playback,
 notification + Bluetooth media controls, downloads with offline playback,
-favorites, recently played, Google/Apple/guest auth, AdMob banners, Premium
-content and subscriptions (later), sleep timer, playlists, analytics, crash
-reporting — all in Sinhala + English.
+favorites, recently played, Google/Apple/guest auth, AdMob banner and
+interstitial ads, Premium content and subscriptions (later), sleep timer,
+playlists, analytics, crash reporting — English UI throughout, with Sinhala
+Pirith content.
 
 ## Workflow — build one phase at a time
 
