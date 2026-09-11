@@ -3,8 +3,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../app/theme/app_colors.dart';
 import '../../../../app/theme/app_spacing.dart';
-import '../../../../app/theme/app_theme.dart';
 import '../../../../app/theme/app_typography.dart';
+import '../../../../core/ads/widgets/banner_ad_widget.dart';
 import '../../../../core/l10n/app_localizations.dart';
 import '../../../../core/services/external_link_launcher.dart';
 import '../../../downloads/domain/entities/download_entity.dart';
@@ -21,52 +21,37 @@ import '../bloc/sleep_timer_cubit.dart';
 /// notification controls come for free from `audio_service`/`just_audio`
 /// via [PirithAudioHandler]; this screen just reflects [PlayerBloc]'s state.
 ///
-/// Always dark regardless of the app theme, per the approved design: the
-/// listening screen is meant to recede, and [AppColors] already carries a
-/// dedicated player palette for exactly this.
+/// Follows the app's light/dark theme rather than forcing its own palette,
+/// so the listening screen matches the rest of the app.
 class PlayerPage extends StatelessWidget {
   const PlayerPage({super.key});
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+    final theme = Theme.of(context);
 
-    return Theme(
-      data: AppTheme.dark.copyWith(
-        scaffoldBackgroundColor: AppColors.player,
-        colorScheme: AppTheme.dark.colorScheme.copyWith(
-          surface: AppColors.player,
-          onSurface: AppColors.playerText,
-        ),
-      ),
-      child: Scaffold(
-        appBar: AppBar(
-          backgroundColor: Colors.transparent,
-          centerTitle: true,
-          iconTheme: const IconThemeData(color: AppColors.playerText),
-          title: Text(
-            l10n.nowPlaying.toUpperCase(),
-            style: const TextStyle(
-              color: AppColors.playerTextSecondary,
-              fontSize: 11,
-              fontWeight: FontWeight.w700,
-              letterSpacing: 2,
-            ),
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        centerTitle: true,
+        title: Text(
+          l10n.nowPlaying.toUpperCase(),
+          style: TextStyle(
+            color: theme.colorScheme.primary,
+            fontSize: 11,
+            fontWeight: FontWeight.w700,
+            letterSpacing: 2,
           ),
         ),
-        body: BlocBuilder<PlayerBloc, PlayerState>(
-          builder: (context, state) {
-            if (state is! PlayerActive) {
-              return Center(
-                child: Text(
-                  l10n.comingSoon,
-                  style: const TextStyle(color: AppColors.playerText),
-                ),
-              );
-            }
-            return _NowPlaying(state: state);
-          },
-        ),
+      ),
+      body: BlocBuilder<PlayerBloc, PlayerState>(
+        builder: (context, state) {
+          if (state is! PlayerActive) {
+            return Center(child: Text(l10n.comingSoon));
+          }
+          return _NowPlaying(state: state);
+        },
       ),
     );
   }
@@ -80,6 +65,7 @@ class _NowPlaying extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+    final theme = Theme.of(context);
     final isBuffering =
         state.status == PlaybackStatus.loading ||
         state.status == PlaybackStatus.buffering;
@@ -87,13 +73,14 @@ class _NowPlaying extends StatelessWidget {
     return SafeArea(
       child: LayoutBuilder(
         builder: (context, constraints) {
-          // ~70% of the width, but never so tall that the controls get
-          // pushed off a short screen — keeps the layout safe from phone to
-          // phone without fixed positioning.
-          final cover = (constraints.maxWidth * 0.70).clamp(
-            160.0,
-            constraints.maxHeight * 0.42,
+          // 16:9 rather than square, so wide cover art isn't cropped. Width
+          // is capped so the resulting height can't crowd out the controls
+          // on a short screen.
+          final coverWidth = constraints.maxWidth.clamp(
+            200.0,
+            constraints.maxHeight * 0.45 * 16 / 9,
           );
+          final coverHeight = coverWidth * 9 / 16;
           // No Spacer/Expanded here: this Column lives inside a scroll
           // view, so its height is unbounded and a flex child would have
           // nothing to expand into — it silently collapses the whole body.
@@ -106,7 +93,11 @@ class _NowPlaying extends StatelessWidget {
               child: Column(
                 children: [
                   const SizedBox(height: AppSpacing.lg),
-                  _Artwork(state: state, size: cover),
+                  _Artwork(
+                    state: state,
+                    width: coverWidth,
+                    height: coverHeight,
+                  ),
                   const SizedBox(height: AppSpacing.xl),
                   _TitleBlock(state: state),
                   const SizedBox(height: AppSpacing.lg),
@@ -117,6 +108,11 @@ class _NowPlaying extends StatelessWidget {
                   _Transport(state: state, isBuffering: isBuffering),
                   const SizedBox(height: AppSpacing.md),
                   const _SleepTimerButton(),
+                  // Kept well below the transport row: an ad crowding the
+                  // play controls invites accidental taps, which AdMob
+                  // counts as invalid traffic.
+                  const SizedBox(height: AppSpacing.xl),
+                  const BannerAdWidget(mediumRectangle: true),
                   if (state.item.youtubeUrl.isNotEmpty)
                     TextButton.icon(
                       onPressed: () => launchExternalUrl(state.item.youtubeUrl),
@@ -126,9 +122,7 @@ class _NowPlaying extends StatelessWidget {
                       ),
                       label: Text(
                         l10n.actionWatchOnYouTube,
-                        style: const TextStyle(
-                          color: AppColors.playerTextSecondary,
-                        ),
+                        style: TextStyle(color: theme.colorScheme.primary),
                       ),
                     ),
                   const SizedBox(height: AppSpacing.xl),
@@ -145,16 +139,21 @@ class _NowPlaying extends StatelessWidget {
 /// Cover art over a soft glow, so the artwork reads as lit rather than
 /// pasted onto a flat dark panel.
 class _Artwork extends StatelessWidget {
-  const _Artwork({required this.state, required this.size});
+  const _Artwork({
+    required this.state,
+    required this.width,
+    required this.height,
+  });
 
   final PlayerActive state;
-  final double size;
+  final double width;
+  final double height;
 
   @override
   Widget build(BuildContext context) {
     return DecoratedBox(
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(28),
+        borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
             color: AppColors.gold.withValues(alpha: 0.18),
@@ -166,8 +165,9 @@ class _Artwork extends StatelessWidget {
       child: PirithArtwork(
         pirithId: state.item.id,
         coverUrl: state.item.coverUrl,
-        size: size,
-        radius: 28,
+        size: width,
+        height: height,
+        radius: 20,
       ),
     );
   }
@@ -182,6 +182,7 @@ class _TitleBlock extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Column(
       children: [
         Text(
@@ -191,7 +192,7 @@ class _TitleBlock extends StatelessWidget {
           overflow: TextOverflow.ellipsis,
           style: AppTypography.sinhalaTitle(
             fontSize: 24,
-            color: AppColors.playerText,
+            color: theme.colorScheme.onSurface,
           ),
         ),
         if (state.item.title.isNotEmpty) ...[
@@ -204,7 +205,7 @@ class _TitleBlock extends StatelessWidget {
             style: AppTypography.englishSerif(
               fontSize: 14,
               fontStyle: FontStyle.italic,
-              color: AppColors.playerTextSecondary,
+              color: theme.colorScheme.primary,
             ),
           ),
         ],
@@ -223,6 +224,7 @@ class _ActionRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+    final theme = Theme.of(context);
 
     final isFavorite = context.select<FavoritesBloc, bool>((bloc) {
       final state = bloc.state;
@@ -263,12 +265,12 @@ class _ActionRow extends StatelessWidget {
             isFavorite ? Icons.favorite : Icons.favorite_border,
             color: isFavorite
                 ? AppColors.maroonDark
-                : AppColors.playerTextSecondary,
+                : theme.colorScheme.primary,
             size: 20,
           ),
           label: Text(
             isFavorite ? l10n.actionFavorite : l10n.actionAddFavorite,
-            style: const TextStyle(color: AppColors.playerTextSecondary),
+            style: TextStyle(color: theme.colorScheme.primary),
           ),
         ),
         const SizedBox(width: AppSpacing.sm),
@@ -281,11 +283,11 @@ class _ActionRow extends StatelessWidget {
             size: 20,
             color: entry?.status == DownloadStatus.downloaded
                 ? AppColors.green
-                : AppColors.playerTextSecondary,
+                : theme.colorScheme.primary,
           ),
           label: Text(
             downloadLabel,
-            style: const TextStyle(color: AppColors.playerTextSecondary),
+            style: TextStyle(color: theme.colorScheme.primary),
           ),
         ),
       ],
@@ -303,6 +305,7 @@ class _SleepTimerButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+    final theme = Theme.of(context);
     final minutes = context.watch<SleepTimerCubit>().state;
 
     return TextButton.icon(
@@ -310,15 +313,13 @@ class _SleepTimerButton extends StatelessWidget {
       icon: Icon(
         minutes == null ? Icons.bedtime_outlined : Icons.bedtime,
         size: 20,
-        color: minutes == null
-            ? AppColors.playerTextSecondary
-            : AppColors.goldDark,
+        color: minutes == null ? theme.colorScheme.primary : AppColors.goldDark,
       ),
       label: Text(
         minutes == null ? l10n.sleepTimerTitle : l10n.sleepTimerActive(minutes),
         style: TextStyle(
           color: minutes == null
-              ? AppColors.playerTextSecondary
+              ? theme.colorScheme.primary
               : AppColors.goldDark,
         ),
       ),
@@ -327,11 +328,12 @@ class _SleepTimerButton extends StatelessWidget {
 
   void _openSheet(BuildContext context, int? current) {
     final l10n = AppLocalizations.of(context);
+    final theme = Theme.of(context);
     final cubit = context.read<SleepTimerCubit>();
 
     showModalBottomSheet<void>(
       context: context,
-      backgroundColor: AppColors.playerSurface,
+      backgroundColor: theme.colorScheme.surface,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(AppRadius.lg)),
       ),
@@ -345,7 +347,7 @@ class _SleepTimerButton extends StatelessWidget {
                 l10n.sleepTimerTitle,
                 style: AppTypography.sinhalaTitle(
                   fontSize: 16,
-                  color: AppColors.playerText,
+                  color: theme.colorScheme.onSurface,
                 ),
               ),
             ),
@@ -355,7 +357,7 @@ class _SleepTimerButton extends StatelessWidget {
                   option == null
                       ? l10n.sleepTimerOff
                       : l10n.sleepTimerMinutes(option),
-                  style: const TextStyle(color: AppColors.playerText),
+                  style: TextStyle(color: theme.colorScheme.onSurface),
                 ),
                 trailing: option == current
                     ? const Icon(Icons.check, color: AppColors.goldDark)
@@ -380,6 +382,7 @@ class _Progress extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     final total = state.duration.inMilliseconds;
     final position = state.position.inMilliseconds.clamp(0, total).toDouble();
 
@@ -389,7 +392,7 @@ class _Progress extends StatelessWidget {
           data: SliderTheme.of(context).copyWith(
             trackHeight: 6,
             activeTrackColor: AppColors.goldDark,
-            inactiveTrackColor: AppColors.playerTextSecondary.withValues(
+            inactiveTrackColor: theme.colorScheme.onSurface.withValues(
               alpha: 0.25,
             ),
             thumbColor: AppColors.goldDark,
@@ -410,19 +413,14 @@ class _Progress extends StatelessWidget {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(_clock(state.position), style: _timeStyle),
-              Text(_clock(state.duration), style: _timeStyle),
+              Text(_clock(state.position), style: theme.textTheme.labelSmall),
+              Text(_clock(state.duration), style: theme.textTheme.labelSmall),
             ],
           ),
         ),
       ],
     );
   }
-
-  static const _timeStyle = TextStyle(
-    color: AppColors.playerTextSecondary,
-    fontSize: 12,
-  );
 
   static String _clock(Duration d) =>
       '${d.inMinutes}:${(d.inSeconds % 60).toString().padLeft(2, '0')}';
@@ -437,6 +435,7 @@ class _Transport extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+    final theme = Theme.of(context);
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
@@ -446,7 +445,7 @@ class _Transport extends StatelessWidget {
         IconButton(
           iconSize: 32,
           icon: const Icon(Icons.replay_10),
-          color: AppColors.playerText,
+          color: theme.colorScheme.onSurface,
           tooltip: l10n.actionRewind10,
           onPressed: () =>
               _seekBy(context, state, const Duration(seconds: -10)),
@@ -457,7 +456,7 @@ class _Transport extends StatelessWidget {
         IconButton(
           iconSize: 32,
           icon: const Icon(Icons.forward_10),
-          color: AppColors.playerText,
+          color: theme.colorScheme.onSurface,
           tooltip: l10n.actionForward10,
           onPressed: () => _seekBy(context, state, const Duration(seconds: 10)),
         ),

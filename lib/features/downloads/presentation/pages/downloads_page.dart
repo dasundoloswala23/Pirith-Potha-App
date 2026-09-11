@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:go_router/go_router.dart';
 
 import '../../../../app/theme/app_colors.dart';
 import '../../../../app/theme/app_spacing.dart';
-import '../../../../core/constants/app_route_paths.dart';
 import '../../../../core/l10n/app_localizations.dart';
 import '../../../../core/l10n/bilingual.dart';
 import '../../../../core/widgets/bilingual_text.dart';
@@ -24,72 +22,67 @@ class DownloadsPage extends StatelessWidget {
       body: SafeArea(
         bottom: false,
         child: BlocBuilder<DownloadBloc, DownloadState>(
-        builder: (context, downloadState) {
-          if (downloadState is! DownloadsLoaded) {
-            return const Center(child: CircularProgressIndicator());
-          }
-          final downloadedIds = downloadState.completed
-              .map((d) => d.pirithId)
-              .toSet();
-          if (downloadedIds.isEmpty) {
-            return Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                BilingualHeader(
-                  sinhala: bi.si.downloadsTitle,
-                  english: bi.en.downloadsTitle,
-                ),
-                Expanded(child: _EmptyDownloads(l10n: l10n)),
-              ],
-            );
-          }
-
-          return BlocBuilder<CatalogueBloc, CatalogueState>(
-            builder: (context, catalogueState) {
-              if (catalogueState is! CatalogueLoaded) {
-                return const Center(child: CircularProgressIndicator());
-              }
-              final items = catalogueState.pirith
-                  .where((p) => downloadedIds.contains(p.id))
-                  .toList();
-
+          builder: (context, downloadState) {
+            if (downloadState is! DownloadsLoaded) {
+              return const Center(child: CircularProgressIndicator());
+            }
+            final downloadedIds = downloadState.completed
+                .map((d) => d.pirithId)
+                .toSet();
+            if (downloadedIds.isEmpty) {
               return Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   BilingualHeader(
                     sinhala: bi.si.downloadsTitle,
                     english: bi.en.downloadsTitle,
-                    englishSuffix:
-                        '${items.length} pirith · ${bi.en.downloadsOfflineReady}',
                   ),
-                  _OfflineBanner(count: items.length),
-                  Expanded(
-                    child: ListView.separated(
-                      padding: const EdgeInsets.fromLTRB(
-                        AppSpacing.lg,
-                        AppSpacing.md,
-                        AppSpacing.lg,
-                        AppSpacing.xl,
-                      ),
-                      itemCount: items.length,
-                      separatorBuilder: (_, _) =>
-                          const SizedBox(height: AppSpacing.md),
-                      itemBuilder: (context, index) {
-                        final item = items[index];
-                        return PirithCard(
-                          item: item,
-                          onTap: () => context.push(
-                            AppRoutePaths.pirithDetailsFor(item.id),
-                          ),
-                        );
-                      },
-                    ),
-                  ),
+                  Expanded(child: _EmptyDownloads(l10n: l10n)),
                 ],
               );
-            },
-          );
-        },
+            }
+
+            return BlocBuilder<CatalogueBloc, CatalogueState>(
+              builder: (context, catalogueState) {
+                if (catalogueState is! CatalogueLoaded) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+                final items = catalogueState.pirith
+                    .where((p) => downloadedIds.contains(p.id))
+                    .toList();
+
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    BilingualHeader(
+                      sinhala: bi.si.downloadsTitle,
+                      english: bi.en.downloadsTitle,
+                      englishSuffix:
+                          '${items.length} pirith · ${bi.en.downloadsOfflineReady}',
+                    ),
+                    _OfflineBanner(count: items.length),
+                    Expanded(
+                      child: ListView.separated(
+                        padding: const EdgeInsets.fromLTRB(
+                          AppSpacing.lg,
+                          AppSpacing.md,
+                          AppSpacing.lg,
+                          AppSpacing.xl,
+                        ),
+                        itemCount: items.length,
+                        separatorBuilder: (_, _) =>
+                            const SizedBox(height: AppSpacing.md),
+                        itemBuilder: (context, index) {
+                          final item = items[index];
+                          return PirithCard(item: item);
+                        },
+                      ),
+                    ),
+                  ],
+                );
+              },
+            );
+          },
         ),
       ),
     );

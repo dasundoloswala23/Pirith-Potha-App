@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 
 import '../../../../app/theme/app_spacing.dart';
 import '../../../../app/theme/app_typography.dart';
-import '../../../../core/constants/app_route_paths.dart';
 import '../../../../core/l10n/app_localizations.dart';
 import '../../../../core/l10n/bilingual.dart';
 import '../../../../core/widgets/bilingual_text.dart';
@@ -90,12 +88,7 @@ class _PirithListPageState extends State<PirithListPage> {
                               const SizedBox(height: AppSpacing.md),
                           itemBuilder: (context, index) {
                             final item = items[index];
-                            return PirithCard(
-                              item: item,
-                              onTap: () => context.push(
-                                AppRoutePaths.pirithDetailsFor(item.id),
-                              ),
-                            );
+                            return PirithCard(item: item);
                           },
                         ),
                 ),

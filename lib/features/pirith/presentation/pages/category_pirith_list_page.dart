@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 
-import '../../../../core/constants/app_route_paths.dart';
 import '../../../../core/l10n/app_localizations.dart';
 import '../widgets/catalogue_loaded_builder.dart';
 import '../widgets/pirith_card.dart';
@@ -40,12 +38,7 @@ class CategoryPirithListPage extends StatelessWidget {
                     separatorBuilder: (_, _) => const SizedBox(height: 10),
                     itemBuilder: (context, index) {
                       final item = items[index];
-                      return PirithCard(
-                        item: item,
-                        onTap: () => context.push(
-                          AppRoutePaths.pirithDetailsFor(item.id),
-                        ),
-                      );
+                      return PirithCard(item: item);
                     },
                   ),
                 ),

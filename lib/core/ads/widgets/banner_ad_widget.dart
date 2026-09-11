@@ -6,16 +6,22 @@ import 'package:google_mobile_ads/google_mobile_ads.dart';
 import '../../constants/ad_unit_ids.dart';
 import '../ad_service.dart';
 
-/// Standard banner ad. Placement is the caller's responsibility — per
-/// docs/07_monetization.md, never place this over or beside the player,
-/// and don't wedge it above the very top of a content list.
+/// Display ad — a standard banner by default, or a 300x250 medium
+/// rectangle via [mediumRectangle].
+///
+/// Placement is the caller's responsibility. Keep clear separation from
+/// playback controls: an ad directly under a transport row invites
+/// accidental taps, which AdMob treats as invalid traffic.
 ///
 /// Renders nothing (not even a loading placeholder) on web/desktop, when
-/// ads are disabled (see [AdService.adsEnabled] — Phase 9 wires this to
-/// Premium), or if the ad fails to load, so a slow/blocked ad network call
-/// never leaves a broken-looking gap in the layout.
+/// ads are disabled (see [AdService.adsEnabled], wired to Premium), or if
+/// the ad fails to load, so a slow or blocked ad call never leaves a
+/// broken-looking gap in the layout.
 class BannerAdWidget extends StatefulWidget {
-  const BannerAdWidget({super.key});
+  const BannerAdWidget({this.mediumRectangle = false, super.key});
+
+  /// 300x250 instead of the 320x50 banner.
+  final bool mediumRectangle;
 
   @override
   State<BannerAdWidget> createState() => _BannerAdWidgetState();
@@ -43,7 +49,7 @@ class _BannerAdWidgetState extends State<BannerAdWidget> {
 
     final ad = BannerAd(
       adUnitId: AdUnitIds.bannerUnitId,
-      size: AdSize.banner,
+      size: widget.mediumRectangle ? AdSize.mediumRectangle : AdSize.banner,
       request: const AdRequest(),
       listener: BannerAdListener(
         onAdLoaded: (ad) {

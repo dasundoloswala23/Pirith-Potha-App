@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../../app/theme/app_colors.dart';
 import '../../../../app/theme/app_spacing.dart';
 import '../../../../app/theme/app_typography.dart';
+import '../../../../core/constants/app_route_paths.dart';
 import '../../../../core/l10n/app_localizations.dart';
 import '../../../downloads/domain/entities/download_entity.dart';
 import '../../../downloads/presentation/bloc/download_bloc.dart';
@@ -14,22 +16,25 @@ import '../../../premium/presentation/widgets/premium_gate.dart';
 import '../../domain/entities/pirith_entity.dart';
 import 'pirith_artwork.dart';
 
-/// List row matching the reference `PirithCard`: artwork, Sinhala title +
-/// English subtitle + duration, favorite/download/play actions. Tapping the
-/// row opens details ([onTap]); the gold play button starts playback right
-/// away via [PlayerBloc]; the download and favorite buttons reflect real
+/// List row: artwork, Sinhala title + English subtitle + duration, and
+/// favorite/download/play actions.
+///
+/// Tapping anywhere on the row starts playback and opens the player — one
+/// tap to listen, rather than stopping at a details page and making the
+/// reader tap again. The gold play button does the same thing and stays as
+/// an explicit affordance. Download and favorite reflect real
 /// [DownloadBloc]/`FavoritesBloc` state.
 class PirithCard extends StatelessWidget {
-  const PirithCard({
-    required this.item,
-    required this.onTap,
-    this.compact = false,
-    super.key,
-  });
+  const PirithCard({required this.item, this.compact = false, super.key});
 
   final PirithEntity item;
-  final VoidCallback onTap;
   final bool compact;
+
+  void _play(BuildContext context) {
+    if (!ensurePremiumAccess(context, isPremiumItem: item.isPremium)) return;
+    context.read<PlayerBloc>().add(PlayerPlayRequested(item));
+    context.push(AppRoutePaths.player);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -39,7 +44,7 @@ class PirithCard extends StatelessWidget {
       margin: EdgeInsets.zero,
       child: InkWell(
         borderRadius: BorderRadius.circular(AppRadius.md),
-        onTap: onTap,
+        onTap: () => _play(context),
         child: Padding(
           padding: EdgeInsets.symmetric(
             horizontal: compact ? 12 : 14,
@@ -94,16 +99,7 @@ class PirithCard extends StatelessWidget {
               ),
               FavoriteButton(pirithId: item.id),
               _DownloadButton(item: item),
-              _PlayButton(
-                onTap: () {
-                  if (ensurePremiumAccess(
-                    context,
-                    isPremiumItem: item.isPremium,
-                  )) {
-                    context.read<PlayerBloc>().add(PlayerPlayRequested(item));
-                  }
-                },
-              ),
+              _PlayButton(onTap: () => _play(context)),
             ],
           ),
         ),

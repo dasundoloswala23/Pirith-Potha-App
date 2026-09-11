@@ -16,14 +16,23 @@ class PirithArtwork extends StatelessWidget {
     required this.pirithId,
     this.coverUrl = '',
     this.size = 56,
+    this.height,
     this.radius = AppRadius.md,
     super.key,
   });
 
   final String pirithId;
   final String coverUrl;
+
+  /// Width, and also the height unless [height] overrides it.
   final double size;
+
+  /// Set to show the cover at an aspect ratio other than 1:1 — the player
+  /// uses 16:9 so a wide cover isn't cropped down to a square.
+  final double? height;
   final double radius;
+
+  double get _height => height ?? size;
 
   @override
   Widget build(BuildContext context) {
@@ -36,7 +45,7 @@ class PirithArtwork extends StatelessWidget {
       child: Image.network(
         coverUrl,
         width: size,
-        height: size,
+        height: _height,
         fit: BoxFit.cover,
         errorBuilder: (_, _, _) => _placeholder(borderRadius),
         loadingBuilder: (context, child, progress) =>
@@ -49,7 +58,7 @@ class PirithArtwork extends StatelessWidget {
     final color = AppColors.artworkColorForId(pirithId);
     return Container(
       width: size,
-      height: size,
+      height: _height,
       decoration: BoxDecoration(
         borderRadius: borderRadius,
         gradient: LinearGradient(
@@ -59,7 +68,10 @@ class PirithArtwork extends StatelessWidget {
         ),
       ),
       child: Center(
-        child: PirithMark(size: size * 0.52, color: const Color(0xFFFBF4E6)),
+        child: PirithMark(
+          size: (size < _height ? size : _height) * 0.52,
+          color: const Color(0xFFFBF4E6),
+        ),
       ),
     );
   }

@@ -248,11 +248,7 @@ class _HomeContent extends StatelessWidget {
                     const SizedBox(height: AppSpacing.md),
                 itemBuilder: (context, index) {
                   final item = popular[index];
-                  return PirithCard(
-                    item: item,
-                    onTap: () =>
-                        context.push(AppRoutePaths.pirithDetailsFor(item.id)),
-                  );
+                  return PirithCard(item: item);
                 },
               ),
             ),
