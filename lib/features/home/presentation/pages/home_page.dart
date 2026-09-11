@@ -175,7 +175,7 @@ class _HomeContent extends StatelessWidget {
                           context.push(AppRoutePaths.recentlyPlayed),
                     ),
                     SizedBox(
-                      height: 96,
+                      height: 150,
                       child: ListView.separated(
                         padding: const EdgeInsets.symmetric(
                           horizontal: AppSpacing.lg,
@@ -329,21 +329,39 @@ class _SectionHeader extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(
-            title,
-            style: AppTypography.sinhalaTitle(
-              fontSize: 16,
-              color: Theme.of(context).colorScheme.onSurface,
-            ),
+          Builder(
+            builder: (context) {
+              final bi = Bilingual.of(context);
+              final (lead, _) = bi.order(title, englishTitle);
+              return Text(
+                lead,
+                style: bi.sinhalaFirst
+                    ? AppTypography.sinhalaTitle(
+                        fontSize: 16,
+                        color: Theme.of(context).colorScheme.onSurface,
+                      )
+                    : Theme.of(context).textTheme.titleMedium?.copyWith(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        color: Theme.of(context).colorScheme.onSurface,
+                      ),
+              );
+            },
           ),
           if (onSeeAll != null)
             TextButton(onPressed: onSeeAll, child: Text(seeAllLabel!))
           else
-            Text(
-              englishTitle,
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                color: Theme.of(context).colorScheme.primary,
-              ),
+            Builder(
+              builder: (context) {
+                final bi = Bilingual.of(context);
+                final (_, sub) = bi.order(title, englishTitle);
+                return Text(
+                  sub,
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    color: Theme.of(context).colorScheme.primary,
+                  ),
+                );
+              },
             ),
         ],
       ),
@@ -368,22 +386,33 @@ class _RecentTile extends StatelessWidget {
         context.push(AppRoutePaths.player);
       },
       child: SizedBox(
-        width: 72,
+        width: 96,
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             PirithArtwork(
               pirithId: item.id,
               coverUrl: item.coverUrl,
-              size: 64,
-              radius: AppRadius.sm,
+              size: 96,
+              radius: AppRadius.md,
             ),
             const SizedBox(height: AppSpacing.sm),
             Text(
               item.titleSinhala,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
-              textAlign: TextAlign.center,
-              style: Theme.of(context).textTheme.labelSmall,
+              style: AppTypography.sinhalaTitle(
+                fontSize: 12,
+                color: Theme.of(context).colorScheme.onSurface,
+              ),
+            ),
+            Text(
+              item.title,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                color: Theme.of(context).colorScheme.primary,
+              ),
             ),
           ],
         ),

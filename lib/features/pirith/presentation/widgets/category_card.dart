@@ -4,6 +4,7 @@ import '../../../../app/theme/app_colors.dart';
 import '../../../../app/theme/app_spacing.dart';
 import '../../../../app/theme/app_typography.dart';
 import '../../../../core/l10n/app_localizations.dart';
+import '../../../../core/l10n/bilingual.dart';
 import '../../domain/entities/category_entity.dart';
 
 /// Gradient category tile matching the reference `CategoryCard`.
@@ -24,6 +25,8 @@ class CategoryCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+    final bi = Bilingual.of(context);
+    final (lead, sub) = bi.order(category.nameSinhala, category.name);
     final (start, end) = AppColors.categoryGradientFor(index);
     return InkWell(
       onTap: onTap,
@@ -44,16 +47,31 @@ class CategoryCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisAlignment: MainAxisAlignment.end,
           children: [
+            // Both names, ordered by the reader's leading-language choice,
+            // matching how Pirith are labelled elsewhere.
             Text(
-              category.nameSinhala,
+              lead,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
-              style: AppTypography.sinhalaTitle(
-                fontSize: 15,
-                color: Colors.white,
-                weight: FontWeight.w700,
-              ),
+              style: bi.sinhalaFirst
+                  ? AppTypography.sinhalaTitle(
+                      fontSize: 15,
+                      color: Colors.white,
+                      weight: FontWeight.w700,
+                    )
+                  : const TextStyle(
+                      fontSize: 15,
+                      color: Colors.white,
+                      fontWeight: FontWeight.w700,
+                    ),
             ),
+            if (sub.isNotEmpty)
+              Text(
+                sub,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(color: Colors.white70, fontSize: 11),
+              ),
             const SizedBox(height: AppSpacing.xs),
             Text(
               l10n.categoryPirithCount(count),

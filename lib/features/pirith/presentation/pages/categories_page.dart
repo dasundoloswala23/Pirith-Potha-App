@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/constants/app_route_paths.dart';
-import '../../../../core/l10n/app_localizations.dart';
+import '../../../../core/l10n/bilingual.dart';
+import '../../../../core/widgets/bilingual_text.dart';
 import '../widgets/catalogue_loaded_builder.dart';
 import '../widgets/category_card.dart';
 
@@ -11,12 +12,22 @@ class CategoriesPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
+    final bi = Bilingual.of(context);
     return Scaffold(
-      appBar: AppBar(title: Text(l10n.sectionCategories)),
-      body: CatalogueLoadedBuilder(
+      body: SafeArea(
+        bottom: false,
+        child: CatalogueLoadedBuilder(
         builder: (context, state) {
-          return GridView.builder(
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              BilingualHeader(
+                sinhala: bi.si.sectionCategories,
+                english: bi.en.sectionCategories,
+                englishSuffix: '${state.categories.length}',
+              ),
+              Expanded(
+                child: GridView.builder(
             padding: const EdgeInsets.all(16),
             gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: 2,
@@ -34,8 +45,12 @@ class CategoriesPage extends StatelessWidget {
                 onTap: () => context.push(AppRoutePaths.categoryDetailsFor(category.id)),
               );
             },
+                ),
+              ),
+            ],
           );
         },
+        ),
       ),
     );
   }

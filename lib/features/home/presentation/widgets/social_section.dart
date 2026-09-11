@@ -1,145 +1,135 @@
 import 'package:flutter/material.dart';
 
 import '../../../../app/theme/app_spacing.dart';
-import '../../../../app/theme/app_typography.dart';
 import '../../../../core/constants/social_links.dart';
-import '../../../../core/l10n/app_localizations.dart';
 import '../../../../core/l10n/bilingual.dart';
 import '../../../../core/services/external_link_launcher.dart';
 
-/// Invitation to follow the official YouTube/Facebook presence — see
-/// docs/08_ui_ux.md. A card is hidden if its URL isn't configured yet (see
+/// Compact "follow us" row near the top of Home — see docs/08_ui_ux.md.
+///
+/// Deliberately small: it sits above the catalogue, so a full heading plus
+/// body copy plus a large card would push the actual Pirith content off the
+/// first screen. Each card is hidden if its URL isn't configured yet (see
 /// core/constants/social_links.dart).
+///
+/// Brand names stay in Latin script in both languages — "YouTube" is a
+/// proper noun, and transliterating it reads as a misspelling.
 class SocialSection extends StatelessWidget {
   const SocialSection({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
     final bi = Bilingual.of(context);
-    final theme = Theme.of(context);
 
-    if (SocialLinks.youTubeUrl.isEmpty && SocialLinks.facebookUrl.isEmpty) {
-      return const SizedBox.shrink();
-    }
+    final links = [
+      if (SocialLinks.youTubeUrl.isNotEmpty)
+        (
+          icon: Icons.play_circle_fill,
+          color: const Color(0xFFFF0000),
+          label: bi.en.socialYouTubeTitle,
+          url: SocialLinks.youTubeUrl,
+        ),
+      if (SocialLinks.facebookUrl.isNotEmpty)
+        (
+          icon: Icons.facebook,
+          color: const Color(0xFF1877F2),
+          label: bi.en.socialFacebookTitle,
+          url: SocialLinks.facebookUrl,
+        ),
+    ];
+    if (links.isEmpty) return const SizedBox.shrink();
+
+    final theme = Theme.of(context);
+    final (lead, sub) = bi.order(bi.si.socialHeading, bi.en.socialHeading);
 
     return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 24, 16, 8),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      padding: const EdgeInsets.fromLTRB(
+        AppSpacing.lg,
+        AppSpacing.lg,
+        AppSpacing.lg,
+        0,
+      ),
+      child: Row(
         children: [
-          Text(
-            bi.si.socialHeading,
-            style: AppTypography.sinhalaTitle(
-              fontSize: 17,
-              color: theme.colorScheme.onSurface,
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  lead,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    fontWeight: FontWeight.w600,
+                    color: theme.colorScheme.onSurface,
+                  ),
+                ),
+                Text(
+                  sub,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: theme.textTheme.labelSmall?.copyWith(
+                    color: theme.colorScheme.primary,
+                  ),
+                ),
+              ],
             ),
           ),
-          Text(
-            bi.en.socialHeading,
-            style: theme.textTheme.bodySmall?.copyWith(
-              color: theme.colorScheme.primary,
+          const SizedBox(width: AppSpacing.sm),
+          for (final link in links) ...[
+            const SizedBox(width: AppSpacing.sm),
+            _SocialChip(
+              icon: link.icon,
+              color: link.color,
+              label: link.label,
+              url: link.url,
             ),
-          ),
-          const SizedBox(height: AppSpacing.sm),
-          Text(bi.si.socialSubtitle, style: theme.textTheme.bodySmall),
-          const SizedBox(height: AppSpacing.lg),
-          if (SocialLinks.youTubeUrl.isNotEmpty)
-            _SocialCard(
-              icon: Icons.play_circle_fill,
-              iconColor: const Color(0xFFFF0000),
-              title: l10n.socialYouTubeTitle,
-              sinhalaTitle: bi.si.socialYouTubeTitle,
-              subtitle: l10n.socialYouTubeSubtitle,
-              cta: l10n.socialYouTubeCta,
-              url: SocialLinks.youTubeUrl,
-            ),
-          if (SocialLinks.youTubeUrl.isNotEmpty &&
-              SocialLinks.facebookUrl.isNotEmpty)
-            const SizedBox(height: 10),
-          if (SocialLinks.facebookUrl.isNotEmpty)
-            _SocialCard(
-              icon: Icons.facebook,
-              iconColor: const Color(0xFF1877F2),
-              title: l10n.socialFacebookTitle,
-              sinhalaTitle: bi.si.socialFacebookTitle,
-              subtitle: l10n.socialFacebookSubtitle,
-              cta: l10n.socialFacebookCta,
-              url: SocialLinks.facebookUrl,
-            ),
+          ],
         ],
       ),
     );
   }
 }
 
-class _SocialCard extends StatelessWidget {
-  const _SocialCard({
+class _SocialChip extends StatelessWidget {
+  const _SocialChip({
     required this.icon,
-    required this.iconColor,
-    required this.title,
-    required this.sinhalaTitle,
-    required this.subtitle,
-    required this.cta,
+    required this.color,
+    required this.label,
     required this.url,
   });
 
   final IconData icon;
-  final Color iconColor;
-  final String title;
-  final String sinhalaTitle;
-  final String subtitle;
-  final String cta;
+  final Color color;
+  final String label;
   final String url;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    return Card(
-      margin: EdgeInsets.zero,
+    return Material(
+      color: theme.colorScheme.surface,
+      borderRadius: BorderRadius.circular(AppRadius.md),
       child: InkWell(
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(AppRadius.md),
         onTap: () => launchExternalUrl(url),
         child: Padding(
-          padding: const EdgeInsets.all(14),
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppSpacing.md,
+            vertical: AppSpacing.sm,
+          ),
           child: Row(
+            mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(icon, color: iconColor, size: 32),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      sinhalaTitle,
-                      style: AppTypography.sinhalaTitle(
-                        fontSize: 14,
-                        color: theme.colorScheme.onSurface,
-                      ),
-                    ),
-                    Text(
-                      title,
-                      style: theme.textTheme.bodySmall?.copyWith(
-                        color: theme.colorScheme.primary,
-                      ),
-                    ),
-                    const SizedBox(height: AppSpacing.xs),
-                    Text(subtitle, style: theme.textTheme.bodySmall),
-                    const SizedBox(height: 6),
-                    Text(
-                      cta,
-                      style: theme.textTheme.labelMedium?.copyWith(
-                        color: theme.colorScheme.primary,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ],
+              Icon(icon, color: color, size: 20),
+              const SizedBox(width: 6),
+              Text(
+                label,
+                style: theme.textTheme.labelMedium?.copyWith(
+                  fontWeight: FontWeight.w600,
+                  color: theme.colorScheme.onSurface,
                 ),
-              ),
-              Icon(
-                Icons.chevron_right,
-                color: theme.colorScheme.onSurface.withValues(alpha: 0.4),
               ),
             ],
           ),

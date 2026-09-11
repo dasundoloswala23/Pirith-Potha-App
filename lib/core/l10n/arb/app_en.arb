@@ -103,6 +103,7 @@
   },
   "labelFeatured": "Featured",
   "labelOffline": "Offline",
+  "nowPlaying": "Now Playing",
   "actionWatchOnYouTube": "Watch on YouTube",
   "catalogueErrorGeneric": "Couldn't load the Pirith catalogue. Check your connection and try again.",
   "categoryPirithCount": "{count} Pirith",

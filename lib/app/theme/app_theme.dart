@@ -67,7 +67,11 @@ abstract final class AppTheme {
       ),
       cardTheme: CardThemeData(
         color: surface,
-        elevation: 0,
+        // A hairline border plus a very soft shadow, rather than Material's
+        // default tinted elevation, which muddies the warm cream palette.
+        elevation: 1,
+        shadowColor: const Color(0x14000000),
+        surfaceTintColor: Colors.transparent,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(AppRadius.md),
           side: BorderSide(color: border2),

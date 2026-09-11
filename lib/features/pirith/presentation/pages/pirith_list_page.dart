@@ -51,7 +51,7 @@ class _PirithListPageState extends State<PirithListPage> {
                 BilingualHeader(
                   sinhala: bi.si.navPirith,
                   english: bi.en.navPirith,
-                  englishSuffix: '${state.pirith.length} pirith',
+                  englishSuffix: '${state.pirith.length}',
                 ),
                 Padding(
                   padding: const EdgeInsets.symmetric(
