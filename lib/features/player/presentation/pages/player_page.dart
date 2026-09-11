@@ -12,6 +12,7 @@ import '../../../downloads/presentation/bloc/download_bloc.dart';
 import '../../../favorites/presentation/bloc/favorites_bloc.dart';
 import '../../../pirith/domain/entities/pirith_entity.dart';
 import '../../../pirith/presentation/widgets/pirith_artwork.dart';
+import '../../domain/entities/playback_mode.dart';
 import '../../domain/entities/playback_status.dart';
 import '../bloc/player_bloc.dart';
 import '../bloc/sleep_timer_cubit.dart';
@@ -107,7 +108,14 @@ class _NowPlaying extends StatelessWidget {
                   const SizedBox(height: AppSpacing.md),
                   _Transport(state: state, isBuffering: isBuffering),
                   const SizedBox(height: AppSpacing.md),
-                  const _SleepTimerButton(),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      _PlaybackModeButton(mode: state.mode),
+                      const SizedBox(width: AppSpacing.sm),
+                      const _SleepTimerButton(),
+                    ],
+                  ),
                   // Kept well below the transport row: an ad crowding the
                   // play controls invites accidental taps, which AdMob
                   // counts as invalid traffic.
@@ -291,6 +299,48 @@ class _ActionRow extends StatelessWidget {
           ),
         ),
       ],
+    );
+  }
+}
+
+/// Cycles through the playback modes, naming the one that is active so
+/// the icon alone never has to carry the meaning.
+class _PlaybackModeButton extends StatelessWidget {
+  const _PlaybackModeButton({required this.mode});
+
+  final PlaybackMode mode;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final theme = Theme.of(context);
+    final isDefault = mode == PlaybackMode.normal;
+
+    final (icon, label) = switch (mode) {
+      PlaybackMode.normal => (Icons.trending_flat, l10n.modeNormal),
+      PlaybackMode.repeatAll => (Icons.repeat, l10n.modeRepeatAll),
+      PlaybackMode.repeatOne => (Icons.repeat_one, l10n.modeRepeatOne),
+      PlaybackMode.shuffle => (Icons.shuffle, l10n.modeShuffle),
+    };
+
+    return TextButton.icon(
+      onPressed: () =>
+          context.read<PlayerBloc>().add(PlayerModeChanged(mode.next)),
+      icon: Icon(
+        icon,
+        size: 20,
+        color: isDefault
+            ? theme.colorScheme.onSurface.withValues(alpha: 0.6)
+            : theme.colorScheme.primary,
+      ),
+      label: Text(
+        label,
+        style: TextStyle(
+          color: isDefault
+              ? theme.colorScheme.onSurface.withValues(alpha: 0.6)
+              : theme.colorScheme.primary,
+        ),
+      ),
     );
   }
 }

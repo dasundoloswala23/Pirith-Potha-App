@@ -44,6 +44,10 @@ import '../../features/player/data/repositories/audio_repository_impl.dart';
 import '../../features/player/domain/repositories/audio_repository.dart';
 import '../../features/player/domain/usecases/pause_playback.dart';
 import '../../features/player/domain/usecases/play_pirith.dart';
+import '../../features/player/domain/usecases/play_queue.dart';
+import '../../features/player/domain/usecases/set_playback_mode.dart';
+import '../../features/player/domain/usecases/skip_to_next.dart';
+import '../../features/player/domain/usecases/skip_to_previous.dart';
 import '../../features/player/domain/usecases/resume_playback.dart';
 import '../../features/player/domain/usecases/seek_playback.dart';
 import '../../features/player/domain/usecases/stop_playback.dart';
@@ -155,6 +159,10 @@ Future<void> _registerPlayerFeature() async {
       () => AudioRepositoryImpl(getIt<PirithAudioHandler>(), getIt<DownloadRepository>()),
     )
     ..registerLazySingleton(() => PlayPirith(getIt<AudioRepository>()))
+    ..registerLazySingleton(() => PlayQueue(getIt<AudioRepository>()))
+    ..registerLazySingleton(() => SkipToNext(getIt<AudioRepository>()))
+    ..registerLazySingleton(() => SkipToPrevious(getIt<AudioRepository>()))
+    ..registerLazySingleton(() => SetPlaybackMode(getIt<AudioRepository>()))
     ..registerLazySingleton(() => PausePlayback(getIt<AudioRepository>()))
     ..registerLazySingleton(() => ResumePlayback(getIt<AudioRepository>()))
     ..registerLazySingleton(() => SeekPlayback(getIt<AudioRepository>()))
@@ -163,6 +171,10 @@ Future<void> _registerPlayerFeature() async {
       () => PlayerBloc(
         audioRepository: getIt<AudioRepository>(),
         playPirith: getIt<PlayPirith>(),
+        playQueue: getIt<PlayQueue>(),
+        skipToNext: getIt<SkipToNext>(),
+        skipToPrevious: getIt<SkipToPrevious>(),
+        setPlaybackMode: getIt<SetPlaybackMode>(),
         pausePlayback: getIt<PausePlayback>(),
         resumePlayback: getIt<ResumePlayback>(),
         seekPlayback: getIt<SeekPlayback>(),

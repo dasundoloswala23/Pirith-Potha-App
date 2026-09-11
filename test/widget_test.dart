@@ -24,6 +24,10 @@ import 'package:pitithpotha/features/pirith/domain/usecases/get_categories.dart'
 import 'package:pitithpotha/features/pirith/presentation/bloc/catalogue_bloc.dart';
 import 'package:pitithpotha/features/player/domain/usecases/pause_playback.dart';
 import 'package:pitithpotha/features/player/domain/usecases/play_pirith.dart';
+import 'package:pitithpotha/features/player/domain/usecases/play_queue.dart';
+import 'package:pitithpotha/features/player/domain/usecases/set_playback_mode.dart';
+import 'package:pitithpotha/features/player/domain/usecases/skip_to_next.dart';
+import 'package:pitithpotha/features/player/domain/usecases/skip_to_previous.dart';
 import 'package:pitithpotha/features/player/domain/usecases/resume_playback.dart';
 import 'package:pitithpotha/features/player/domain/usecases/seek_playback.dart';
 import 'package:pitithpotha/features/player/domain/usecases/stop_playback.dart';
@@ -74,6 +78,10 @@ void main() {
     final playerBloc = PlayerBloc(
       audioRepository: fakeAudioRepository,
       playPirith: PlayPirith(fakeAudioRepository),
+      playQueue: PlayQueue(fakeAudioRepository),
+      skipToNext: SkipToNext(fakeAudioRepository),
+      skipToPrevious: SkipToPrevious(fakeAudioRepository),
+      setPlaybackMode: SetPlaybackMode(fakeAudioRepository),
       pausePlayback: PausePlayback(fakeAudioRepository),
       resumePlayback: ResumePlayback(fakeAudioRepository),
       seekPlayback: SeekPlayback(fakeAudioRepository),

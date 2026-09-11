@@ -16,6 +16,45 @@ class PlayerPlayRequested extends PlayerEvent {
   List<Object?> get props => [item];
 }
 
+/// Plays a whole queue — a playlist, a category listing, or search
+/// results — starting at [startIndex].
+class PlayerQueueRequested extends PlayerEvent {
+  const PlayerQueueRequested(this.items, {this.startIndex = 0, this.mode});
+
+  final List<PirithEntity> items;
+  final int startIndex;
+  final PlaybackMode? mode;
+
+  @override
+  List<Object?> get props => [items, startIndex, mode];
+}
+
+class PlayerNextRequested extends PlayerEvent {
+  const PlayerNextRequested();
+}
+
+class PlayerPreviousRequested extends PlayerEvent {
+  const PlayerPreviousRequested();
+}
+
+class PlayerModeChanged extends PlayerEvent {
+  const PlayerModeChanged(this.mode);
+
+  final PlaybackMode mode;
+
+  @override
+  List<Object?> get props => [mode];
+}
+
+class PlayerQueueIndexSelected extends PlayerEvent {
+  const PlayerQueueIndexSelected(this.index);
+
+  final int index;
+
+  @override
+  List<Object?> get props => [index];
+}
+
 class PlayerPauseRequested extends PlayerEvent {
   const PlayerPauseRequested();
 }
@@ -53,6 +92,17 @@ class _PlayerPositionChanged extends PlayerEvent {
 
   @override
   List<Object?> get props => [position];
+}
+
+/// The player moved to another queue item — including auto-advance we
+/// didn't ask for, which is how the UI follows the audio.
+class _PlayerIndexChanged extends PlayerEvent {
+  const _PlayerIndexChanged(this.index);
+
+  final int index;
+
+  @override
+  List<Object?> get props => [index];
 }
 
 class _PlayerDurationChanged extends PlayerEvent {

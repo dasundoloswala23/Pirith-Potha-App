@@ -63,9 +63,29 @@ depend on network access. The `AudioRepository` decides local-vs-remote
 source resolution (checking the download store first) before handing a
 source to the manager; `PlayerBloc` doesn't know the difference.
 
+## Queue playback
+
+Playback is queue-based throughout — a single Pirith is a queue of one, so
+there is one code path rather than two. The queue lives in `just_audio`'s
+own sequence (`setAudioSources`), not in a hand-rolled "load the next file
+when this one ends" loop, which is what gives us gapless advance, loop and
+shuffle modes, and working lock-screen skip buttons for free.
+
+- `PlaybackMode` (normal / repeatOne / repeatAll / shuffle) maps onto
+  `setLoopMode` + `setShuffleModeEnabled` in `PirithAudioHandler`.
+- The UI follows the audio rather than the other way round: the handler
+  drives `mediaItem` from `currentIndexStream`, and `PlayerBloc` listens to
+  `AudioRepository.currentIndexStream`, so an advance triggered by a track
+  ending or by the lock screen updates the mini-player correctly.
+- Local-vs-remote source resolution happens per item when the queue is
+  built. A download that completes mid-queue therefore only takes effect
+  the next time the queue is built — the tradeoff for letting `just_audio`
+  own the sequence.
+- `ProcessingState.completed` is only handled for the genuine end of
+  playback (loop off, no more items); with a loop mode set the player
+  advances on its own.
+
 ## Out of scope for the initial audio phase
 
-- Playlists / queue reordering UI (build the queue-capable plumbing, but
-  playlist management ships in V1.1)
-- Sleep timer (V1.1 feature; can be layered on top of `PlayerBloc` later
-  without changing `AudioPlayerManager`)
+- Sleep timer (shipped since — layered on top of `PlayerBloc` via
+  `SleepTimerCubit` without changing the audio layer, as anticipated)

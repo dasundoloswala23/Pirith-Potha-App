@@ -5,10 +5,15 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../history/domain/usecases/record_played.dart';
 import '../../../pirith/domain/entities/pirith_entity.dart';
+import '../../domain/entities/playback_mode.dart';
 import '../../domain/entities/playback_status.dart';
 import '../../domain/repositories/audio_repository.dart';
 import '../../domain/usecases/pause_playback.dart';
 import '../../domain/usecases/play_pirith.dart';
+import '../../domain/usecases/play_queue.dart';
+import '../../domain/usecases/set_playback_mode.dart';
+import '../../domain/usecases/skip_to_next.dart';
+import '../../domain/usecases/skip_to_previous.dart';
 import '../../domain/usecases/resume_playback.dart';
 import '../../domain/usecases/seek_playback.dart';
 import '../../domain/usecases/stop_playback.dart';
@@ -18,12 +23,21 @@ part 'player_state.dart';
 
 /// App-scoped BLoC (one instance for the whole app, so the mini-player and
 /// full player screen always reflect the same "now playing" state) — see
-/// docs/04_audio_architecture.md. Single active item only; queue/playlist
-/// support is a V1.1 feature.
+/// docs/04_audio_architecture.md.
+///
+/// Playback is queue-based throughout; a single Pirith is a queue of one.
+/// Auto-advance is driven by the player itself via
+/// [AudioRepository.currentIndexStream] rather than by this BLoC watching
+/// for completion, so the UI follows the audio even when the advance
+/// happened from the lock screen.
 class PlayerBloc extends Bloc<PlayerEvent, PlayerState> {
   PlayerBloc({
     required AudioRepository audioRepository,
     required PlayPirith playPirith,
+    required PlayQueue playQueue,
+    required SkipToNext skipToNext,
+    required SkipToPrevious skipToPrevious,
+    required SetPlaybackMode setPlaybackMode,
     required PausePlayback pausePlayback,
     required ResumePlayback resumePlayback,
     required SeekPlayback seekPlayback,
@@ -31,6 +45,10 @@ class PlayerBloc extends Bloc<PlayerEvent, PlayerState> {
     required RecordPlayed recordPlayed,
   })  : _audioRepository = audioRepository,
         _playPirith = playPirith,
+        _playQueue = playQueue,
+        _skipToNext = skipToNext,
+        _skipToPrevious = skipToPrevious,
+        _setPlaybackMode = setPlaybackMode,
         _pausePlayback = pausePlayback,
         _resumePlayback = resumePlayback,
         _seekPlayback = seekPlayback,
@@ -38,6 +56,14 @@ class PlayerBloc extends Bloc<PlayerEvent, PlayerState> {
         _recordPlayed = recordPlayed,
         super(const PlayerIdle()) {
     on<PlayerPlayRequested>(_onPlayRequested);
+    on<PlayerQueueRequested>(_onQueueRequested);
+    on<PlayerNextRequested>((event, emit) => _skipToNext());
+    on<PlayerPreviousRequested>((event, emit) => _skipToPrevious());
+    on<PlayerQueueIndexSelected>(
+      (event, emit) => _audioRepository.skipToIndex(event.index),
+    );
+    on<PlayerModeChanged>(_onModeChanged);
+    on<_PlayerIndexChanged>(_onIndexChanged);
     on<PlayerPauseRequested>((event, emit) => _pausePlayback());
     on<PlayerResumeRequested>((event, emit) => _resumePlayback());
     on<PlayerSeekRequested>((event, emit) => _seekPlayback(event.position));
@@ -55,10 +81,17 @@ class PlayerBloc extends Bloc<PlayerEvent, PlayerState> {
     _durationSubscription = _audioRepository.durationStream.listen(
       (duration) => add(_PlayerDurationChanged(duration)),
     );
+    _indexSubscription = _audioRepository.currentIndexStream.listen(
+      (index) => add(_PlayerIndexChanged(index)),
+    );
   }
 
   final AudioRepository _audioRepository;
   final PlayPirith _playPirith;
+  final PlayQueue _playQueue;
+  final SkipToNext _skipToNext;
+  final SkipToPrevious _skipToPrevious;
+  final SetPlaybackMode _setPlaybackMode;
   final PausePlayback _pausePlayback;
   final ResumePlayback _resumePlayback;
   final SeekPlayback _seekPlayback;
@@ -68,6 +101,7 @@ class PlayerBloc extends Bloc<PlayerEvent, PlayerState> {
   late final StreamSubscription<PlaybackStatus> _statusSubscription;
   late final StreamSubscription<Duration> _positionSubscription;
   late final StreamSubscription<Duration?> _durationSubscription;
+  late final StreamSubscription<int> _indexSubscription;
 
   Future<void> _onPlayRequested(
     PlayerPlayRequested event,
@@ -79,10 +113,66 @@ class PlayerBloc extends Bloc<PlayerEvent, PlayerState> {
         status: PlaybackStatus.loading,
         position: Duration.zero,
         duration: Duration(seconds: event.item.duration),
+        queue: [event.item],
+        mode: _audioRepository.mode,
       ),
     );
     await _playPirith(event.item);
     unawaited(_recordPlayed(event.item.id));
+  }
+
+  Future<void> _onQueueRequested(
+    PlayerQueueRequested event,
+    Emitter<PlayerState> emit,
+  ) async {
+    if (event.items.isEmpty) return;
+    final start = event.startIndex.clamp(0, event.items.length - 1);
+    final item = event.items[start];
+    // Emitted before awaiting playback so the player appears instantly.
+    emit(
+      PlayerActive(
+        item: item,
+        status: PlaybackStatus.loading,
+        position: Duration.zero,
+        duration: Duration(seconds: item.duration),
+        queue: event.items,
+        queueIndex: start,
+        mode: event.mode ?? _audioRepository.mode,
+      ),
+    );
+    await _playQueue(event.items, startIndex: start, mode: event.mode);
+    unawaited(_recordPlayed(item.id));
+  }
+
+  Future<void> _onModeChanged(
+    PlayerModeChanged event,
+    Emitter<PlayerState> emit,
+  ) async {
+    final current = state;
+    if (current is PlayerActive) emit(current.copyWith(mode: event.mode));
+    await _setPlaybackMode(event.mode);
+  }
+
+  /// Follows the player to whichever item it moved to — including advances
+  /// this BLoC didn't initiate, such as a track ending or a lock-screen
+  /// skip. Without this the mini-player would keep showing the previous
+  /// chant while the next one played.
+  void _onIndexChanged(_PlayerIndexChanged event, Emitter<PlayerState> emit) {
+    final current = state;
+    if (current is! PlayerActive) return;
+    if (event.index < 0 || event.index >= current.queue.length) return;
+    if (event.index == current.queueIndex) return;
+
+    final item = current.queue[event.index];
+    emit(
+      current.copyWith(
+        item: item,
+        queueIndex: event.index,
+        position: Duration.zero,
+        duration: Duration(seconds: item.duration),
+      ),
+    );
+    unawaited(_recordPlayed(item.id));
   }
 
   Future<void> _onStopRequested(
@@ -119,6 +209,7 @@ class PlayerBloc extends Bloc<PlayerEvent, PlayerState> {
     _statusSubscription.cancel();
     _positionSubscription.cancel();
     _durationSubscription.cancel();
+    _indexSubscription.cancel();
     return super.close();
   }
 }
