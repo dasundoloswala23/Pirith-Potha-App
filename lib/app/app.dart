@@ -12,6 +12,7 @@ import '../features/favorites/presentation/bloc/favorites_bloc.dart';
 import '../features/history/presentation/bloc/history_bloc.dart';
 import '../features/pirith/presentation/bloc/catalogue_bloc.dart';
 import '../features/player/presentation/bloc/player_bloc.dart';
+import '../features/player/presentation/bloc/sleep_timer_cubit.dart';
 import '../features/premium/presentation/bloc/premium_bloc.dart';
 import 'router/app_router.dart';
 import 'theme/app_theme.dart';
@@ -35,6 +36,7 @@ class PirithPothaApp extends StatefulWidget {
     required this.historyBloc,
     required this.premiumBloc,
     required this.languageCubit,
+    required this.sleepTimerCubit,
     this.adService,
     super.key,
   });
@@ -47,6 +49,7 @@ class PirithPothaApp extends StatefulWidget {
   final HistoryBloc historyBloc;
   final PremiumBloc premiumBloc;
   final LanguageCubit languageCubit;
+  final SleepTimerCubit sleepTimerCubit;
 
   /// Null in widget tests, which build the app without the ad SDK; the
   /// player-exit interstitial is simply not wired up in that case.
@@ -81,6 +84,7 @@ class _PirithPothaAppState extends State<PirithPothaApp> {
         BlocProvider<HistoryBloc>.value(value: widget.historyBloc),
         BlocProvider<PremiumBloc>.value(value: widget.premiumBloc),
         BlocProvider<LanguageCubit>.value(value: widget.languageCubit),
+        BlocProvider<SleepTimerCubit>.value(value: widget.sleepTimerCubit),
       ],
       child: MaterialApp.router(
         debugShowCheckedModeBanner: false,

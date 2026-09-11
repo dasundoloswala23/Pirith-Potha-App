@@ -104,6 +104,17 @@
   "labelFeatured": "Featured",
   "labelOffline": "Offline",
   "nowPlaying": "Now Playing",
+  "sleepTimerOff": "Off",
+  "sleepTimerMinutes": "{count} minutes",
+  "@sleepTimerMinutes": {
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "sleepTimerActive": "Sleeps in {minutes} min",
+  "@sleepTimerActive": {
+    "placeholders": { "minutes": { "type": "int" } }
+  },
+  "actionRewind10": "Back 10 seconds",
+  "actionForward10": "Forward 10 seconds",
   "actionWatchOnYouTube": "Watch on YouTube",
   "catalogueErrorGeneric": "Couldn't load the Pirith catalogue. Check your connection and try again.",
   "categoryPirithCount": "{count} Pirith",

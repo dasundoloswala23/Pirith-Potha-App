@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../app/theme/app_spacing.dart';
 import '../../../../app/theme/app_typography.dart';
 import '../../../../core/constants/app_route_paths.dart';
 import '../../../pirith/presentation/widgets/pirith_artwork.dart';
@@ -24,6 +25,8 @@ class MiniPlayerBar extends StatelessWidget {
             ? 0.0
             : state.position.inMilliseconds / state.duration.inMilliseconds;
 
+        // A hairline above the bar separates it from the content behind it,
+        // so it reads as docked rather than colliding with the nav below.
         return Material(
           color: theme.colorScheme.surface,
           child: InkWell(
@@ -33,23 +36,25 @@ class MiniPlayerBar extends StatelessWidget {
               children: [
                 LinearProgressIndicator(
                   value: progress.clamp(0, 1),
-                  minHeight: 2,
+                  minHeight: 3,
                   backgroundColor: theme.colorScheme.surfaceContainerHighest,
                 ),
                 Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 8,
+                  padding: const EdgeInsets.fromLTRB(
+                    AppSpacing.md,
+                    AppSpacing.md,
+                    AppSpacing.sm,
+                    AppSpacing.md,
                   ),
                   child: Row(
                     children: [
                       PirithArtwork(
                         pirithId: state.item.id,
                         coverUrl: state.item.coverUrl,
-                        size: 36,
-                        radius: 8,
+                        size: 48,
+                        radius: AppRadius.sm,
                       ),
-                      const SizedBox(width: 10),
+                      const SizedBox(width: AppSpacing.md),
                       Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -60,7 +65,7 @@ class MiniPlayerBar extends StatelessWidget {
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                               style: AppTypography.sinhalaTitle(
-                                fontSize: 13,
+                                fontSize: 14,
                                 color: theme.colorScheme.onSurface,
                               ),
                             ),
@@ -74,8 +79,10 @@ class MiniPlayerBar extends StatelessWidget {
                         ),
                       ),
                       IconButton(
+                        iconSize: 28,
+                        color: theme.colorScheme.primary,
                         icon: Icon(
-                          state.isPlaying ? Icons.pause : Icons.play_arrow,
+                          state.isPlaying ? Icons.pause_circle : Icons.play_circle,
                         ),
                         onPressed: () => context.read<PlayerBloc>().add(
                           state.isPlaying

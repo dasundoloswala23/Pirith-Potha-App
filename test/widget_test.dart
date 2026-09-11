@@ -1,6 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:pitithpotha/core/l10n/language_cubit.dart';
+import 'package:pitithpotha/features/player/presentation/bloc/sleep_timer_cubit.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import 'package:pitithpotha/app/app.dart';
@@ -104,6 +105,9 @@ void main() {
     final languageCubit = LanguageCubit(await SharedPreferences.getInstance());
     addTearDown(languageCubit.close);
 
+    final sleepTimerCubit = SleepTimerCubit(playerBloc);
+    addTearDown(sleepTimerCubit.close);
+
     await tester.pumpWidget(
       PirithPothaApp(
         authBloc: authBloc,
@@ -114,6 +118,7 @@ void main() {
         historyBloc: historyBloc,
         premiumBloc: premiumBloc,
         languageCubit: languageCubit,
+        sleepTimerCubit: sleepTimerCubit,
       ),
     );
     expect(find.byType(PirithPothaApp), findsOneWidget);

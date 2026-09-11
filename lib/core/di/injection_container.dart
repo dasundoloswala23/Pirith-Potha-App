@@ -7,6 +7,7 @@ import 'package:get_it/get_it.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../l10n/language_cubit.dart';
+import '../../features/player/presentation/bloc/sleep_timer_cubit.dart';
 
 import '../../features/auth/data/datasources/auth_remote_data_source.dart';
 import '../../features/auth/data/datasources/firebase_auth_remote_data_source.dart';
@@ -83,6 +84,7 @@ Future<void> configureDependencies() async {
   await _registerHistoryFeature(prefs);
   await _registerPlayerFeature();
   await _registerAdsFeature();
+  getIt.registerLazySingleton(() => SleepTimerCubit(getIt<PlayerBloc>()));
 }
 
 void _registerPremiumFeature() {

@@ -11,6 +11,7 @@ import 'features/favorites/presentation/bloc/favorites_bloc.dart';
 import 'features/history/presentation/bloc/history_bloc.dart';
 import 'features/pirith/presentation/bloc/catalogue_bloc.dart';
 import 'features/player/presentation/bloc/player_bloc.dart';
+import 'features/player/presentation/bloc/sleep_timer_cubit.dart';
 import 'features/premium/presentation/bloc/premium_bloc.dart';
 
 Future<void> main() async {
@@ -27,6 +28,7 @@ Future<void> main() async {
       historyBloc: getIt<HistoryBloc>(),
       premiumBloc: getIt<PremiumBloc>(),
       languageCubit: getIt<LanguageCubit>(),
+      sleepTimerCubit: getIt<SleepTimerCubit>(),
       adService: getIt<AdService>(),
     ),
   );

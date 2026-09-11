@@ -7,11 +7,14 @@ import '../../../../app/theme/app_theme.dart';
 import '../../../../app/theme/app_typography.dart';
 import '../../../../core/l10n/app_localizations.dart';
 import '../../../../core/services/external_link_launcher.dart';
+import '../../../downloads/domain/entities/download_entity.dart';
 import '../../../downloads/presentation/bloc/download_bloc.dart';
-import '../../../favorites/presentation/widgets/favorite_button.dart';
+import '../../../favorites/presentation/bloc/favorites_bloc.dart';
+import '../../../pirith/domain/entities/pirith_entity.dart';
 import '../../../pirith/presentation/widgets/pirith_artwork.dart';
 import '../../domain/entities/playback_status.dart';
 import '../bloc/player_bloc.dart';
+import '../bloc/sleep_timer_cubit.dart';
 
 /// Full-screen "now playing", driven by the app-scoped [PlayerBloc] — see
 /// docs/04_audio_architecture.md. Background/lock-screen playback and
@@ -82,41 +85,58 @@ class _NowPlaying extends StatelessWidget {
         state.status == PlaybackStatus.buffering;
 
     return SafeArea(
-      child: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(
-            horizontal: AppSpacing.xl,
-            vertical: AppSpacing.lg,
-          ),
-          child: Column(
-            children: [
-              const SizedBox(height: AppSpacing.lg),
-              _Artwork(state: state),
-              const SizedBox(height: AppSpacing.xxl),
-              _TitleRow(state: state),
-              const SizedBox(height: AppSpacing.lg),
-              _Progress(state: state),
-              const SizedBox(height: AppSpacing.lg),
-              _Transport(state: state, isBuffering: isBuffering),
-              if (state.item.youtubeUrl.isNotEmpty) ...[
-                const SizedBox(height: AppSpacing.lg),
-                TextButton.icon(
-                  onPressed: () => launchExternalUrl(state.item.youtubeUrl),
-                  icon: const Icon(
-                    Icons.play_circle_fill,
-                    color: Color(0xFFFF0000),
-                  ),
-                  label: Text(
-                    l10n.actionWatchOnYouTube,
-                    style: const TextStyle(
-                      color: AppColors.playerTextSecondary,
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          // ~70% of the width, but never so tall that the controls get
+          // pushed off a short screen — keeps the layout safe from phone to
+          // phone without fixed positioning.
+          final cover = (constraints.maxWidth * 0.70).clamp(
+            160.0,
+            constraints.maxHeight * 0.42,
+          );
+          // No Spacer/Expanded here: this Column lives inside a scroll
+          // view, so its height is unbounded and a flex child would have
+          // nothing to expand into — it silently collapses the whole body.
+          return SingleChildScrollView(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppSpacing.xl,
+                vertical: AppSpacing.lg,
+              ),
+              child: Column(
+                children: [
+                  const SizedBox(height: AppSpacing.lg),
+                  _Artwork(state: state, size: cover),
+                  const SizedBox(height: AppSpacing.xl),
+                  _TitleBlock(state: state),
+                  const SizedBox(height: AppSpacing.lg),
+                  _ActionRow(item: state.item),
+                  const SizedBox(height: AppSpacing.lg),
+                  _Progress(state: state),
+                  const SizedBox(height: AppSpacing.md),
+                  _Transport(state: state, isBuffering: isBuffering),
+                  const SizedBox(height: AppSpacing.md),
+                  const _SleepTimerButton(),
+                  if (state.item.youtubeUrl.isNotEmpty)
+                    TextButton.icon(
+                      onPressed: () => launchExternalUrl(state.item.youtubeUrl),
+                      icon: const Icon(
+                        Icons.play_circle_fill,
+                        color: Color(0xFFFF0000),
+                      ),
+                      label: Text(
+                        l10n.actionWatchOnYouTube,
+                        style: const TextStyle(
+                          color: AppColors.playerTextSecondary,
+                        ),
+                      ),
                     ),
-                  ),
-                ),
-              ],
-            ],
-          ),
-        ),
+                  const SizedBox(height: AppSpacing.xl),
+                ],
+              ),
+            ),
+          );
+        },
       ),
     );
   }
@@ -125,9 +145,10 @@ class _NowPlaying extends StatelessWidget {
 /// Cover art over a soft glow, so the artwork reads as lit rather than
 /// pasted onto a flat dark panel.
 class _Artwork extends StatelessWidget {
-  const _Artwork({required this.state});
+  const _Artwork({required this.state, required this.size});
 
   final PlayerActive state;
+  final double size;
 
   @override
   Widget build(BuildContext context) {
@@ -145,59 +166,209 @@ class _Artwork extends StatelessWidget {
       child: PirithArtwork(
         pirithId: state.item.id,
         coverUrl: state.item.coverUrl,
-        size: 250,
+        size: size,
         radius: 28,
       ),
     );
   }
 }
 
-class _TitleRow extends StatelessWidget {
-  const _TitleRow({required this.state});
+/// Title block: the Sinhala name carries the hierarchy, with the English
+/// name and duration deliberately quieter beneath it.
+class _TitleBlock extends StatelessWidget {
+  const _TitleBlock({required this.state});
 
   final PlayerActive state;
 
   @override
   Widget build(BuildContext context) {
-    return Row(
+    return Column(
       children: [
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                state.item.titleSinhala,
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
+        Text(
+          state.item.titleSinhala,
+          maxLines: 2,
+          textAlign: TextAlign.center,
+          overflow: TextOverflow.ellipsis,
+          style: AppTypography.sinhalaTitle(
+            fontSize: 24,
+            color: AppColors.playerText,
+          ),
+        ),
+        if (state.item.title.isNotEmpty) ...[
+          const SizedBox(height: AppSpacing.xs),
+          Text(
+            state.item.title,
+            maxLines: 1,
+            textAlign: TextAlign.center,
+            overflow: TextOverflow.ellipsis,
+            style: AppTypography.englishSerif(
+              fontSize: 14,
+              fontStyle: FontStyle.italic,
+              color: AppColors.playerTextSecondary,
+            ),
+          ),
+        ],
+      ],
+    );
+  }
+}
+
+/// Favourite and download as labelled secondary actions — deliberately
+/// quiet text buttons so neither competes with the play control.
+class _ActionRow extends StatelessWidget {
+  const _ActionRow({required this.item});
+
+  final PirithEntity item;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+
+    final isFavorite = context.select<FavoritesBloc, bool>((bloc) {
+      final state = bloc.state;
+      return state is FavoritesLoaded && state.ids.contains(item.id);
+    });
+
+    final entry = context.select<DownloadBloc, DownloadEntity?>((bloc) {
+      final state = bloc.state;
+      return state is DownloadsLoaded ? state.statusFor(item.id) : null;
+    });
+
+    final (
+      downloadIcon,
+      downloadLabel,
+      downloadEnabled,
+    ) = switch (entry?.status) {
+      DownloadStatus.downloading => (
+        Icons.downloading,
+        l10n.downloadInProgress,
+        false,
+      ),
+      DownloadStatus.downloaded => (
+        Icons.download_done,
+        l10n.downloadedLabel,
+        false,
+      ),
+      DownloadStatus.failed => (Icons.error_outline, l10n.actionRetry, true),
+      _ => (Icons.download_outlined, l10n.actionDownload, true),
+    };
+
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        TextButton.icon(
+          onPressed: () =>
+              context.read<FavoritesBloc>().add(FavoriteToggled(item.id)),
+          icon: Icon(
+            isFavorite ? Icons.favorite : Icons.favorite_border,
+            color: isFavorite
+                ? AppColors.maroonDark
+                : AppColors.playerTextSecondary,
+            size: 20,
+          ),
+          label: Text(
+            isFavorite ? l10n.actionFavorite : l10n.actionAddFavorite,
+            style: const TextStyle(color: AppColors.playerTextSecondary),
+          ),
+        ),
+        const SizedBox(width: AppSpacing.sm),
+        TextButton.icon(
+          onPressed: downloadEnabled
+              ? () => context.read<DownloadBloc>().add(DownloadRequested(item))
+              : null,
+          icon: Icon(
+            downloadIcon,
+            size: 20,
+            color: entry?.status == DownloadStatus.downloaded
+                ? AppColors.green
+                : AppColors.playerTextSecondary,
+          ),
+          label: Text(
+            downloadLabel,
+            style: const TextStyle(color: AppColors.playerTextSecondary),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+/// Sleep timer entry point. Shows the remaining minutes once armed, so the
+/// state is visible without opening the sheet.
+class _SleepTimerButton extends StatelessWidget {
+  const _SleepTimerButton();
+
+  static const _options = [15, 30, 45, 60];
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final minutes = context.watch<SleepTimerCubit>().state;
+
+    return TextButton.icon(
+      onPressed: () => _openSheet(context, minutes),
+      icon: Icon(
+        minutes == null ? Icons.bedtime_outlined : Icons.bedtime,
+        size: 20,
+        color: minutes == null
+            ? AppColors.playerTextSecondary
+            : AppColors.goldDark,
+      ),
+      label: Text(
+        minutes == null ? l10n.sleepTimerTitle : l10n.sleepTimerActive(minutes),
+        style: TextStyle(
+          color: minutes == null
+              ? AppColors.playerTextSecondary
+              : AppColors.goldDark,
+        ),
+      ),
+    );
+  }
+
+  void _openSheet(BuildContext context, int? current) {
+    final l10n = AppLocalizations.of(context);
+    final cubit = context.read<SleepTimerCubit>();
+
+    showModalBottomSheet<void>(
+      context: context,
+      backgroundColor: AppColors.playerSurface,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(AppRadius.lg)),
+      ),
+      builder: (sheetContext) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(AppSpacing.lg),
+              child: Text(
+                l10n.sleepTimerTitle,
                 style: AppTypography.sinhalaTitle(
-                  fontSize: 20,
+                  fontSize: 16,
                   color: AppColors.playerText,
                 ),
               ),
-              if (state.item.title.isNotEmpty)
-                Text(
-                  state.item.title,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: AppTypography.englishSerif(
-                    fontSize: 13,
-                    fontStyle: FontStyle.italic,
-                    color: AppColors.playerTextSecondary,
-                  ),
+            ),
+            for (final option in [null, ..._options])
+              ListTile(
+                title: Text(
+                  option == null
+                      ? l10n.sleepTimerOff
+                      : l10n.sleepTimerMinutes(option),
+                  style: const TextStyle(color: AppColors.playerText),
                 ),
-            ],
-          ),
+                trailing: option == current
+                    ? const Icon(Icons.check, color: AppColors.goldDark)
+                    : null,
+                onTap: () {
+                  cubit.setMinutes(option);
+                  Navigator.of(sheetContext).pop();
+                },
+              ),
+            const SizedBox(height: AppSpacing.sm),
+          ],
         ),
-        FavoriteButton(pirithId: state.item.id),
-        IconButton(
-          icon: const Icon(Icons.download_outlined),
-          color: AppColors.playerTextSecondary,
-          tooltip: AppLocalizations.of(context).actionDownload,
-          onPressed: () =>
-              context.read<DownloadBloc>().add(DownloadRequested(state.item)),
-        ),
-      ],
+      ),
     );
   }
 }
@@ -216,14 +387,15 @@ class _Progress extends StatelessWidget {
       children: [
         SliderTheme(
           data: SliderTheme.of(context).copyWith(
-            trackHeight: 3,
+            trackHeight: 6,
             activeTrackColor: AppColors.goldDark,
             inactiveTrackColor: AppColors.playerTextSecondary.withValues(
               alpha: 0.25,
             ),
             thumbColor: AppColors.goldDark,
-            thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 7),
-            overlayShape: const RoundSliderOverlayShape(overlayRadius: 16),
+            thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 9),
+            overlayShape: const RoundSliderOverlayShape(overlayRadius: 22),
+            trackShape: const RoundedRectSliderTrackShape(),
           ),
           child: Slider(
             value: position,
@@ -268,28 +440,40 @@ class _Transport extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        // Previous/next stay disabled until playlists exist (V1.1) — shown
-        // rather than hidden so the transport keeps the shape people expect.
+        // Skip back/forward rather than previous/next track: there are no
+        // playlists yet, and on a 12-to-60-minute chant nudging the position
+        // is the thing people actually reach for.
         IconButton(
-          iconSize: 30,
-          icon: const Icon(Icons.skip_previous),
-          color: AppColors.playerTextSecondary.withValues(alpha: 0.4),
-          tooltip: l10n.comingSoon,
-          onPressed: null,
+          iconSize: 32,
+          icon: const Icon(Icons.replay_10),
+          color: AppColors.playerText,
+          tooltip: l10n.actionRewind10,
+          onPressed: () =>
+              _seekBy(context, state, const Duration(seconds: -10)),
         ),
         const SizedBox(width: AppSpacing.xl),
         _PlayPauseButton(state: state, isBuffering: isBuffering),
         const SizedBox(width: AppSpacing.xl),
         IconButton(
-          iconSize: 30,
-          icon: const Icon(Icons.skip_next),
-          color: AppColors.playerTextSecondary.withValues(alpha: 0.4),
-          tooltip: l10n.comingSoon,
-          onPressed: null,
+          iconSize: 32,
+          icon: const Icon(Icons.forward_10),
+          color: AppColors.playerText,
+          tooltip: l10n.actionForward10,
+          onPressed: () => _seekBy(context, state, const Duration(seconds: 10)),
         ),
       ],
     );
   }
+}
+
+/// Nudges playback, clamped so a skip near either end can't seek out of
+/// bounds.
+void _seekBy(BuildContext context, PlayerActive state, Duration delta) {
+  final target = state.position + delta;
+  final clamped = target < Duration.zero
+      ? Duration.zero
+      : (target > state.duration ? state.duration : target);
+  context.read<PlayerBloc>().add(PlayerSeekRequested(clamped));
 }
 
 class _PlayPauseButton extends StatelessWidget {

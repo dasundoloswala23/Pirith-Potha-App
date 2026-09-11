@@ -87,6 +87,11 @@
   "labelFeatured": "විශේෂ",
   "labelOffline": "නොබැඳි",
   "nowPlaying": "දැන් ධාවනය වේ",
+  "sleepTimerOff": "අක්‍රිය",
+  "sleepTimerMinutes": "විනාඩි {count}",
+  "sleepTimerActive": "විනාඩි {minutes}කින් නවතී",
+  "actionRewind10": "තත්පර 10ක් පසුපසට",
+  "actionForward10": "තත්පර 10ක් ඉදිරියට",
   "actionWatchOnYouTube": "යූටියුබ් හි නරඹන්න",
   "catalogueErrorGeneric": "පිරිත් ලැයිස්තුව පූරණය කළ නොහැකි විය. සම්බන්ධතාවය පරීක්ෂා කර නැවත උත්සාහ කරන්න.",
   "categoryPirithCount": "පිරිත් {count}"
