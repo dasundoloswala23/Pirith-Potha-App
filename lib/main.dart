@@ -8,6 +8,7 @@ import 'core/firebase/firebase_initializer.dart';
 import 'features/auth/presentation/bloc/auth_bloc.dart';
 import 'features/downloads/presentation/bloc/download_bloc.dart';
 import 'features/favorites/presentation/bloc/favorites_bloc.dart';
+import 'features/playlists/presentation/bloc/playlist_bloc.dart';
 import 'features/history/presentation/bloc/history_bloc.dart';
 import 'features/pirith/presentation/bloc/catalogue_bloc.dart';
 import 'features/player/presentation/bloc/player_bloc.dart';
@@ -25,6 +26,7 @@ Future<void> main() async {
       playerBloc: getIt<PlayerBloc>(),
       downloadBloc: getIt<DownloadBloc>(),
       favoritesBloc: getIt<FavoritesBloc>(),
+      playlistBloc: getIt<PlaylistBloc>(),
       historyBloc: getIt<HistoryBloc>(),
       premiumBloc: getIt<PremiumBloc>(),
       languageCubit: getIt<LanguageCubit>(),

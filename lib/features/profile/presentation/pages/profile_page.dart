@@ -3,9 +3,11 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/constants/app_route_paths.dart';
+import '../../../../core/constants/app_urls.dart';
 
 import '../../../../core/l10n/app_localizations.dart';
 import '../../../../core/l10n/bilingual.dart';
+import '../../../../core/services/external_link_launcher.dart';
 import '../../../../core/l10n/language_cubit.dart';
 import '../../../../core/widgets/bilingual_text.dart';
 import '../../../auth/presentation/bloc/auth_bloc.dart';
@@ -56,14 +58,6 @@ class ProfilePage extends StatelessWidget {
                   title: bi.en.settingsAppearance,
                   children: [
                     SettingsRow(
-                      icon: Icons.dark_mode_outlined,
-                      english: bi.en.settingsDarkMode,
-                      sinhala: bi.si.settingsDarkMode,
-                      enabled: false,
-                      trailing: Text(l10n.comingSoon,
-                          style: Theme.of(context).textTheme.labelSmall),
-                    ),
-                    SettingsRow(
                       icon: Icons.language,
                       english: bi.en.profileLanguage,
                       sinhala: bi.si.profileLanguage,
@@ -83,36 +77,6 @@ class ProfilePage extends StatelessWidget {
                       // lock-screen playback, so this states a fact rather
                       // than offering a switch that could break it.
                       trailing: const Icon(Icons.check, size: 20),
-                    ),
-                    SettingsRow(
-                      icon: Icons.graphic_eq,
-                      english: bi.en.settingsAudioQuality,
-                      sinhala: bi.si.settingsAudioQuality,
-                      enabled: false,
-                      trailing: Text(l10n.comingSoon,
-                          style: Theme.of(context).textTheme.labelSmall),
-                    ),
-                  ],
-                ),
-
-                SettingsSection(
-                  title: bi.en.settingsStorage,
-                  children: [
-                    SettingsRow(
-                      icon: Icons.wifi,
-                      english: bi.en.settingsAutoDownloadWifi,
-                      sinhala: bi.si.settingsAutoDownloadWifi,
-                      enabled: false,
-                      trailing: Text(l10n.comingSoon,
-                          style: Theme.of(context).textTheme.labelSmall),
-                    ),
-                    SettingsRow(
-                      icon: Icons.sd_storage_outlined,
-                      english: bi.en.settingsStorageUsed,
-                      sinhala: bi.si.settingsStorageUsed,
-                      enabled: false,
-                      trailing: Text(l10n.comingSoon,
-                          style: Theme.of(context).textTheme.labelSmall),
                     ),
                   ],
                 ),
@@ -147,7 +111,8 @@ class ProfilePage extends StatelessWidget {
                       icon: Icons.privacy_tip_outlined,
                       english: bi.en.profilePrivacyPolicy,
                       sinhala: bi.si.profilePrivacyPolicy,
-                      enabled: false,
+                      trailing: const Icon(Icons.open_in_new, size: 18),
+                      onTap: () => launchExternalUrl(AppUrls.privacyPolicy),
                     ),
                   ],
                 ),

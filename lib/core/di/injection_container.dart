@@ -52,6 +52,15 @@ import '../../features/player/domain/usecases/resume_playback.dart';
 import '../../features/player/domain/usecases/seek_playback.dart';
 import '../../features/player/domain/usecases/stop_playback.dart';
 import '../../features/player/presentation/bloc/player_bloc.dart';
+import '../../features/playlists/data/repositories/playlist_repository_impl.dart';
+import '../../features/playlists/domain/repositories/playlist_repository.dart';
+import '../../features/playlists/domain/usecases/add_pirith_to_playlist.dart';
+import '../../features/playlists/domain/usecases/create_playlist.dart';
+import '../../features/playlists/domain/usecases/delete_playlist.dart';
+import '../../features/playlists/domain/usecases/remove_pirith_from_playlist.dart';
+import '../../features/playlists/domain/usecases/rename_playlist.dart';
+import '../../features/playlists/domain/usecases/reorder_playlist.dart';
+import '../../features/playlists/presentation/bloc/playlist_bloc.dart';
 import '../../features/premium/data/repositories/premium_repository_impl.dart';
 import '../../features/premium/domain/repositories/premium_repository.dart';
 import '../../features/premium/presentation/bloc/premium_bloc.dart';
@@ -86,6 +95,7 @@ Future<void> configureDependencies() async {
   await _registerDownloadFeature();
   await _registerFavoritesFeature(prefs);
   await _registerHistoryFeature(prefs);
+  await _registerPlaylistsFeature(prefs);
   await _registerPlayerFeature();
   await _registerAdsFeature();
   getIt.registerLazySingleton(() => SleepTimerCubit(getIt<PlayerBloc>()));
@@ -131,6 +141,37 @@ Future<void> _registerHistoryFeature(SharedPreferences prefs) async {
     ..registerSingleton<HistoryRepository>(repository)
     ..registerLazySingleton(() => RecordPlayed(getIt<HistoryRepository>()))
     ..registerLazySingleton(() => HistoryBloc(historyRepository: getIt<HistoryRepository>()));
+}
+
+/// Eager like favorites/history: the store is read from SharedPreferences
+/// once at startup so every screen can read playlists synchronously.
+Future<void> _registerPlaylistsFeature(SharedPreferences prefs) async {
+  final repository = PlaylistRepositoryImpl(prefs);
+  await repository.initialize();
+  getIt
+    ..registerSingleton<PlaylistRepository>(repository)
+    ..registerLazySingleton(() => CreatePlaylist(getIt<PlaylistRepository>()))
+    ..registerLazySingleton(() => RenamePlaylist(getIt<PlaylistRepository>()))
+    ..registerLazySingleton(() => DeletePlaylist(getIt<PlaylistRepository>()))
+    ..registerLazySingleton(
+      () => AddPirithToPlaylist(getIt<PlaylistRepository>()),
+    )
+    ..registerLazySingleton(
+      () => RemovePirithFromPlaylist(getIt<PlaylistRepository>()),
+    )
+    ..registerLazySingleton(() => ReorderPlaylist(getIt<PlaylistRepository>()))
+    ..registerLazySingleton(
+      () => PlaylistBloc(
+        playlistRepository: getIt<PlaylistRepository>(),
+        createPlaylist: getIt<CreatePlaylist>(),
+        renamePlaylist: getIt<RenamePlaylist>(),
+        deletePlaylist: getIt<DeletePlaylist>(),
+        addPirithToPlaylist: getIt<AddPirithToPlaylist>(),
+        removePirithFromPlaylist: getIt<RemovePirithFromPlaylist>(),
+        reorderPlaylist: getIt<ReorderPlaylist>(),
+        analytics: getIt<AnalyticsService>(),
+      ),
+    );
 }
 
 Future<void> _registerDownloadFeature() async {

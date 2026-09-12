@@ -10,12 +10,20 @@ abstract final class AppRoutePaths {
   static const favorites = '/home/favorites';
   static const pirithList = '/pirith';
   static const pirithDetails = '/pirith/:pirithId';
-  static const categories = '/categories';
-  static const categoryDetails = '/categories/:categoryId';
+  // Categories moved under the Home branch when Playlists took the third
+  // bottom-nav slot; it is reached from Home's "See all".
+  static const categories = '/home/categories';
+  static const categoryDetails = '/home/categories/:categoryId';
+  static const playlists = '/playlists';
+  static const playlistDetails = '/playlists/:playlistId';
+  static const queue = '/queue';
   static const downloads = '/downloads';
   static const profile = '/profile';
   static const player = '/player';
 
   static String pirithDetailsFor(String pirithId) => '/pirith/$pirithId';
-  static String categoryDetailsFor(String categoryId) => '/categories/$categoryId';
+  static String categoryDetailsFor(String categoryId) =>
+      '/home/categories/$categoryId';
+  static String playlistDetailsFor(String playlistId) =>
+      '/playlists/$playlistId';
 }

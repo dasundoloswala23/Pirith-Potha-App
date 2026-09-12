@@ -26,7 +26,8 @@ Both ARB files are therefore load-bearing and must stay in sync; use
 - Firebase: Auth, Cloud Firestore, Storage, Analytics, Crashlytics
 - google_sign_in, sign_in_with_apple
 - just_audio + audio_service
-- Hive or Isar for local metadata/cache
+- shared_preferences for all local metadata/cache (no Hive/Isar — see
+  docs/03_database_schema.md)
 - path_provider for local audio file storage
 - google_mobile_ads (AdMob)
 - flutter_localizations + intl (Sinhala + English)

@@ -6,10 +6,13 @@ import '../../../../app/theme/app_spacing.dart';
 import '../../../../app/theme/app_typography.dart';
 import '../../../../core/constants/app_route_paths.dart';
 import '../../../../core/l10n/app_localizations.dart';
+import '../../../../core/l10n/bilingual.dart';
+import '../../../../core/widgets/confirm_dialog.dart';
 import '../../../downloads/domain/entities/download_entity.dart';
 import '../../../downloads/presentation/bloc/download_bloc.dart';
 import '../../../favorites/presentation/widgets/favorite_button.dart';
 import '../../../player/presentation/bloc/player_bloc.dart';
+import '../../../playlists/presentation/widgets/add_to_playlist_sheet.dart';
 import '../../../premium/presentation/widgets/premium_badge.dart';
 import '../../../premium/presentation/widgets/premium_gate.dart';
 import '../../domain/entities/pirith_entity.dart';
@@ -106,6 +109,18 @@ class PirithDetailsPage extends StatelessWidget {
                           _DetailsDownloadButton(item: item),
                           const SizedBox(width: 12),
                           FavoriteButton(pirithId: item.id, outlined: true),
+                          const SizedBox(width: 12),
+                          // The explicit counterpart to the card's
+                          // long-press, which nothing advertises.
+                          IconButton.outlined(
+                            tooltip: Bilingual.of(context).si.playlistAddTo,
+                            icon: const Icon(Icons.playlist_add),
+                            onPressed: () => showAddToPlaylistSheet(
+                              context,
+                              pirithId: item.id,
+                              pirithTitle: item.titleSinhala,
+                            ),
+                          ),
                         ],
                       ),
                       _InlinePlayback(pirithId: item.id),
@@ -288,24 +303,14 @@ class _DetailsDownloadButton extends StatelessWidget {
     BuildContext context,
     AppLocalizations l10n,
   ) async {
-    final confirmed = await showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text(l10n.downloadDeleteConfirmTitle),
-        content: Text(l10n.downloadDeleteConfirmBody),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(false),
-            child: Text(l10n.actionCancel),
-          ),
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(true),
-            child: Text(l10n.actionDelete),
-          ),
-        ],
-      ),
+    final labels = Bilingual.read(context).primary;
+    final confirmed = await confirmDestructive(
+      context,
+      title: labels.downloadDeleteConfirmTitle,
+      body: labels.downloadDeleteConfirmBody,
+      confirmLabel: labels.actionDelete,
     );
-    if (confirmed == true && context.mounted) {
+    if (confirmed && context.mounted) {
       context.read<DownloadBloc>().add(DownloadDeleteRequested(item.id));
     }
   }

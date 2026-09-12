@@ -41,6 +41,15 @@ class CatalogueLoaded extends CatalogueState {
     return sorted;
   }
 
+  /// Resolves stored ids (playlists, favorites) to catalogue entries, in the
+  /// order given. Ids with no match are **skipped**: a Pirith unpublished in
+  /// the admin app must not crash or blank out a playlist that still lists
+  /// it.
+  List<PirithEntity> byIds(List<String> ids) {
+    final index = {for (final item in pirith) item.id: item};
+    return [for (final id in ids) ?index[id]];
+  }
+
   List<PirithEntity> forCategory(String categoryId) =>
       pirith.where((p) => p.categoryId == categoryId).toList();
 

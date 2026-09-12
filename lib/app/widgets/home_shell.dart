@@ -1,14 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../core/l10n/app_localizations.dart';
+import '../../core/l10n/bilingual.dart';
 import '../../features/player/presentation/widgets/mini_player_bar.dart';
 
 /// Bottom-navigation shell wrapping the five primary top-level destinations
-/// (Home, Search, Downloads, Favorites, Profile), matching the approved UI
-/// reference's tab order, with the persistent mini-player docked above the
-/// nav bar. Used as the [StatefulShellRoute] branch container from the
-/// router.
+/// — Home, Pirith, Playlists, Downloads, Settings — with the persistent
+/// mini-player docked above the nav bar. Used as the [StatefulShellRoute]
+/// branch container from the router.
+///
+/// Labels are the leading language only: a nav label has room for one line
+/// at ~10sp, so the usual Sinhala-over-English pairing doesn't fit here.
+/// Categories and Favorites are reached from Home rather than the nav bar;
+/// five destinations is the Material maximum and these two are browse-level
+/// entry points, not places users live.
 class HomeShell extends StatelessWidget {
   const HomeShell({required this.navigationShell, super.key});
 
@@ -16,7 +21,7 @@ class HomeShell extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
+    final l10n = Bilingual.of(context).primary;
     return Scaffold(
       body: navigationShell,
       bottomNavigationBar: Column(
@@ -41,9 +46,9 @@ class HomeShell extends StatelessWidget {
                 label: l10n.navPirith,
               ),
               NavigationDestination(
-                icon: const Icon(Icons.grid_view_outlined),
-                selectedIcon: const Icon(Icons.grid_view),
-                label: l10n.navCategories,
+                icon: const Icon(Icons.queue_music_outlined),
+                selectedIcon: const Icon(Icons.queue_music),
+                label: l10n.navPlaylists,
               ),
               NavigationDestination(
                 icon: const Icon(Icons.download_outlined),

@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../core/l10n/app_localizations.dart';
+import '../../../../core/l10n/bilingual.dart';
+import '../../../../core/widgets/empty_state.dart';
 import '../../../../core/widgets/pirith_mark.dart';
 import '../../../pirith/presentation/widgets/catalogue_loaded_builder.dart';
 import '../../../pirith/presentation/widgets/pirith_card.dart';
@@ -13,6 +15,7 @@ class RecentlyPlayedPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+    final bi = Bilingual.of(context);
     return Scaffold(
       appBar: AppBar(title: Text(l10n.sectionRecentlyPlayed)),
       body: BlocBuilder<HistoryBloc, HistoryState>(
@@ -21,7 +24,10 @@ class RecentlyPlayedPage extends StatelessWidget {
             return const Center(child: CircularProgressIndicator());
           }
           if (historyState.entries.isEmpty) {
-            return _EmptyHistory(l10n: l10n);
+            return EmptyState(
+              sinhalaTitle: bi.si.recentlyPlayedEmpty,
+              englishTitle: bi.en.recentlyPlayedEmpty,
+            );
           }
 
           return CatalogueLoadedBuilder(
@@ -44,31 +50,6 @@ class RecentlyPlayedPage extends StatelessWidget {
             },
           );
         },
-      ),
-    );
-  }
-}
-
-class _EmptyHistory extends StatelessWidget {
-  const _EmptyHistory({required this.l10n});
-
-  final AppLocalizations l10n;
-
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          PirithMark(
-            size: 64,
-            color: Theme.of(
-              context,
-            ).colorScheme.onSurface.withValues(alpha: 0.3),
-          ),
-          const SizedBox(height: 16),
-          Text(l10n.recentlyPlayedEmpty),
-        ],
       ),
     );
   }

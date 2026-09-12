@@ -24,8 +24,17 @@ class Bilingual {
 
   /// Watches [LanguageCubit], so flipping the leading language rebuilds
   /// every screen that reads this.
+  ///
+  /// **Only valid inside `build`.** `context.watch` asserts when called from
+  /// an event handler; use [read] there instead.
   static Bilingual of(BuildContext context) =>
       Bilingual._(_si, _en, context.watch<LanguageCubit>().state);
+
+  /// Same pairing without subscribing, for event handlers — opening a
+  /// dialog or sheet, building a SnackBar. Nothing there needs to rebuild
+  /// when the leading language changes, and [of] would assert.
+  static Bilingual read(BuildContext context) =>
+      Bilingual._(_si, _en, context.read<LanguageCubit>().state);
 
   final AppLocalizations si;
   final AppLocalizations en;

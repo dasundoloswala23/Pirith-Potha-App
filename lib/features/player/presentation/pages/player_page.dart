@@ -1,17 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../../app/theme/app_colors.dart';
 import '../../../../app/theme/app_spacing.dart';
 import '../../../../app/theme/app_typography.dart';
 import '../../../../core/ads/widgets/banner_ad_widget.dart';
+import '../../../../core/constants/app_route_paths.dart';
 import '../../../../core/l10n/app_localizations.dart';
+import '../../../../core/l10n/bilingual.dart';
 import '../../../../core/services/external_link_launcher.dart';
 import '../../../downloads/domain/entities/download_entity.dart';
 import '../../../downloads/presentation/bloc/download_bloc.dart';
 import '../../../favorites/presentation/bloc/favorites_bloc.dart';
 import '../../../pirith/domain/entities/pirith_entity.dart';
 import '../../../pirith/presentation/widgets/pirith_artwork.dart';
+import '../../../playlists/presentation/widgets/add_to_playlist_sheet.dart';
 import '../../domain/entities/playback_mode.dart';
 import '../../domain/entities/playback_status.dart';
 import '../bloc/player_bloc.dart';
@@ -108,19 +112,35 @@ class _NowPlaying extends StatelessWidget {
                   const SizedBox(height: AppSpacing.md),
                   _Transport(state: state, isBuffering: isBuffering),
                   const SizedBox(height: AppSpacing.md),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
+                  Wrap(
+                    alignment: WrapAlignment.center,
+                    spacing: AppSpacing.sm,
+                    runSpacing: AppSpacing.sm,
                     children: [
                       _PlaybackModeButton(mode: state.mode),
-                      const SizedBox(width: AppSpacing.sm),
                       const _SleepTimerButton(),
+                      // Long-press is the only other way to reach this, and
+                      // it advertises nothing; the player has the room for a
+                      // labelled control.
+                      _PlayerChip(
+                        icon: Icons.playlist_add,
+                        label: Bilingual.of(context).primary.playlistAddTo,
+                        active: false,
+                        onTap: () => showAddToPlaylistSheet(
+                          context,
+                          pirithId: state.item.id,
+                          pirithTitle: state.item.titleSinhala,
+                        ),
+                      ),
+                      if (state.queue.length > 1)
+                        _PlayerChip(
+                          icon: Icons.queue_music,
+                          label: Bilingual.of(context).primary.queueTitle,
+                          active: false,
+                          onTap: () => context.push(AppRoutePaths.queue),
+                        ),
                     ],
                   ),
-                  // Kept well below the transport row: an ad crowding the
-                  // play controls invites accidental taps, which AdMob
-                  // counts as invalid traffic.
-                  const SizedBox(height: AppSpacing.xl),
-                  const BannerAdWidget(mediumRectangle: true),
                   if (state.item.youtubeUrl.isNotEmpty)
                     TextButton.icon(
                       onPressed: () => launchExternalUrl(state.item.youtubeUrl),
@@ -133,7 +153,12 @@ class _NowPlaying extends StatelessWidget {
                         style: TextStyle(color: theme.colorScheme.primary),
                       ),
                     ),
+                  // Last thing on the screen, well clear of the transport
+                  // row: an ad crowding the play controls invites accidental
+                  // taps, which AdMob counts as invalid traffic.
                   const SizedBox(height: AppSpacing.xl),
+                  const BannerAdWidget(mediumRectangle: true),
+                  const SizedBox(height: AppSpacing.lg),
                 ],
               ),
             ),
@@ -303,6 +328,68 @@ class _ActionRow extends StatelessWidget {
   }
 }
 
+/// Pill used by the secondary player controls. Filled when the setting is
+/// active and outlined when it isn't, so "on" is legible at a glance
+/// rather than depending on the icon alone.
+class _PlayerChip extends StatelessWidget {
+  const _PlayerChip({
+    required this.icon,
+    required this.label,
+    required this.active,
+    required this.onTap,
+  });
+
+  final IconData icon;
+  final String label;
+  final bool active;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final accent = theme.colorScheme.primary;
+    final idle = theme.colorScheme.onSurface.withValues(alpha: 0.65);
+    final foreground = active ? accent : idle;
+
+    return Material(
+      color: active ? accent.withValues(alpha: 0.12) : Colors.transparent,
+      borderRadius: BorderRadius.circular(999),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(999),
+        onTap: onTap,
+        child: Container(
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppSpacing.md,
+            vertical: AppSpacing.sm,
+          ),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(999),
+            border: Border.all(
+              color: active
+                  ? accent.withValues(alpha: 0.5)
+                  : idle.withValues(alpha: 0.3),
+            ),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(icon, size: 18, color: foreground),
+              const SizedBox(width: 6),
+              Text(
+                label,
+                style: theme.textTheme.labelLarge?.copyWith(
+                  color: foreground,
+                  fontWeight: active ? FontWeight.w600 : FontWeight.w500,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 /// Cycles through the playback modes, naming the one that is active so
 /// the icon alone never has to carry the meaning.
 class _PlaybackModeButton extends StatelessWidget {
@@ -312,8 +399,9 @@ class _PlaybackModeButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
-    final theme = Theme.of(context);
+    // Sinhala leads here as everywhere else: these chips sit in one row
+    // and a mix of Sinhala and English labels reads as a mistake.
+    final l10n = Bilingual.of(context).primary;
     final isDefault = mode == PlaybackMode.normal;
 
     final (icon, label) = switch (mode) {
@@ -323,24 +411,11 @@ class _PlaybackModeButton extends StatelessWidget {
       PlaybackMode.shuffle => (Icons.shuffle, l10n.modeShuffle),
     };
 
-    return TextButton.icon(
-      onPressed: () =>
-          context.read<PlayerBloc>().add(PlayerModeChanged(mode.next)),
-      icon: Icon(
-        icon,
-        size: 20,
-        color: isDefault
-            ? theme.colorScheme.onSurface.withValues(alpha: 0.6)
-            : theme.colorScheme.primary,
-      ),
-      label: Text(
-        label,
-        style: TextStyle(
-          color: isDefault
-              ? theme.colorScheme.onSurface.withValues(alpha: 0.6)
-              : theme.colorScheme.primary,
-        ),
-      ),
+    return _PlayerChip(
+      icon: icon,
+      label: label,
+      active: !isDefault,
+      onTap: () => context.read<PlayerBloc>().add(PlayerModeChanged(mode.next)),
     );
   }
 }
@@ -354,25 +429,16 @@ class _SleepTimerButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
-    final theme = Theme.of(context);
+    final l10n = Bilingual.of(context).primary;
     final minutes = context.watch<SleepTimerCubit>().state;
 
-    return TextButton.icon(
-      onPressed: () => _openSheet(context, minutes),
-      icon: Icon(
-        minutes == null ? Icons.bedtime_outlined : Icons.bedtime,
-        size: 20,
-        color: minutes == null ? theme.colorScheme.primary : AppColors.goldDark,
-      ),
-      label: Text(
-        minutes == null ? l10n.sleepTimerTitle : l10n.sleepTimerActive(minutes),
-        style: TextStyle(
-          color: minutes == null
-              ? theme.colorScheme.primary
-              : AppColors.goldDark,
-        ),
-      ),
+    return _PlayerChip(
+      icon: minutes == null ? Icons.bedtime_outlined : Icons.bedtime,
+      label: minutes == null
+          ? l10n.sleepTimerTitle
+          : l10n.sleepTimerActive(minutes),
+      active: minutes != null,
+      onTap: () => _openSheet(context, minutes),
     );
   }
 
@@ -486,12 +552,32 @@ class _Transport extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final theme = Theme.of(context);
+
+    // ±10s always stays: on a 12-to-60-minute chant, nudging the position is
+    // what people actually reach for. Previous/next join it only when there
+    // is a queue to move through, so a single Pirith keeps the roomier
+    // three-button layout.
+    final hasSkips = state.hasPrevious || state.hasNext;
+    final gap = hasSkips ? AppSpacing.md : AppSpacing.xl;
+
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        // Skip back/forward rather than previous/next track: there are no
-        // playlists yet, and on a 12-to-60-minute chant nudging the position
-        // is the thing people actually reach for.
+        if (hasSkips) ...[
+          IconButton(
+            iconSize: 28,
+            icon: const Icon(Icons.skip_previous),
+            color: theme.colorScheme.onSurface,
+            tooltip: l10n.actionPrevious,
+            onPressed: state.hasPrevious
+                ? () =>
+                      context.read<PlayerBloc>().add(
+                        const PlayerPreviousRequested(),
+                      )
+                : null,
+          ),
+          SizedBox(width: gap),
+        ],
         IconButton(
           iconSize: 32,
           icon: const Icon(Icons.replay_10),
@@ -500,9 +586,9 @@ class _Transport extends StatelessWidget {
           onPressed: () =>
               _seekBy(context, state, const Duration(seconds: -10)),
         ),
-        const SizedBox(width: AppSpacing.xl),
+        SizedBox(width: gap),
         _PlayPauseButton(state: state, isBuffering: isBuffering),
-        const SizedBox(width: AppSpacing.xl),
+        SizedBox(width: gap),
         IconButton(
           iconSize: 32,
           icon: const Icon(Icons.forward_10),
@@ -510,6 +596,21 @@ class _Transport extends StatelessWidget {
           tooltip: l10n.actionForward10,
           onPressed: () => _seekBy(context, state, const Duration(seconds: 10)),
         ),
+        if (hasSkips) ...[
+          SizedBox(width: gap),
+          IconButton(
+            iconSize: 28,
+            icon: const Icon(Icons.skip_next),
+            color: theme.colorScheme.onSurface,
+            tooltip: l10n.actionNext,
+            onPressed: state.hasNext
+                ? () =>
+                      context.read<PlayerBloc>().add(
+                        const PlayerNextRequested(),
+                      )
+                : null,
+          ),
+        ],
       ],
     );
   }

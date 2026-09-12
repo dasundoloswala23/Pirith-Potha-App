@@ -100,9 +100,17 @@ Covers use WebP. Audio starts as MP3 for simplicity.
 
 Two distinct stores — do not conflate them:
 
-1. **Metadata/cache DB** (Hive or Isar) — downloaded-Pirith records, favorites
-   (guest mode), recently played, playback position, settings, cached
+1. **Key-value store** (`shared_preferences`) — downloaded-Pirith records,
+   favorites (guest mode), recently played, playlists, settings, cached
    Pirith/category metadata for offline browsing.
+
+   Earlier drafts of this document named Hive or Isar here. Neither was ever
+   adopted: every local store in the app is SharedPreferences, JSON-encoded
+   where the value isn't a plain string list (`playlists_v1`, the download
+   records). The `sqflite` entry in `pubspec.lock` is a transitive
+   dependency, not something the app uses. A real embedded database is only
+   worth adding if a store outgrows whole-collection reads and writes —
+   nothing does today.
 2. **File system** (`path_provider`) — actual downloaded audio + cover files:
 
 ```

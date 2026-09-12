@@ -38,7 +38,7 @@ abstract final class AdUnitIds {
   static const _testIosBannerUnitId = 'ca-app-pub-3940256099942544/2934735716';
 
   static const _productionAndroidInterstitialUnitId =
-      'ca-app-pub-6564803074312178/9848606794';
+      'ca-app-pub-6564803074312178/5321188942';
   static const _productionIosInterstitialUnitId = '';
 
   static const _testAndroidInterstitialUnitId =

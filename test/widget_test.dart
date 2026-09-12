@@ -32,6 +32,13 @@ import 'package:pitithpotha/features/player/domain/usecases/resume_playback.dart
 import 'package:pitithpotha/features/player/domain/usecases/seek_playback.dart';
 import 'package:pitithpotha/features/player/domain/usecases/stop_playback.dart';
 import 'package:pitithpotha/features/player/presentation/bloc/player_bloc.dart';
+import 'package:pitithpotha/features/playlists/domain/usecases/add_pirith_to_playlist.dart';
+import 'package:pitithpotha/features/playlists/domain/usecases/create_playlist.dart';
+import 'package:pitithpotha/features/playlists/domain/usecases/delete_playlist.dart';
+import 'package:pitithpotha/features/playlists/domain/usecases/remove_pirith_from_playlist.dart';
+import 'package:pitithpotha/features/playlists/domain/usecases/rename_playlist.dart';
+import 'package:pitithpotha/features/playlists/domain/usecases/reorder_playlist.dart';
+import 'package:pitithpotha/features/playlists/presentation/bloc/playlist_bloc.dart';
 import 'package:pitithpotha/features/premium/presentation/bloc/premium_bloc.dart';
 
 import 'fakes/fake_audio_repository.dart';
@@ -40,6 +47,7 @@ import 'fakes/fake_download_repository.dart';
 import 'fakes/fake_favorites_repository.dart';
 import 'fakes/fake_history_repository.dart';
 import 'fakes/fake_pirith_repository.dart';
+import 'fakes/fake_playlist_repository.dart';
 import 'fakes/fake_premium_repository.dart';
 
 void main() {
@@ -116,6 +124,20 @@ void main() {
     final sleepTimerCubit = SleepTimerCubit(playerBloc);
     addTearDown(sleepTimerCubit.close);
 
+    final fakePlaylistRepository = FakePlaylistRepository();
+    final playlistBloc = PlaylistBloc(
+      playlistRepository: fakePlaylistRepository,
+      createPlaylist: CreatePlaylist(fakePlaylistRepository),
+      renamePlaylist: RenamePlaylist(fakePlaylistRepository),
+      deletePlaylist: DeletePlaylist(fakePlaylistRepository),
+      addPirithToPlaylist: AddPirithToPlaylist(fakePlaylistRepository),
+      removePirithFromPlaylist: RemovePirithFromPlaylist(
+        fakePlaylistRepository,
+      ),
+      reorderPlaylist: ReorderPlaylist(fakePlaylistRepository),
+    );
+    addTearDown(playlistBloc.close);
+
     await tester.pumpWidget(
       PirithPothaApp(
         authBloc: authBloc,
@@ -125,6 +147,7 @@ void main() {
         favoritesBloc: favoritesBloc,
         historyBloc: historyBloc,
         premiumBloc: premiumBloc,
+        playlistBloc: playlistBloc,
         languageCubit: languageCubit,
         sleepTimerCubit: sleepTimerCubit,
       ),

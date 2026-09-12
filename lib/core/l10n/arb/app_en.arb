@@ -132,5 +132,70 @@
         "type": "int"
       }
     }
-  }
+  },
+  "navPlaylists": "Playlists",
+  "playlistsTitle": "Playlists",
+  "playlistsEmptyTitle": "No playlists yet",
+  "playlistsEmptySubtitle": "Group the Pirith you listen to together and play them one after another.",
+  "playlistCreate": "New playlist",
+  "playlistCreateTitle": "New playlist",
+  "playlistNameLabel": "Playlist name",
+  "playlistNameHint": "e.g. Morning Pirith",
+  "playlistDescriptionLabel": "Description (optional)",
+  "playlistRenameTitle": "Rename playlist",
+  "playlistDeleteConfirmTitle": "Delete this playlist?",
+  "playlistDeleteConfirmBody": "The playlist will be removed. The Pirith themselves are not deleted.",
+  "playlistDeleted": "Playlist deleted",
+  "playlistEmptyTitle": "This playlist is empty",
+  "playlistEmptySubtitle": "Press and hold any Pirith to add it to a playlist.",
+  "playlistsCount": "{count} playlists",
+  "@playlistsCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "playlistItemCount": "{count} Pirith",
+  "@playlistItemCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "playlistPlayAll": "Play all",
+  "playlistShuffle": "Shuffle",
+  "playlistEdit": "Edit",
+  "playlistDone": "Done",
+  "playlistAddTo": "Add to playlist",
+  "playlistAddedTo": "Added to {name}",
+  "@playlistAddedTo": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "playlistAlreadyIn": "Already in {name}",
+  "@playlistAlreadyIn": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "playlistRemovedFrom": "Removed from {name}",
+  "@playlistRemovedFrom": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "playlistItemRemoved": "Removed from the playlist",
+  "playlistNoPlaylistsYet": "You have no playlists yet",
+  "actionSave": "Save",
+  "actionRemove": "Remove",
+  "actionReorderHint": "Drag to reorder"
 }

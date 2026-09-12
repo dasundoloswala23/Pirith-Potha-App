@@ -32,4 +32,41 @@ class AnalyticsService {
       _analytics.logEvent(name: 'search_used', parameters: {'query': query});
 
   Future<void> logPremiumClicked() => _analytics.logEvent(name: 'premium_clicked');
+
+  Future<void> logPlaylistCreated(String playlistId) => _analytics.logEvent(
+        name: 'playlist_created',
+        parameters: {'playlist_id': playlistId},
+      );
+
+  Future<void> logPlaylistDeleted(String playlistId) => _analytics.logEvent(
+        name: 'playlist_deleted',
+        parameters: {'playlist_id': playlistId},
+      );
+
+  Future<void> logPlaylistPlayed(String playlistId, int itemCount) =>
+      _analytics.logEvent(
+        name: 'playlist_played',
+        parameters: {'playlist_id': playlistId, 'item_count': itemCount},
+      );
+
+  Future<void> logPlaylistShuffleStarted(String playlistId, int itemCount) =>
+      _analytics.logEvent(
+        name: 'playlist_shuffle_started',
+        parameters: {'playlist_id': playlistId, 'item_count': itemCount},
+      );
+
+  Future<void> logPirithAddedToPlaylist(String playlistId, String pirithId) =>
+      _analytics.logEvent(
+        name: 'pirith_added_to_playlist',
+        parameters: {'playlist_id': playlistId, 'pirith_id': pirithId},
+      );
+
+  Future<void> logPirithRemovedFromPlaylist(
+    String playlistId,
+    String pirithId,
+  ) =>
+      _analytics.logEvent(
+        name: 'pirith_removed_from_playlist',
+        parameters: {'playlist_id': playlistId, 'pirith_id': pirithId},
+      );
 }

@@ -199,7 +199,10 @@ class _HomeContent extends StatelessWidget {
                 title: bi.si.sectionCategories,
                 englishTitle: bi.en.sectionCategories,
                 seeAllLabel: l10n.actionSeeAll,
-                onSeeAll: () => context.go(AppRoutePaths.categories),
+                // Categories is nested under Home now, so this must push
+                // onto the Home stack — a `go` would replace it and leave
+                // the user without a back button.
+                onSeeAll: () => context.push(AppRoutePaths.categories),
               ),
             ),
             SliverToBoxAdapter(

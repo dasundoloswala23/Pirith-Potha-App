@@ -6,6 +6,7 @@ import '../core/ads/ad_service.dart';
 import '../core/ads/player_exit_ad_observer.dart';
 import '../core/l10n/app_localizations.dart';
 import '../core/l10n/language_cubit.dart';
+import '../core/services/notification_permission.dart';
 import '../features/auth/presentation/bloc/auth_bloc.dart';
 import '../features/downloads/presentation/bloc/download_bloc.dart';
 import '../features/favorites/presentation/bloc/favorites_bloc.dart';
@@ -13,6 +14,7 @@ import '../features/history/presentation/bloc/history_bloc.dart';
 import '../features/pirith/presentation/bloc/catalogue_bloc.dart';
 import '../features/player/presentation/bloc/player_bloc.dart';
 import '../features/player/presentation/bloc/sleep_timer_cubit.dart';
+import '../features/playlists/presentation/bloc/playlist_bloc.dart';
 import '../features/premium/presentation/bloc/premium_bloc.dart';
 import 'router/app_router.dart';
 import 'theme/app_theme.dart';
@@ -21,11 +23,9 @@ import 'theme/app_theme.dart';
 /// here, so widget tests can supply fake-repository-backed instances
 /// instead of needing a live Firebase/audio connection.
 ///
-/// The interface is English with no in-app language switcher (see
-/// docs/08_ui_ux.md) — the locale is fixed rather than user-selectable.
-/// Sinhala is reserved for Pirith content itself (chant names and
-/// descriptions, which come from Firestore). The Sinhala ARB file is kept
-/// complete and in sync so a future language switch needs no UI rewrite.
+/// The interface shows Sinhala and English together (see docs/08_ui_ux.md);
+/// [LanguageCubit] chooses which of the two leads. Both ARB files are
+/// therefore load-bearing and kept in sync.
 class PirithPothaApp extends StatefulWidget {
   const PirithPothaApp({
     required this.authBloc,
@@ -35,6 +35,7 @@ class PirithPothaApp extends StatefulWidget {
     required this.favoritesBloc,
     required this.historyBloc,
     required this.premiumBloc,
+    required this.playlistBloc,
     required this.languageCubit,
     required this.sleepTimerCubit,
     this.adService,
@@ -48,6 +49,7 @@ class PirithPothaApp extends StatefulWidget {
   final FavoritesBloc favoritesBloc;
   final HistoryBloc historyBloc;
   final PremiumBloc premiumBloc;
+  final PlaylistBloc playlistBloc;
   final LanguageCubit languageCubit;
   final SleepTimerCubit sleepTimerCubit;
 
@@ -83,23 +85,33 @@ class _PirithPothaAppState extends State<PirithPothaApp> {
         BlocProvider<FavoritesBloc>.value(value: widget.favoritesBloc),
         BlocProvider<HistoryBloc>.value(value: widget.historyBloc),
         BlocProvider<PremiumBloc>.value(value: widget.premiumBloc),
+        BlocProvider<PlaylistBloc>.value(value: widget.playlistBloc),
         BlocProvider<LanguageCubit>.value(value: widget.languageCubit),
         BlocProvider<SleepTimerCubit>.value(value: widget.sleepTimerCubit),
       ],
-      child: MaterialApp.router(
-        debugShowCheckedModeBanner: false,
-        onGenerateTitle: (context) => AppLocalizations.of(context).appName,
-        theme: AppTheme.light,
-        darkTheme: AppTheme.dark,
-        locale: const Locale('en'),
-        supportedLocales: AppLocalizations.supportedLocales,
-        localizationsDelegates: const [
-          AppLocalizations.delegate,
-          GlobalMaterialLocalizations.delegate,
-          GlobalWidgetsLocalizations.delegate,
-          GlobalCupertinoLocalizations.delegate,
-        ],
-        routerConfig: _router,
+      // One listener rather than a call at each of the seven play entry
+      // points: the prompt belongs to "playback has started", not to any
+      // particular button. NotificationPermission asks at most once per
+      // session.
+      child: BlocListener<PlayerBloc, PlayerState>(
+        listenWhen: (previous, current) =>
+            previous is! PlayerActive && current is PlayerActive,
+        listener: (context, state) => NotificationPermission.requestIfNeeded(),
+        child: MaterialApp.router(
+          debugShowCheckedModeBanner: false,
+          onGenerateTitle: (context) => AppLocalizations.of(context).appName,
+          theme: AppTheme.light,
+          darkTheme: AppTheme.dark,
+          locale: const Locale('en'),
+          supportedLocales: AppLocalizations.supportedLocales,
+          localizationsDelegates: const [
+            AppLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          routerConfig: _router,
+        ),
       ),
     );
   }

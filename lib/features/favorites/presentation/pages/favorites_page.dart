@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../app/theme/app_spacing.dart';
 import '../../../../core/l10n/app_localizations.dart';
 import '../../../../core/l10n/bilingual.dart';
+import '../../../../core/widgets/empty_state.dart';
 import '../../../../core/widgets/bilingual_text.dart';
 import '../../../../core/widgets/pirith_mark.dart';
 import '../../../pirith/presentation/widgets/catalogue_loaded_builder.dart';
@@ -39,7 +40,13 @@ class FavoritesPage extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   header,
-                  Expanded(child: _EmptyFavorites(l10n: l10n)),
+                  Expanded(
+                    child: EmptyState(
+                      sinhalaTitle: bi.si.favoritesEmpty,
+                      englishTitle: bi.en.favoritesEmpty,
+                      subtitle: bi.si.favoritesEmptySubtitle,
+                    ),
+                  ),
                 ],
               );
             }
@@ -81,40 +88,6 @@ class FavoritesPage extends StatelessWidget {
             );
           },
         ),
-      ),
-    );
-  }
-}
-
-class _EmptyFavorites extends StatelessWidget {
-  const _EmptyFavorites({required this.l10n});
-
-  final AppLocalizations l10n;
-
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          PirithMark(
-            size: 64,
-            color: Theme.of(
-              context,
-            ).colorScheme.onSurface.withValues(alpha: 0.3),
-          ),
-          const SizedBox(height: 16),
-          Text(
-            l10n.favoritesEmpty,
-            style: Theme.of(context).textTheme.titleMedium,
-          ),
-          const SizedBox(height: 4),
-          Text(
-            l10n.favoritesEmptySubtitle,
-            textAlign: TextAlign.center,
-            style: Theme.of(context).textTheme.bodySmall,
-          ),
-        ],
       ),
     );
   }

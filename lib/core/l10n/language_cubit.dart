@@ -6,8 +6,12 @@ import 'package:shared_preferences/shared_preferences.dart';
 /// Both languages are always shown (see docs/08_ui_ux.md) — this only
 /// decides which one is the large/primary line and which is the smaller
 /// one beneath it, so nothing is ever hidden by the choice.
+///
+/// Defaults to English leading. The choice is written to SharedPreferences
+/// the moment it changes and read back at construction, so switching to
+/// Sinhala survives closing the app.
 class LanguageCubit extends Cubit<bool> {
-  LanguageCubit(this._prefs) : super(_prefs.getBool(_key) ?? true);
+  LanguageCubit(this._prefs) : super(_prefs.getBool(_key) ?? false);
 
   static const _key = 'sinhala_first';
 

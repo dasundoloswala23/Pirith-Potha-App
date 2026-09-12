@@ -7,10 +7,13 @@ import '../../../../app/theme/app_spacing.dart';
 import '../../../../app/theme/app_typography.dart';
 import '../../../../core/constants/app_route_paths.dart';
 import '../../../../core/l10n/app_localizations.dart';
+import '../../../../core/l10n/bilingual.dart';
+import '../../../../core/widgets/confirm_dialog.dart';
 import '../../../downloads/domain/entities/download_entity.dart';
 import '../../../downloads/presentation/bloc/download_bloc.dart';
 import '../../../favorites/presentation/widgets/favorite_button.dart';
 import '../../../player/presentation/bloc/player_bloc.dart';
+import '../../../playlists/presentation/widgets/add_to_playlist_sheet.dart';
 import '../../../premium/presentation/widgets/premium_badge.dart';
 import '../../../premium/presentation/widgets/premium_gate.dart';
 import '../../domain/entities/pirith_entity.dart';
@@ -24,14 +27,35 @@ import 'pirith_artwork.dart';
 /// reader tap again. The gold play button does the same thing and stays as
 /// an explicit affordance. Download and favorite reflect real
 /// [DownloadBloc]/`FavoritesBloc` state.
+///
+/// Long-pressing offers "add to playlist". The trailing edge already carries
+/// three controls; a fourth would crush the title on a 360dp screen. Because
+/// long-press advertises nothing about itself, the player and details
+/// screens — which have room — also show an explicit labelled button.
 class PirithCard extends StatelessWidget {
-  const PirithCard({required this.item, this.compact = false, super.key});
+  const PirithCard({
+    required this.item,
+    this.compact = false,
+    this.onPlay,
+    super.key,
+  });
 
   final PirithEntity item;
   final bool compact;
 
+  /// Replaces "play this one Pirith" — a playlist or category passes a
+  /// closure that plays the whole list from this row instead. The premium
+  /// gate still runs first either way.
+  final VoidCallback? onPlay;
+
   void _play(BuildContext context) {
     if (!ensurePremiumAccess(context, isPremiumItem: item.isPremium)) return;
+
+    final onPlay = this.onPlay;
+    if (onPlay != null) {
+      onPlay();
+      return;
+    }
     context.read<PlayerBloc>().add(PlayerPlayRequested(item));
     context.push(AppRoutePaths.player);
   }
@@ -45,6 +69,11 @@ class PirithCard extends StatelessWidget {
       child: InkWell(
         borderRadius: BorderRadius.circular(AppRadius.md),
         onTap: () => _play(context),
+        onLongPress: () => showAddToPlaylistSheet(
+          context,
+          pirithId: item.id,
+          pirithTitle: item.titleSinhala,
+        ),
         child: Padding(
           padding: EdgeInsets.symmetric(
             horizontal: compact ? 12 : 14,
@@ -202,24 +231,14 @@ class _DownloadButton extends StatelessWidget {
     BuildContext context,
     AppLocalizations l10n,
   ) async {
-    final confirmed = await showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text(l10n.downloadDeleteConfirmTitle),
-        content: Text(l10n.downloadDeleteConfirmBody),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(false),
-            child: Text(l10n.actionCancel),
-          ),
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(true),
-            child: Text(l10n.actionDelete),
-          ),
-        ],
-      ),
+    final labels = Bilingual.read(context).primary;
+    final confirmed = await confirmDestructive(
+      context,
+      title: labels.downloadDeleteConfirmTitle,
+      body: labels.downloadDeleteConfirmBody,
+      confirmLabel: labels.actionDelete,
     );
-    if (confirmed == true && context.mounted) {
+    if (confirmed && context.mounted) {
       context.read<DownloadBloc>().add(DownloadDeleteRequested(item.id));
     }
   }

@@ -12,6 +12,9 @@ import '../../features/pirith/presentation/pages/category_pirith_list_page.dart'
 import '../../features/pirith/presentation/pages/pirith_details_page.dart';
 import '../../features/pirith/presentation/pages/pirith_list_page.dart';
 import '../../features/player/presentation/pages/player_page.dart';
+import '../../features/player/presentation/pages/queue_page.dart';
+import '../../features/playlists/presentation/pages/playlist_details_page.dart';
+import '../../features/playlists/presentation/pages/playlists_page.dart';
 import '../../features/profile/presentation/pages/profile_page.dart';
 import '../widgets/home_shell.dart';
 import '../widgets/splash_page.dart';
@@ -51,6 +54,20 @@ GoRouter buildAppRouter({NavigatorObserver? adObserver}) {
                     path: 'favorites',
                     builder: (context, state) => const FavoritesPage(),
                   ),
+                  // Categories lost its bottom-nav slot to Playlists, so it
+                  // lives under Home, reached from Home's "See all".
+                  GoRoute(
+                    path: 'categories',
+                    builder: (context, state) => const CategoriesPage(),
+                    routes: [
+                      GoRoute(
+                        path: ':categoryId',
+                        builder: (context, state) => CategoryPirithListPage(
+                          categoryId: state.pathParameters['categoryId']!,
+                        ),
+                      ),
+                    ],
+                  ),
                 ],
               ),
             ],
@@ -74,13 +91,13 @@ GoRouter buildAppRouter({NavigatorObserver? adObserver}) {
           StatefulShellBranch(
             routes: [
               GoRoute(
-                path: AppRoutePaths.categories,
-                builder: (context, state) => const CategoriesPage(),
+                path: AppRoutePaths.playlists,
+                builder: (context, state) => const PlaylistsPage(),
                 routes: [
                   GoRoute(
-                    path: ':categoryId',
-                    builder: (context, state) => CategoryPirithListPage(
-                      categoryId: state.pathParameters['categoryId']!,
+                    path: ':playlistId',
+                    builder: (context, state) => PlaylistDetailsPage(
+                      playlistId: state.pathParameters['playlistId']!,
                     ),
                   ),
                 ],
@@ -111,6 +128,10 @@ GoRouter buildAppRouter({NavigatorObserver? adObserver}) {
         name: PlayerExitAdObserver.playerRouteName,
         path: AppRoutePaths.player,
         builder: (context, state) => const PlayerPage(),
+      ),
+      GoRoute(
+        path: AppRoutePaths.queue,
+        builder: (context, state) => const QueuePage(),
       ),
     ],
   );
