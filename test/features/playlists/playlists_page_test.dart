@@ -76,8 +76,11 @@ void main() {
     await tester.tap(find.byType(FilledButton));
     await tester.pumpAndSettle();
 
-    expect(find.byType(AlertDialog), findsOneWidget);
+    // Asserted by what the user sees, not by the Material class backing it:
+    // the dialog has since been restyled from AlertDialog to Dialog, and a
+    // test that fails on that is testing the wrong thing.
     expect(find.byType(TextField), findsNWidgets(2));
+    expect(find.text('Save'), findsOneWidget);
 
     // Saving must survive the dialog's *exit* transition: the fields are
     // still mounted and still rebuilding while it animates out, so
@@ -88,7 +91,7 @@ void main() {
     await tester.tap(find.text('Save'));
     await tester.pumpAndSettle();
 
-    expect(find.byType(AlertDialog), findsNothing);
+    expect(find.byType(TextField), findsNothing);
     expect(tester.takeException(), isNull);
 
     final state = playlistBloc.state as PlaylistsLoaded;
