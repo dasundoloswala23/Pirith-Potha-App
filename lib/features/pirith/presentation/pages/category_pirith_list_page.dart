@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../../core/ads/widgets/banner_ad_widget.dart';
 import '../../../../core/l10n/app_localizations.dart';
 import '../widgets/catalogue_loaded_builder.dart';
 import '../widgets/pirith_card.dart';
@@ -13,6 +14,7 @@ class CategoryPirithListPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     return Scaffold(
+      bottomNavigationBar: const BannerAdWidget(anchored: true),
       body: CatalogueLoadedBuilder(
         builder: (context, state) {
           final category = state.categories

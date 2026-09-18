@@ -18,10 +18,25 @@ import '../ad_service.dart';
 /// the ad fails to load, so a slow or blocked ad call never leaves a
 /// broken-looking gap in the layout.
 class BannerAdWidget extends StatefulWidget {
-  const BannerAdWidget({this.mediumRectangle = false, super.key});
+  const BannerAdWidget({
+    this.mediumRectangle = false,
+    this.anchored = false,
+    super.key,
+  });
 
   /// 300x250 instead of the 320x50 banner.
   final bool mediumRectangle;
+
+  /// Dress the banner for use in `Scaffold.bottomNavigationBar`: a hairline
+  /// above it and bottom safe-area inset.
+  ///
+  /// The rule is drawn here rather than by the caller so it disappears along
+  /// with the ad — a caller-drawn divider would leave a stray line across
+  /// the screen whenever the ad is disabled, blocked or unfilled.
+  ///
+  /// AdMob requires ads be distinguishable from app content; flush against a
+  /// list, a bare banner reads as another row.
+  final bool anchored;
 
   @override
   State<BannerAdWidget> createState() => _BannerAdWidgetState();
@@ -76,11 +91,30 @@ class _BannerAdWidgetState extends State<BannerAdWidget> {
     final ad = _bannerAd;
     if (ad == null) return const SizedBox.shrink();
 
-    return Align(
+    final banner = Align(
       child: SizedBox(
         width: ad.size.width.toDouble(),
         height: ad.size.height.toDouble(),
         child: AdWidget(ad: ad),
+      ),
+    );
+
+    if (!widget.anchored) return banner;
+
+    return SafeArea(
+      top: false,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Divider(
+            height: 1,
+            color: Theme.of(context).dividerColor.withValues(alpha: 0.5),
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 4),
+            child: banner,
+          ),
+        ],
       ),
     );
   }

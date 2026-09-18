@@ -41,6 +41,27 @@ class PirithEntity extends Equatable {
   final int playCount;
   final int downloadCount;
 
+  /// Whether this Pirith can be played, downloaded or queued.
+  ///
+  /// The single predicate the audio, download and playlist paths consult.
+  /// Deliberately not `!isVideoOnly`: a Pirith with neither audio nor video
+  /// must be kept out of those paths too.
+  ///
+  /// Trimmed here rather than at the call sites because the admin app stores
+  /// these URLs as free text, without trimming.
+  bool get hasAudio => audioUrl.trim().isNotEmpty;
+
+  /// Video-only: a title, a cover and a YouTube link, but no audio file.
+  ///
+  /// A presentation predicate — it decides which screen a tap opens. False
+  /// when there is no video either, so the video screen can never be opened
+  /// on something with nothing to show.
+  ///
+  /// Derived rather than stored: `PirithModel.fromFirestore` already coerces
+  /// a missing `audioUrl` to `''`, so this needs no schema change, no
+  /// backfill, and no new cache key — see docs/03_database_schema.md.
+  bool get isVideoOnly => !hasAudio && youtubeUrl.trim().isNotEmpty;
+
   String durationLabel() {
     final minutes = duration ~/ 60;
     final seconds = duration % 60;

@@ -17,6 +17,11 @@ abstract final class AppRoutePaths {
   static const playlists = '/playlists';
   static const playlistDetails = '/playlists/:playlistId';
   static const queue = '/queue';
+
+  /// Video-only Pirith get their own screen rather than the player: opening
+  /// one must not disturb audio that is already playing, so it cannot be
+  /// driven by PlayerBloc's state.
+  static const videoPirith = '/video/:pirithId';
   static const downloads = '/downloads';
   static const profile = '/profile';
   static const player = '/player';
@@ -26,4 +31,5 @@ abstract final class AppRoutePaths {
       '/home/categories/$categoryId';
   static String playlistDetailsFor(String playlistId) =>
       '/playlists/$playlistId';
+  static String videoPirithFor(String pirithId) => '/video/$pirithId';
 }

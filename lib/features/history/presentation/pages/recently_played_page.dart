@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../../core/ads/widgets/banner_ad_widget.dart';
 import '../../../../core/l10n/app_localizations.dart';
 import '../../../../core/l10n/bilingual.dart';
 import '../../../../core/widgets/empty_state.dart';
@@ -17,6 +18,7 @@ class RecentlyPlayedPage extends StatelessWidget {
     final l10n = AppLocalizations.of(context);
     final bi = Bilingual.of(context);
     return Scaffold(
+      bottomNavigationBar: const BannerAdWidget(anchored: true),
       appBar: AppBar(title: Text(l10n.sectionRecentlyPlayed)),
       body: BlocBuilder<HistoryBloc, HistoryState>(
         builder: (context, historyState) {

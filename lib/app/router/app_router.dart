@@ -13,6 +13,7 @@ import '../../features/pirith/presentation/pages/pirith_details_page.dart';
 import '../../features/pirith/presentation/pages/pirith_list_page.dart';
 import '../../features/player/presentation/pages/player_page.dart';
 import '../../features/player/presentation/pages/queue_page.dart';
+import '../../features/player/presentation/pages/video_pirith_page.dart';
 import '../../features/playlists/presentation/pages/playlist_details_page.dart';
 import '../../features/playlists/presentation/pages/playlists_page.dart';
 import '../../features/profile/presentation/pages/profile_page.dart';
@@ -132,6 +133,15 @@ GoRouter buildAppRouter({NavigatorObserver? adObserver}) {
       GoRoute(
         path: AppRoutePaths.queue,
         builder: (context, state) => const QueuePage(),
+      ),
+      // Deliberately NOT named PlayerExitAdObserver.playerRouteName: an
+      // interstitial firing as the user crosses to or from the YouTube app
+      // is the worst possible placement for it.
+      GoRoute(
+        path: AppRoutePaths.videoPirith,
+        builder: (context, state) => VideoPirithPage(
+          pirithId: state.pathParameters['pirithId']!,
+        ),
       ),
     ],
   );

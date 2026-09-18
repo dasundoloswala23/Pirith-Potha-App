@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../../core/ads/widgets/banner_ad_widget.dart';
 import '../../../../app/theme/app_spacing.dart';
 import '../../../../core/l10n/app_localizations.dart';
 import '../../../../core/l10n/bilingual.dart';
@@ -19,6 +20,7 @@ class FavoritesPage extends StatelessWidget {
     final l10n = AppLocalizations.of(context);
     final bi = Bilingual.of(context);
     return Scaffold(
+      bottomNavigationBar: const BannerAdWidget(anchored: true),
       body: SafeArea(
         bottom: false,
         child: BlocBuilder<FavoritesBloc, FavoritesState>(

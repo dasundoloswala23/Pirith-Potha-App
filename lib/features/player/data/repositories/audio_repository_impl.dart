@@ -7,6 +7,7 @@ import '../../../downloads/domain/repositories/download_repository.dart';
 import '../../../pirith/domain/entities/pirith_entity.dart';
 import '../../domain/entities/playback_mode.dart';
 import '../../domain/entities/playback_status.dart';
+import '../../domain/playable_queue.dart';
 import '../../domain/repositories/audio_repository.dart';
 
 class AudioRepositoryImpl implements AudioRepository {
@@ -55,11 +56,17 @@ class AudioRepositoryImpl implements AudioRepository {
     PlaybackMode? mode,
   }) async {
     if (items.isEmpty) return;
-    _queue = List.unmodifiable(items);
-    _index = startIndex.clamp(0, items.length - 1);
+    // Filtered here as well as in PlayerBloc: _queue and _index are the
+    // source of `currentItem`, `queue` and the currentIndexStream mapping,
+    // so they have to describe exactly the list that becomes AudioSources.
+    final playable = playableQueue(items, startIndex: startIndex);
+    if (playable.items.isEmpty) return;
+
+    _queue = List.unmodifiable(playable.items);
+    _index = playable.index;
     if (mode != null) _mode = mode;
 
-    final mediaItems = items.map(_toMediaItem).toList();
+    final mediaItems = playable.items.map(_toMediaItem).toList();
     try {
       // Mode is applied before loading so shuffle order is established for
       // the sequence we're about to play, not the previous one.
@@ -67,7 +74,7 @@ class AudioRepositoryImpl implements AudioRepository {
       await _handler.setQueue(mediaItems, initialIndex: _index);
     } catch (_) {
       throw AppException(
-        _downloadRepository.localAudioPathFor(items[_index].id) != null
+        _downloadRepository.localAudioPathFor(_queue[_index].id) != null
             ? const UnknownFailure('Could not play this Pirith')
             : const NetworkFailure('Could not play this Pirith'),
       );

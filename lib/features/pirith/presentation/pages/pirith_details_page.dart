@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/ads/widgets/banner_ad_widget.dart';
 import '../../../../app/theme/app_spacing.dart';
 import '../../../../app/theme/app_typography.dart';
 import '../../../../core/constants/app_route_paths.dart';
@@ -17,6 +18,7 @@ import '../../../premium/presentation/widgets/premium_badge.dart';
 import '../../../premium/presentation/widgets/premium_gate.dart';
 import '../../domain/entities/pirith_entity.dart';
 import '../widgets/catalogue_loaded_builder.dart';
+import '../utils/open_pirith.dart';
 import '../widgets/pirith_artwork.dart';
 
 /// Real Pirith details, sourced from the already-loaded catalogue. Play/
@@ -31,6 +33,7 @@ class PirithDetailsPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     return Scaffold(
+      bottomNavigationBar: const BannerAdWidget(anchored: true),
       body: CatalogueLoadedBuilder(
         builder: (context, state) {
           final item = state.pirith.where((p) => p.id == pirithId).firstOrNull;
@@ -70,7 +73,11 @@ class PirithDetailsPage extends StatelessWidget {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Text(
-                            '${item.title} · ${item.durationLabel()}',
+                            item.hasAudio
+                                ? '${item.title} · ${item.durationLabel()}'
+                                : item.isVideoOnly
+                                ? '${item.title} · ${l10n.labelVideo}'
+                                : item.title,
                             style: Theme.of(context).textTheme.bodyMedium,
                           ),
                           if (item.isPremium) ...[
@@ -89,38 +96,41 @@ class PirithDetailsPage extends StatelessWidget {
                           // as broken.
                           if (!_isPlayingThis(context, item.id))
                             FilledButton.icon(
-                              onPressed: () {
-                                if (!ensurePremiumAccess(
-                                  context,
-                                  isPremiumItem: item.isPremium,
-                                )) {
-                                  return;
-                                }
-                                context.read<PlayerBloc>().add(
-                                  PlayerPlayRequested(item),
-                                );
-                                context.push(AppRoutePaths.player);
-                              },
-                              icon: const Icon(Icons.play_arrow),
-                              label: Text(l10n.actionPlay),
+                              onPressed: () => openPirith(context, item),
+                              icon: Icon(
+                                item.isVideoOnly
+                                    ? Icons.smart_display
+                                    : Icons.play_arrow,
+                              ),
+                              label: Text(
+                                item.isVideoOnly
+                                    ? l10n.actionWatchVideo
+                                    : l10n.actionPlay,
+                              ),
                             ),
                           if (!_isPlayingThis(context, item.id))
                             const SizedBox(width: 12),
-                          _DetailsDownloadButton(item: item),
-                          const SizedBox(width: 12),
+                          // Neither downloading nor queueing means anything
+                          // without an audio file.
+                          if (item.hasAudio) ...[
+                            _DetailsDownloadButton(item: item),
+                            const SizedBox(width: 12),
+                          ],
                           FavoriteButton(pirithId: item.id, outlined: true),
-                          const SizedBox(width: 12),
-                          // The explicit counterpart to the card's
-                          // long-press, which nothing advertises.
-                          IconButton.outlined(
-                            tooltip: Bilingual.of(context).si.playlistAddTo,
-                            icon: const Icon(Icons.playlist_add),
-                            onPressed: () => showAddToPlaylistSheet(
-                              context,
-                              pirithId: item.id,
-                              pirithTitle: item.titleSinhala,
+                          if (item.hasAudio) ...[
+                            const SizedBox(width: 12),
+                            // The explicit counterpart to the card's
+                            // long-press, which nothing advertises.
+                            IconButton.outlined(
+                              tooltip: Bilingual.of(context).si.playlistAddTo,
+                              icon: const Icon(Icons.playlist_add),
+                              onPressed: () => showAddToPlaylistSheet(
+                                context,
+                                pirithId: item.id,
+                                pirithTitle: item.titleSinhala,
+                              ),
                             ),
-                          ),
+                          ],
                         ],
                       ),
                       _InlinePlayback(pirithId: item.id),

@@ -3,10 +3,13 @@ import 'dart:async';
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../../core/errors/app_exception.dart';
+import '../../../../core/errors/error_reporter.dart';
 import '../../../history/domain/usecases/record_played.dart';
 import '../../../pirith/domain/entities/pirith_entity.dart';
 import '../../domain/entities/playback_mode.dart';
 import '../../domain/entities/playback_status.dart';
+import '../../domain/playable_queue.dart';
 import '../../domain/repositories/audio_repository.dart';
 import '../../domain/usecases/pause_playback.dart';
 import '../../domain/usecases/play_pirith.dart';
@@ -107,6 +110,15 @@ class PlayerBloc extends Bloc<PlayerEvent, PlayerState> {
     PlayerPlayRequested event,
     Emitter<PlayerState> emit,
   ) async {
+    // Return without emitting: an item with no audio must not become the
+    // active one. Previously this emitted `loading`, then the handler
+    // silently declined to load anything, so the play button span forever
+    // and — if something was already playing — the old track kept going
+    // under a UI that had already switched to the new item. Returning here
+    // is also what keeps that existing playback untouched, which is the
+    // behaviour a video-only Pirith needs.
+    if (!event.item.hasAudio) return;
+
     emit(
       PlayerActive(
         item: event.item,
@@ -117,7 +129,7 @@ class PlayerBloc extends Bloc<PlayerEvent, PlayerState> {
         mode: _audioRepository.mode,
       ),
     );
-    await _playPirith(event.item);
+    await _play(emit, () => _playPirith(event.item));
     unawaited(_recordPlayed(event.item.id));
   }
 
@@ -126,8 +138,15 @@ class PlayerBloc extends Bloc<PlayerEvent, PlayerState> {
     Emitter<PlayerState> emit,
   ) async {
     if (event.items.isEmpty) return;
-    final start = event.startIndex.clamp(0, event.items.length - 1);
-    final item = event.items[start];
+    // Filter before anything counts. The state's queue must be the same list
+    // that reaches the player, or the indices reported back by
+    // currentIndexStream address a different array than the one they are
+    // used to index.
+    final playable = playableQueue(event.items, startIndex: event.startIndex);
+    if (playable.items.isEmpty) return;
+
+    final start = playable.index;
+    final item = playable.items[start];
     // Emitted before awaiting playback so the player appears instantly.
     emit(
       PlayerActive(
@@ -135,13 +154,33 @@ class PlayerBloc extends Bloc<PlayerEvent, PlayerState> {
         status: PlaybackStatus.loading,
         position: Duration.zero,
         duration: Duration(seconds: item.duration),
-        queue: event.items,
+        queue: playable.items,
         queueIndex: start,
         mode: event.mode ?? _audioRepository.mode,
       ),
     );
-    await _playQueue(event.items, startIndex: start, mode: event.mode);
+    await _play(
+      emit,
+      () => _playQueue(playable.items, startIndex: start, mode: event.mode),
+    );
     unawaited(_recordPlayed(item.id));
+  }
+
+  /// Runs a playback call, surfacing failure as an error status.
+  ///
+  /// Without this an AppException thrown by the repository escapes the
+  /// handler and the state stays on `loading` forever — the spinner that
+  /// never resolves.
+  Future<void> _play(Emitter<PlayerState> emit, Future<void> Function() run) async {
+    try {
+      await run();
+    } on AppException catch (error, stackTrace) {
+      reportNonFatal(error, stackTrace, reason: 'Playback failed');
+      final current = state;
+      if (current is PlayerActive) {
+        emit(current.copyWith(status: PlaybackStatus.error));
+      }
+    }
   }
 
   Future<void> _onModeChanged(

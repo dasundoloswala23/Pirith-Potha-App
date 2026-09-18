@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../app/theme/app_spacing.dart';
+import '../../../../core/ads/widgets/banner_ad_widget.dart';
 import '../../../../app/theme/app_typography.dart';
 import '../../../../core/constants/app_route_paths.dart';
 import '../../../../core/l10n/bilingual.dart';
@@ -55,6 +56,7 @@ class _PlaylistDetailsPageState extends State<PlaylistDetailsPage> {
     }
 
     return Scaffold(
+      bottomNavigationBar: const BannerAdWidget(anchored: true),
       appBar: AppBar(
         title: Text(
           playlist.name,
@@ -208,13 +210,18 @@ class _Header extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               FilledButton.icon(
-                onPressed: () => _play(context, PlaybackMode.normal),
+                // A playlist of nothing but videos has nothing to play.
+                onPressed: items.any((i) => i.hasAudio)
+                    ? () => _play(context, PlaybackMode.normal)
+                    : null,
                 icon: const Icon(Icons.play_arrow),
                 label: Text(bi.primary.playlistPlayAll),
               ),
               const SizedBox(width: AppSpacing.md),
               OutlinedButton.icon(
-                onPressed: () => _play(context, PlaybackMode.shuffle),
+                onPressed: items.any((i) => i.hasAudio)
+                    ? () => _play(context, PlaybackMode.shuffle)
+                    : null,
                 icon: const Icon(Icons.shuffle),
                 label: Text(bi.primary.playlistShuffle),
               ),
@@ -229,7 +236,9 @@ class _Header extends StatelessWidget {
   /// the player in saved order and just_audio randomises its own sequence,
   /// so the playlist on disk is untouched.
   void _play(BuildContext context, PlaybackMode mode) {
-    context.read<PlayerBloc>().add(PlayerQueueRequested(items, mode: mode));
+    final playable = items.where((i) => i.hasAudio).toList();
+    if (playable.isEmpty) return;
+    context.read<PlayerBloc>().add(PlayerQueueRequested(playable, mode: mode));
     context.push(AppRoutePaths.player);
   }
 }
@@ -251,16 +260,25 @@ class _Items extends StatelessWidget {
       itemCount: items.length,
       separatorBuilder: (_, _) => const SizedBox(height: AppSpacing.md),
       itemBuilder: (context, index) {
+        final item = items[index];
         return PirithCard(
-          item: items[index],
+          item: item,
           // Tapping a row plays the whole playlist from here, not just the
-          // one Pirith — that is the point of a playlist.
-          onPlay: () {
-            context.read<PlayerBloc>().add(
-              PlayerQueueRequested(items, startIndex: index),
-            );
-            context.push(AppRoutePaths.player);
-          },
+          // one Pirith — that is the point of a playlist. A video-only row
+          // has no onPlay, so openPirith sends it to the video screen
+          // instead of starting a queue it cannot be part of.
+          onPlay: item.hasAudio
+              ? () {
+                  final playable = items.where((i) => i.hasAudio).toList();
+                  context.read<PlayerBloc>().add(
+                    PlayerQueueRequested(
+                      playable,
+                      startIndex: playable.indexWhere((i) => i.id == item.id),
+                    ),
+                  );
+                  context.push(AppRoutePaths.player);
+                }
+              : null,
         );
       },
     );
