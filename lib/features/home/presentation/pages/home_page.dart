@@ -8,7 +8,6 @@ import '../../../../app/theme/app_typography.dart';
 import '../../../../core/constants/app_route_paths.dart';
 import '../../../../core/l10n/app_localizations.dart';
 import '../../../../core/l10n/bilingual.dart';
-import '../../../../core/ads/widgets/banner_ad_widget.dart';
 import '../../../../core/widgets/bilingual_text.dart';
 import '../../../../core/widgets/pirith_mark.dart';
 import '../../../history/presentation/bloc/history_bloc.dart';
@@ -16,6 +15,7 @@ import '../../../pirith/domain/entities/pirith_entity.dart';
 import '../../../pirith/presentation/bloc/catalogue_bloc.dart';
 import '../../../pirith/presentation/widgets/category_card.dart';
 import '../../../pirith/presentation/widgets/pirith_artwork.dart';
+import '../../../pirith/presentation/utils/open_pirith.dart';
 import '../../../pirith/presentation/widgets/pirith_card.dart';
 import '../../../player/presentation/bloc/player_bloc.dart';
 import '../../../pirith/presentation/widgets/catalogue_loaded_builder.dart';
@@ -256,12 +256,6 @@ class _HomeContent extends StatelessWidget {
               ),
             ),
           ],
-          const SliverToBoxAdapter(
-            child: Padding(
-              padding: EdgeInsets.symmetric(vertical: 8),
-              child: BannerAdWidget(),
-            ),
-          ),
           if (featured == null && popular.isEmpty)
             SliverToBoxAdapter(
               child: Padding(
@@ -378,11 +372,7 @@ class _RecentTile extends StatelessWidget {
     return InkWell(
       borderRadius: BorderRadius.circular(AppRadius.sm),
       onTap: () {
-        if (!ensurePremiumAccess(context, isPremiumItem: item.isPremium)) {
-          return;
-        }
-        context.read<PlayerBloc>().add(PlayerPlayRequested(item));
-        context.push(AppRoutePaths.player);
+        openPirith(context, item);
       },
       child: SizedBox(
         width: 96,
@@ -430,11 +420,7 @@ class _FeaturedCard extends StatelessWidget {
     return InkWell(
       borderRadius: BorderRadius.circular(AppRadius.lg),
       onTap: () {
-        if (!ensurePremiumAccess(context, isPremiumItem: item.isPremium)) {
-          return;
-        }
-        context.read<PlayerBloc>().add(PlayerPlayRequested(item));
-        context.push(AppRoutePaths.player);
+        openPirith(context, item);
       },
       child: Container(
         height: 160,

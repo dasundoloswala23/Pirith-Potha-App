@@ -17,6 +17,7 @@ import '../../../playlists/presentation/widgets/add_to_playlist_sheet.dart';
 import '../../../premium/presentation/widgets/premium_badge.dart';
 import '../../../premium/presentation/widgets/premium_gate.dart';
 import '../../domain/entities/pirith_entity.dart';
+import '../utils/open_pirith.dart';
 import 'pirith_artwork.dart';
 
 /// List row: artwork, Sinhala title + English subtitle + duration, and
@@ -48,17 +49,7 @@ class PirithCard extends StatelessWidget {
   /// gate still runs first either way.
   final VoidCallback? onPlay;
 
-  void _play(BuildContext context) {
-    if (!ensurePremiumAccess(context, isPremiumItem: item.isPremium)) return;
-
-    final onPlay = this.onPlay;
-    if (onPlay != null) {
-      onPlay();
-      return;
-    }
-    context.read<PlayerBloc>().add(PlayerPlayRequested(item));
-    context.push(AppRoutePaths.player);
-  }
+  void _play(BuildContext context) => openPirith(context, item, onPlay: onPlay);
 
   @override
   Widget build(BuildContext context) {
@@ -69,11 +60,14 @@ class PirithCard extends StatelessWidget {
       child: InkWell(
         borderRadius: BorderRadius.circular(AppRadius.md),
         onTap: () => _play(context),
-        onLongPress: () => showAddToPlaylistSheet(
-          context,
-          pirithId: item.id,
-          pirithTitle: item.titleSinhala,
-        ),
+        // Only for items that can actually be queued.
+        onLongPress: item.hasAudio
+            ? () => showAddToPlaylistSheet(
+                context,
+                pirithId: item.id,
+                pirithTitle: item.titleSinhala,
+              )
+            : null,
         child: Padding(
           padding: EdgeInsets.symmetric(
             horizontal: compact ? 12 : 14,
@@ -112,10 +106,15 @@ class PirithCard extends StatelessWidget {
                     const SizedBox(height: 4),
                     Row(
                       children: [
-                        Text(
-                          item.durationLabel(),
-                          style: theme.textTheme.labelSmall,
-                        ),
+                        // A video has no duration to show, and "0:00" reads
+                        // as a broken file rather than as a video.
+                        if (item.hasAudio)
+                          Text(
+                            item.durationLabel(),
+                            style: theme.textTheme.labelSmall,
+                          )
+                        else if (item.isVideoOnly)
+                          const _VideoBadge(),
                         _OfflineBadge(pirithId: item.id),
                         if (item.isPremium) ...[
                           const SizedBox(width: 6),
@@ -128,7 +127,10 @@ class PirithCard extends StatelessWidget {
               ),
               FavoriteButton(pirithId: item.id),
               _DownloadButton(item: item),
-              _PlayButton(onTap: () => _play(context)),
+              _PlayButton(
+                icon: item.isVideoOnly ? Icons.smart_display : Icons.play_arrow,
+                onTap: () => _play(context),
+              ),
             ],
           ),
         ),
@@ -185,6 +187,9 @@ class _DownloadButton extends StatelessWidget {
       final state = bloc.state;
       return state is DownloadsLoaded ? state.statusFor(item.id) : null;
     });
+
+    // Nothing to download, and nothing already downloaded to manage.
+    if (!item.hasAudio && entry == null) return const SizedBox.shrink();
 
     switch (entry?.status) {
       case DownloadStatus.downloading:
@@ -245,9 +250,13 @@ class _DownloadButton extends StatelessWidget {
 }
 
 class _PlayButton extends StatelessWidget {
-  const _PlayButton({required this.onTap});
+  const _PlayButton({required this.onTap, this.icon = Icons.play_arrow});
 
   final VoidCallback onTap;
+
+  /// A video gets a screen glyph. The gold circle stays either way — one
+  /// odd-coloured dot in a gold list reads as an error state.
+  final IconData icon;
 
   @override
   Widget build(BuildContext context) {
@@ -263,6 +272,34 @@ class _PlayButton extends StatelessWidget {
         ),
         child: const Icon(Icons.play_arrow, color: Colors.white, size: 18),
       ),
+    );
+  }
+}
+
+
+/// Marks a Pirith that exists only as a video, in place of a duration.
+class _VideoBadge extends StatelessWidget {
+  const _VideoBadge();
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Icon(
+          Icons.smart_display_outlined,
+          size: 12,
+          color: theme.colorScheme.primary,
+        ),
+        const SizedBox(width: 2),
+        Text(
+          AppLocalizations.of(context).labelVideo,
+          style: theme.textTheme.labelSmall?.copyWith(
+            color: theme.colorScheme.primary,
+          ),
+        ),
+      ],
     );
   }
 }

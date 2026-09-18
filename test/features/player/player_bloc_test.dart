@@ -34,6 +34,24 @@ PirithEntity _make(String id) => PirithEntity(
   downloadCount: 0,
 );
 
+PirithEntity _videoOnly(String id) => PirithEntity(
+  id: id,
+  title: 'Video $id',
+  titleSinhala: 'වීඩියෝ $id',
+  description: '',
+  descriptionSinhala: '',
+  coverUrl: '',
+  audioUrl: '',
+  youtubeUrl: 'https://youtu.be/dQw4w9WgXcQ',
+  duration: 0,
+  categoryId: 'protective',
+  isPremium: false,
+  isFeatured: false,
+  sortOrder: 1,
+  playCount: 0,
+  downloadCount: 0,
+);
+
 const _item = PirithEntity(
   id: '1',
   title: 'Ratana Sutta',
@@ -51,7 +69,10 @@ const _item = PirithEntity(
   downloadCount: 0,
 );
 
-PlayerBloc _buildBloc(FakeAudioRepository repository) => PlayerBloc(
+PlayerBloc _buildBloc(
+  FakeAudioRepository repository, {
+  FakeHistoryRepository? history,
+}) => PlayerBloc(
       audioRepository: repository,
       playPirith: PlayPirith(repository),
       playQueue: PlayQueue(repository),
@@ -62,7 +83,7 @@ PlayerBloc _buildBloc(FakeAudioRepository repository) => PlayerBloc(
       resumePlayback: ResumePlayback(repository),
       seekPlayback: SeekPlayback(repository),
       stopPlayback: StopPlayback(repository),
-      recordPlayed: RecordPlayed(FakeHistoryRepository()),
+      recordPlayed: RecordPlayed(history ?? FakeHistoryRepository()),
     );
 
 void main() {
@@ -280,6 +301,97 @@ void main() {
       expect(state.queue, hasLength(1));
       expect(state.hasNext, isFalse);
       expect(state.hasPrevious, isFalse);
+    });
+
+    group('items with no audio', () {
+      test('are refused rather than left loading forever', () async {
+        final repository = FakeAudioRepository();
+        final history = FakeHistoryRepository();
+        final bloc = _buildBloc(repository, history: history);
+        addTearDown(bloc.close);
+
+        bloc.add(PlayerPlayRequested(_videoOnly('v')));
+        await Future<void>.delayed(const Duration(milliseconds: 10));
+
+        // No PlayerActive at all — the old behaviour emitted `loading` and
+        // then never moved off it, leaving a permanent spinner.
+        expect(bloc.state, isA<PlayerIdle>());
+        expect(repository.queue, isEmpty);
+        // And it never counted as played.
+        expect(history.currentHistory, isEmpty);
+      });
+
+      test('do not interrupt what is already playing', () async {
+        // The behaviour the video-only screen depends on: opening a video
+        // must leave the current chant alone. Previously the UI switched to
+        // the new item while the old audio kept going underneath it.
+        final repository = FakeAudioRepository();
+        final bloc = _buildBloc(repository);
+        addTearDown(bloc.close);
+
+        bloc.add(const PlayerPlayRequested(_item));
+        await Future<void>.delayed(const Duration(milliseconds: 10));
+
+        bloc.add(PlayerPlayRequested(_videoOnly('v')));
+        await Future<void>.delayed(const Duration(milliseconds: 10));
+
+        final state = bloc.state as PlayerActive;
+        expect(state.item.id, '1');
+        expect(state.status, PlaybackStatus.playing);
+      });
+
+      test('are filtered out of a queue without shifting the others', () async {
+        final repository = FakeAudioRepository();
+        final bloc = _buildBloc(repository);
+        addTearDown(bloc.close);
+
+        bloc.add(
+          PlayerQueueRequested([
+            _make('a'),
+            _videoOnly('v'),
+            _make('b'),
+          ], startIndex: 2),
+        );
+        await Future<void>.delayed(const Duration(milliseconds: 10));
+
+        final state = bloc.state as PlayerActive;
+        expect(state.queue.map((i) => i.id), ['a', 'b']);
+        expect(state.queueIndex, 1);
+        expect(state.item.id, 'b');
+        expect(repository.queue.map((i) => i.id), ['a', 'b']);
+      });
+
+      test('skipping by index lands on the right track', () async {
+        // The desync regression: with the video still in state.queue,
+        // index 1 resolved to the video rather than to 'b'.
+        final repository = FakeAudioRepository();
+        final bloc = _buildBloc(repository);
+        addTearDown(bloc.close);
+
+        bloc.add(
+          PlayerQueueRequested([_make('a'), _videoOnly('v'), _make('b')]),
+        );
+        await Future<void>.delayed(const Duration(milliseconds: 10));
+
+        final future = expectLater(
+          bloc.stream,
+          emitsThrough(isA<PlayerActive>().having((s) => s.item.id, 'item', 'b')),
+        );
+        bloc.add(const PlayerQueueIndexSelected(1));
+        await future;
+      });
+
+      test('a queue of nothing but videos plays nothing', () async {
+        final repository = FakeAudioRepository();
+        final bloc = _buildBloc(repository);
+        addTearDown(bloc.close);
+
+        bloc.add(PlayerQueueRequested([_videoOnly('v'), _videoOnly('w')]));
+        await Future<void>.delayed(const Duration(milliseconds: 10));
+
+        expect(bloc.state, isA<PlayerIdle>());
+        expect(repository.queue, isEmpty);
+      });
     });
   });
 }

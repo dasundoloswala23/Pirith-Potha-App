@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../core/ads/widgets/banner_ad_widget.dart';
 import '../../core/l10n/bilingual.dart';
 import '../../features/player/presentation/widgets/mini_player_bar.dart';
 
@@ -27,6 +28,10 @@ class HomeShell extends StatelessWidget {
       bottomNavigationBar: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
+          // Above the mini player, not between it and the nav bar: the ad
+          // needs content on one side, not interactive strips on both.
+          // One widget here covers all five tabs.
+          const BannerAdWidget(anchored: true),
           const MiniPlayerBar(),
           NavigationBar(
             selectedIndex: navigationShell.currentIndex,

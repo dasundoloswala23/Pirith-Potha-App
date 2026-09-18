@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/ads/widgets/banner_ad_widget.dart';
 import '../../../../app/theme/app_colors.dart';
 import '../../../../app/theme/app_spacing.dart';
 import '../../../../app/theme/app_typography.dart';
@@ -23,6 +24,7 @@ class QueuePage extends StatelessWidget {
     final bi = Bilingual.of(context);
 
     return Scaffold(
+      bottomNavigationBar: const BannerAdWidget(anchored: true),
       appBar: AppBar(title: Text(bi.primary.queueTitle)),
       body: BlocBuilder<PlayerBloc, PlayerState>(
         builder: (context, state) {

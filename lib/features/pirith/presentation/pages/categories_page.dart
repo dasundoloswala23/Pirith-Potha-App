@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/ads/widgets/banner_ad_widget.dart';
 import '../../../../core/constants/app_route_paths.dart';
 import '../../../../core/l10n/bilingual.dart';
 import '../../../../core/widgets/bilingual_text.dart';
@@ -14,6 +15,7 @@ class CategoriesPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final bi = Bilingual.of(context);
     return Scaffold(
+      bottomNavigationBar: const BannerAdWidget(anchored: true),
       body: SafeArea(
         bottom: false,
         child: CatalogueLoadedBuilder(

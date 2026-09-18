@@ -4,9 +4,30 @@
 
 - `google_mobile_ads`, wrapped behind an `AdService` abstraction — UI never
   calls the AdMob SDK directly.
-- **Banner**: below/within content lists (e.g. home feed), never overlaid on
-  or adjacent to the audio player screen. This is a devotional app; ads must
-  not feel intrusive on the core listening experience.
+- **Banner**: one anchored 320x50 banner per screen, in
+  `Scaffold.bottomNavigationBar` via `BannerAdWidget(anchored: true)`. The
+  five bottom-nav tabs are covered by a single instance in `HomeShell`;
+  pushed routes (details, categories, favourites, recently played, playlist
+  details, queue) each carry their own. The player and the video screen
+  instead use an inline 300x250 medium rectangle, placed last on the screen
+  and well clear of the transport row.
+
+  This supersedes the original rule ("never adjacent to the player"). The
+  owner asked for ad coverage on every screen; that is a revenue decision and
+  it is theirs to make, but the reasoning that produced the old rule still
+  holds and is worth keeping in view:
+    - The divider above an anchored banner is drawn *inside* `BannerAdWidget`
+      so it vanishes with the ad. AdMob requires ads be distinguishable from
+      content, and a caller-drawn rule would strand a line across the screen
+      whenever an ad fails to fill.
+    - In `HomeShell` the banner sits **above** the mini player, not between
+      the mini player and the nav bar — an ad wedged between two interactive
+      strips is an accidental-click complaint waiting to happen, and AdMob
+      counts those as invalid traffic.
+    - Ad density is the live risk to watch. Google's policy prohibits ads
+      that interfere with navigation or provoke accidental clicks; a banner
+      per screen is ordinary, but stacking one against a control is not.
+      Revisit if invalid-traffic warnings appear in the AdMob console.
 - **Interstitial**: fires only when the user navigates *out* of the player,
   and **never while audio is playing**. A video interstitial takes Android
   audio focus, so showing one mid-playback would duck or pause the chant and

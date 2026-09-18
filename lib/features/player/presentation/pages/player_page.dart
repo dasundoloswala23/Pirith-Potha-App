@@ -9,7 +9,6 @@ import '../../../../core/ads/widgets/banner_ad_widget.dart';
 import '../../../../core/constants/app_route_paths.dart';
 import '../../../../core/l10n/app_localizations.dart';
 import '../../../../core/l10n/bilingual.dart';
-import '../../../../core/services/external_link_launcher.dart';
 import '../../../downloads/domain/entities/download_entity.dart';
 import '../../../downloads/presentation/bloc/download_bloc.dart';
 import '../../../favorites/presentation/bloc/favorites_bloc.dart';
@@ -20,6 +19,9 @@ import '../../domain/entities/playback_mode.dart';
 import '../../domain/entities/playback_status.dart';
 import '../bloc/player_bloc.dart';
 import '../bloc/sleep_timer_cubit.dart';
+import '../widgets/player_artwork.dart';
+import '../widgets/player_title_block.dart';
+import '../widgets/youtube_preview_card.dart';
 
 /// Full-screen "now playing", driven by the app-scoped [PlayerBloc] — see
 /// docs/04_audio_architecture.md. Background/lock-screen playback and
@@ -69,8 +71,6 @@ class _NowPlaying extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
-    final theme = Theme.of(context);
     final isBuffering =
         state.status == PlaybackStatus.loading ||
         state.status == PlaybackStatus.buffering;
@@ -98,13 +98,13 @@ class _NowPlaying extends StatelessWidget {
               child: Column(
                 children: [
                   const SizedBox(height: AppSpacing.lg),
-                  _Artwork(
-                    state: state,
+                  PlayerArtwork(
+                    item: state.item,
                     width: coverWidth,
                     height: coverHeight,
                   ),
                   const SizedBox(height: AppSpacing.xl),
-                  _TitleBlock(state: state),
+                  PlayerTitleBlock(item: state.item),
                   const SizedBox(height: AppSpacing.lg),
                   _ActionRow(item: state.item),
                   const SizedBox(height: AppSpacing.lg),
@@ -141,18 +141,13 @@ class _NowPlaying extends StatelessWidget {
                         ),
                     ],
                   ),
-                  if (state.item.youtubeUrl.isNotEmpty)
-                    TextButton.icon(
-                      onPressed: () => launchExternalUrl(state.item.youtubeUrl),
-                      icon: const Icon(
-                        Icons.play_circle_fill,
-                        color: Color(0xFFFF0000),
-                      ),
-                      label: Text(
-                        l10n.actionWatchOnYouTube,
-                        style: TextStyle(color: theme.colorScheme.primary),
-                      ),
-                    ),
+                  // The button this replaced brought its own padding, so the
+                  // Wrap above needed no spacer; a card butted against the
+                  // chips would read as a layout bug.
+                  if (state.item.youtubeUrl.trim().isNotEmpty) ...[
+                    const SizedBox(height: AppSpacing.lg),
+                    YouTubePreviewCard(youtubeUrl: state.item.youtubeUrl),
+                  ],
                   // Last thing on the screen, well clear of the transport
                   // row: an ad crowding the play controls invites accidental
                   // taps, which AdMob counts as invalid traffic.
@@ -165,84 +160,6 @@ class _NowPlaying extends StatelessWidget {
           );
         },
       ),
-    );
-  }
-}
-
-/// Cover art over a soft glow, so the artwork reads as lit rather than
-/// pasted onto a flat dark panel.
-class _Artwork extends StatelessWidget {
-  const _Artwork({
-    required this.state,
-    required this.width,
-    required this.height,
-  });
-
-  final PlayerActive state;
-  final double width;
-  final double height;
-
-  @override
-  Widget build(BuildContext context) {
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.gold.withValues(alpha: 0.18),
-            blurRadius: 60,
-            spreadRadius: 8,
-          ),
-        ],
-      ),
-      child: PirithArtwork(
-        pirithId: state.item.id,
-        coverUrl: state.item.coverUrl,
-        size: width,
-        height: height,
-        radius: 20,
-      ),
-    );
-  }
-}
-
-/// Title block: the Sinhala name carries the hierarchy, with the English
-/// name and duration deliberately quieter beneath it.
-class _TitleBlock extends StatelessWidget {
-  const _TitleBlock({required this.state});
-
-  final PlayerActive state;
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    return Column(
-      children: [
-        Text(
-          state.item.titleSinhala,
-          maxLines: 2,
-          textAlign: TextAlign.center,
-          overflow: TextOverflow.ellipsis,
-          style: AppTypography.sinhalaTitle(
-            fontSize: 24,
-            color: theme.colorScheme.onSurface,
-          ),
-        ),
-        if (state.item.title.isNotEmpty) ...[
-          const SizedBox(height: AppSpacing.xs),
-          Text(
-            state.item.title,
-            maxLines: 1,
-            textAlign: TextAlign.center,
-            overflow: TextOverflow.ellipsis,
-            style: AppTypography.englishSerif(
-              fontSize: 14,
-              fontStyle: FontStyle.italic,
-              color: theme.colorScheme.primary,
-            ),
-          ),
-        ],
-      ],
     );
   }
 }

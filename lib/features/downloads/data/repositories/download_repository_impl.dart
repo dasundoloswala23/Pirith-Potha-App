@@ -56,6 +56,11 @@ class DownloadRepositoryImpl implements DownloadRepository {
 
   @override
   Future<void> download(PirithEntity item) async {
+    // Before the directory is created and before the `downloading` entry is
+    // published: without this an empty URL left a stray empty folder and a
+    // Retry button that could never succeed.
+    if (!item.hasAudio) return;
+
     final existing = _downloads[item.id];
     if (existing?.status == DownloadStatus.downloading ||
         existing?.status == DownloadStatus.downloaded) {

@@ -63,21 +63,36 @@ class PirithAudioHandler extends BaseAudioHandler with SeekHandler {
   /// repository's job, since only it knows what has been downloaded.
   Future<void> setQueue(List<MediaItem> items, {int initialIndex = 0}) async {
     if (items.isEmpty) return;
-    queue.add(items);
-    mediaItem.add(items[initialIndex.clamp(0, items.length - 1)]);
 
-    final sources = <AudioSource>[];
-    for (final item in items) {
-      final url = item.extras?['audioUrl'] as String?;
-      if (url == null || url.isEmpty) continue;
-      sources.add(AudioSource.uri(Uri.parse(url), tag: item));
+    // Filter once, then publish *that* list. This used to skip empty-URL
+    // items while building sources but still publish the unfiltered list to
+    // `queue`/`mediaItem`, so the indices just_audio reported addressed a
+    // shorter array than the one they were used to index — every track after
+    // a skipped one showed the wrong title and artwork.
+    final playable = items
+        .where((item) => (item.extras?['audioUrl'] as String? ?? '').isNotEmpty)
+        .toList();
+    if (playable.isEmpty) {
+      // Loud rather than silent: AudioRepositoryImpl.playQueue wraps this in
+      // a try/catch and turns it into an AppException, where a bare `return`
+      // left the UI on a spinner that never resolved. Callers filter first,
+      // so reaching this is a bug.
+      throw StateError('setQueue called with no playable items');
     }
-    if (sources.isEmpty) return;
 
-    await _player.setAudioSources(
-      sources,
-      initialIndex: initialIndex.clamp(0, sources.length - 1),
-    );
+    final index = initialIndex.clamp(0, playable.length - 1);
+    queue.add(playable);
+    mediaItem.add(playable[index]);
+
+    final sources = [
+      for (final item in playable)
+        AudioSource.uri(
+          Uri.parse(item.extras!['audioUrl'] as String),
+          tag: item,
+        ),
+    ];
+
+    await _player.setAudioSources(sources, initialIndex: index);
     await play();
   }
 

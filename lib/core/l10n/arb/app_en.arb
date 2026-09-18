@@ -123,6 +123,12 @@
   "actionRewind10": "Back 10 seconds",
   "actionForward10": "Forward 10 seconds",
   "actionWatchOnYouTube": "Watch on YouTube",
+  "videoScreenTitle": "Watch",
+  "labelVideo": "Video",
+  "actionWatchVideo": "Watch video",
+  "videoOnlyNote": "This Pirith is video only",
+  "pirithUnavailable": "This Pirith isn't available yet",
+  "linkErrorGeneric": "Couldn't open that link.",
   "catalogueErrorGeneric": "Couldn't load the Pirith catalogue. Check your connection and try again.",
   "categoryPirithCount": "{count} Pirith",
   "@categoryPirithCount": {
