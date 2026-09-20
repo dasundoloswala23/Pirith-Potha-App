@@ -83,6 +83,17 @@
 -keep class androidx.startup.** { *; }
 -keep class * implements androidx.startup.Initializer { *; }
 
+# --- Play Core: in-app update -----------------------------------------------
+# A different class family from the deferred-components rule above
+# (com.google.android.play.core.appupdate/install vs .splitinstall) — do not
+# assume that rule covers this. Given the WorkDatabase precedent right above,
+# treat this as unverified until it's been through a real release-build
+# smoke test on device, not just flutter analyze.
+-keep class com.google.android.play.core.appupdate.** { *; }
+-keep class com.google.android.play.core.install.** { *; }
+-dontwarn com.google.android.play.core.appupdate.**
+-dontwarn com.google.android.play.core.install.**
+
 # --- Kotlin / coroutines ---------------------------------------------------
 -dontwarn kotlin.**
 -dontwarn kotlinx.coroutines.**

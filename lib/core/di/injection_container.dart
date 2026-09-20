@@ -64,11 +64,14 @@ import '../../features/playlists/presentation/bloc/playlist_bloc.dart';
 import '../../features/premium/data/repositories/premium_repository_impl.dart';
 import '../../features/premium/domain/repositories/premium_repository.dart';
 import '../../features/premium/presentation/bloc/premium_bloc.dart';
+import '../../features/app_update/data/repositories/version_config_repository_impl.dart';
+import '../../features/app_update/domain/repositories/version_config_repository.dart';
 import '../ads/ad_service.dart';
 import '../ads/mobile_ads_service.dart';
 import '../audio/audio_service_initializer.dart';
 import '../audio/pirith_audio_handler.dart';
 import '../firebase/analytics_service.dart';
+import '../services/app_review_service.dart';
 
 /// App-wide service locator. Repositories/data sources are registered as
 /// lazy singletons; screen-scoped BLoCs are registered as factories.
@@ -87,6 +90,7 @@ Future<void> configureDependencies() async {
     );
 
   final prefs = await SharedPreferences.getInstance();
+  getIt.registerSingleton<SharedPreferences>(prefs);
   getIt.registerLazySingleton(() => LanguageCubit(prefs));
 
   _registerAuthFeature();
@@ -99,6 +103,11 @@ Future<void> configureDependencies() async {
   await _registerPlayerFeature();
   await _registerAdsFeature();
   getIt.registerLazySingleton(() => SleepTimerCubit(getIt<PlayerBloc>()));
+
+  getIt.registerLazySingleton<VersionConfigRepository>(
+    () => VersionConfigRepositoryImpl(getIt<FirebaseFirestore>()),
+  );
+  AppReviewService.configure(prefs, getIt<AnalyticsService>());
 }
 
 void _registerPremiumFeature() {
