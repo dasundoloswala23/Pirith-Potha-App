@@ -7,6 +7,7 @@ import '../../../../core/constants/app_urls.dart';
 
 import '../../../../core/l10n/app_localizations.dart';
 import '../../../../core/l10n/bilingual.dart';
+import '../../../../core/services/app_review_service.dart';
 import '../../../../core/services/external_link_launcher.dart';
 import '../../../../core/l10n/language_cubit.dart';
 import '../../../../core/widgets/bilingual_text.dart';
@@ -92,6 +93,13 @@ class ProfilePage extends StatelessWidget {
                       sinhala: bi.si.favoritesTitle,
                       trailing: const Icon(Icons.chevron_right, size: 20),
                       onTap: () => context.push(AppRoutePaths.favorites),
+                    ),
+                    SettingsRow(
+                      icon: Icons.star_outline,
+                      english: bi.en.profileRateApp,
+                      sinhala: bi.si.profileRateApp,
+                      trailing: const Icon(Icons.chevron_right, size: 20),
+                      onTap: AppReviewService.promptFromSettings,
                     ),
                     SettingsRow(
                       icon: Icons.workspace_premium_outlined,

@@ -137,5 +137,12 @@
   "playlistNoPlaylistsYet": "ඔබට තවම ධාවන ලැයිස්තු නැත",
   "actionSave": "සුරකින්න",
   "actionRemove": "ඉවත් කරන්න",
-  "actionReorderHint": "අනුපිළිවෙල වෙනස් කිරීමට අදින්න"
+  "actionReorderHint": "අනුපිළිවෙල වෙනස් කිරීමට අදින්න",
+  "profileRateApp": "යෙදුම ශ්‍රේණිගත කරන්න",
+  "updateBannerTitle": "යාවත්කාලීනයක් තිබේ",
+  "updateBannerBody": "අනුවාදය {version} ස්ථාපනය කිරීමට සූදානම්.",
+  "updateBannerActionUpdate": "යාවත්කාලීන කරන්න",
+  "updateBannerActionLater": "පසුව",
+  "updateRestartTitle": "යාවත්කාලීනය බාගත කරන ලදී",
+  "updateRestartAction": "නැවත ආරම්භ කරන්න"
 }

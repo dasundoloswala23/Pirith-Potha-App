@@ -1,13 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:get_it/get_it.dart';
 
 import '../core/ads/ad_service.dart';
 import '../core/ads/player_exit_ad_observer.dart';
+import '../core/firebase/analytics_service.dart';
 import '../core/l10n/app_localizations.dart';
 import '../core/l10n/language_cubit.dart';
+import '../core/services/app_review_service.dart';
 import '../core/services/notification_permission.dart';
 import '../features/auth/presentation/bloc/auth_bloc.dart';
+import '../features/player/domain/entities/playback_status.dart';
 import '../features/downloads/presentation/bloc/download_bloc.dart';
 import '../features/favorites/presentation/bloc/favorites_bloc.dart';
 import '../features/history/presentation/bloc/history_bloc.dart';
@@ -89,14 +93,41 @@ class _PirithPothaAppState extends State<PirithPothaApp> {
         BlocProvider<LanguageCubit>.value(value: widget.languageCubit),
         BlocProvider<SleepTimerCubit>.value(value: widget.sleepTimerCubit),
       ],
-      // One listener rather than a call at each of the seven play entry
-      // points: the prompt belongs to "playback has started", not to any
-      // particular button. NotificationPermission asks at most once per
-      // session.
-      child: BlocListener<PlayerBloc, PlayerState>(
-        listenWhen: (previous, current) =>
-            previous is! PlayerActive && current is PlayerActive,
-        listener: (context, state) => NotificationPermission.requestIfNeeded(),
+      child: MultiBlocListener(
+        listeners: [
+          // One listener rather than a call at each of the seven play entry
+          // points: the prompt belongs to "playback has started", not to any
+          // particular button. NotificationPermission asks at most once per
+          // session.
+          BlocListener<PlayerBloc, PlayerState>(
+            listenWhen: (previous, current) =>
+                previous is! PlayerActive && current is PlayerActive,
+            listener: (context, state) =>
+                NotificationPermission.requestIfNeeded(),
+          ),
+          // A chant finishing to completion is the one moment this app
+          // treats as "positive" enough to ask for a review — never on cold
+          // start, never mid-queue (just_audio's own auto-advance never
+          // surfaces PlaybackStatus.completed; see PirithAudioHandler).
+          // maybePromptAfterPositiveMoment caps itself at one attempt per
+          // app version regardless of outcome.
+          BlocListener<PlayerBloc, PlayerState>(
+            listenWhen: (previous, current) =>
+                previous is PlayerActive &&
+                current is PlayerActive &&
+                previous.status != PlaybackStatus.completed &&
+                current.status == PlaybackStatus.completed,
+            listener: (context, state) {
+              final item = (state as PlayerActive).item;
+              if (GetIt.instance.isRegistered<AnalyticsService>()) {
+                GetIt.instance<AnalyticsService>()
+                    .logPirithCompleted(item.id)
+                    .ignore();
+              }
+              AppReviewService.maybePromptAfterPositiveMoment();
+            },
+          ),
+        ],
         child: MaterialApp.router(
           debugShowCheckedModeBanner: false,
           onGenerateTitle: (context) => AppLocalizations.of(context).appName,

@@ -203,5 +203,19 @@
   "playlistNoPlaylistsYet": "You have no playlists yet",
   "actionSave": "Save",
   "actionRemove": "Remove",
-  "actionReorderHint": "Drag to reorder"
+  "actionReorderHint": "Drag to reorder",
+  "profileRateApp": "Rate this app",
+  "updateBannerTitle": "Update available",
+  "updateBannerBody": "Version {version} is ready to install.",
+  "@updateBannerBody": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "updateBannerActionUpdate": "Update",
+  "updateBannerActionLater": "Later",
+  "updateRestartTitle": "Update downloaded",
+  "updateRestartAction": "Restart"
 }

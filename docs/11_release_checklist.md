@@ -14,6 +14,8 @@ Status as of 11 September 2026. Items marked **BLOCKER** stop a submission.
 | R8 / resource shrinking | Enabled, with keep rules in `android/app/proguard-rules.pro` |
 | POST_NOTIFICATIONS runtime request | Implemented; asked at first playback, once per session |
 | Release build verified on device | `ZL8325W28X` — launches, plays audio, media notification with transport controls appears |
+| In-app update (flexible) | `in_app_update` added; new ProGuard keep rules for `com.google.android.play.core.appupdate/install`; verified on a **minified release build** on `ZL8325W28X` — process launches and stays alive, `com.google.android.play.core.appupdate.internal.zzp` present at runtime (not stripped). `checkForUpdate()` itself can't be exercised end-to-end pre-launch — see "Both stores" below |
+| In-app review | `in_app_review` added; verified on the same minified build — tapping Settings → "Rate this app" reaches Play Core's `ReviewService` and completes (`onComplete: Successfully requested review flow`) with **no dialog rendered**, which is Google's documented quota behavior, not a failure. Automatic trigger (chant finishes playing) wired via `PlaybackStatus.completed`, capped once per app version on attempt, not on "shown" — neither store API reports whether its dialog actually appeared |
 
 ### The keystore is irreplaceable
 
@@ -102,14 +104,35 @@ flutter build appbundle --release
    (Build Phases → Copy Bundle Resources). A file sitting in the folder is not
    bundled.
 5. Apple Developer Program membership, certificates and provisioning profiles.
+6. **In-app review (StoreKit).** `AppReviewService` calls `in_app_review`'s
+   `requestReview()`/`openStoreListing()`, which bind to `SKStoreReviewController`
+   on iOS — no Info.plist keys needed, but unverified here: same Mac/cert
+   blockers as everything else above.
+7. **The update-available banner's App Store link.** `AppUrls.appStoreId` is
+   an empty placeholder — there is no App Store Connect listing yet, so the
+   banner's "Update" button quietly no-ops on iOS until it's filled in. Once
+   you have a numeric App Store id, set it there; no other code changes needed.
 
 ## Both stores
 
 - [ ] **BLOCKER** Privacy policy must be publicly reachable. Draft is at
       `store/privacy-policy.html`; the contact email is a placeholder and must be
       filled in before publishing.
-- [ ] Version for first release is `1.0.0+1` in `pubspec.yaml`. Increment the
-      build number (`+N`) on every upload — both stores reject a duplicate.
+- [ ] Version for the current build is `1.00.03+3` in `pubspec.yaml` (this
+      doc previously said `1.0.0+1`, stale). Increment the build number (`+N`)
+      on every upload — both stores reject a duplicate.
+- [ ] **In-app update config doc.** The update banner and Android's flexible
+      update both read `config/app_meta` in Firestore (`latestVersion`, optional
+      `updateMessage: {en, si}`) via `VersionConfigRepository`. Nothing publishes
+      to it yet — either extend the admin app with a settings screen or edit the
+      doc directly in the Firebase console after each release. It needs a public
+      read rule (`allow read: if true` on `config/app_meta` only) and
+      `allow write: if false` from the client, wherever `firestore.rules` is
+      actually deployed from (not checked into this repo — see the admin repo).
+- [ ] **In-app update is inert pre-launch.** `checkForUpdate()` compares
+      against what Play has *published*, so there is nothing newer to detect
+      until after the first release goes live. Don't treat "the banner never
+      shows" as a bug before then — see the device-verification notes below.
 
 ## Known gaps, deliberately not fixed
 

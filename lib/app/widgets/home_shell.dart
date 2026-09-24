@@ -4,6 +4,8 @@ import 'package:go_router/go_router.dart';
 import '../../core/ads/widgets/banner_ad_widget.dart';
 import '../../core/l10n/bilingual.dart';
 import '../../features/player/presentation/widgets/mini_player_bar.dart';
+import 'flexible_update_listener.dart';
+import 'update_available_banner.dart';
 
 /// Bottom-navigation shell wrapping the five primary top-level destinations
 /// — Home, Pirith, Playlists, Downloads, Settings — with the persistent
@@ -23,51 +25,62 @@ class HomeShell extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = Bilingual.of(context).primary;
-    return Scaffold(
-      body: navigationShell,
-      bottomNavigationBar: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          // Above the mini player, not between it and the nav bar: the ad
-          // needs content on one side, not interactive strips on both.
-          // One widget here covers all five tabs.
-          const BannerAdWidget(anchored: true),
-          const MiniPlayerBar(),
-          NavigationBar(
-            selectedIndex: navigationShell.currentIndex,
-            onDestinationSelected: (index) => navigationShell.goBranch(
-              index,
-              initialLocation: index == navigationShell.currentIndex,
+    return FlexibleUpdateListener(
+      child: Scaffold(
+        body: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            // Above the tab content so it's seen on every tab without being
+            // duplicated per-screen. Renders nothing until a check finds
+            // something worth showing.
+            const UpdateAvailableBanner(),
+            Expanded(child: navigationShell),
+          ],
+        ),
+        bottomNavigationBar: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Above the mini player, not between it and the nav bar: the ad
+            // needs content on one side, not interactive strips on both.
+            // One widget here covers all five tabs.
+            const BannerAdWidget(anchored: true),
+            const MiniPlayerBar(),
+            NavigationBar(
+              selectedIndex: navigationShell.currentIndex,
+              onDestinationSelected: (index) => navigationShell.goBranch(
+                index,
+                initialLocation: index == navigationShell.currentIndex,
+              ),
+              destinations: [
+                NavigationDestination(
+                  icon: const Icon(Icons.home_outlined),
+                  selectedIcon: const Icon(Icons.home),
+                  label: l10n.navHome,
+                ),
+                NavigationDestination(
+                  icon: const Icon(Icons.menu_book_outlined),
+                  selectedIcon: const Icon(Icons.menu_book),
+                  label: l10n.navPirith,
+                ),
+                NavigationDestination(
+                  icon: const Icon(Icons.queue_music_outlined),
+                  selectedIcon: const Icon(Icons.queue_music),
+                  label: l10n.navPlaylists,
+                ),
+                NavigationDestination(
+                  icon: const Icon(Icons.download_outlined),
+                  selectedIcon: const Icon(Icons.download),
+                  label: l10n.navDownloads,
+                ),
+                NavigationDestination(
+                  icon: const Icon(Icons.settings_outlined),
+                  selectedIcon: const Icon(Icons.settings),
+                  label: l10n.navProfile,
+                ),
+              ],
             ),
-            destinations: [
-              NavigationDestination(
-                icon: const Icon(Icons.home_outlined),
-                selectedIcon: const Icon(Icons.home),
-                label: l10n.navHome,
-              ),
-              NavigationDestination(
-                icon: const Icon(Icons.menu_book_outlined),
-                selectedIcon: const Icon(Icons.menu_book),
-                label: l10n.navPirith,
-              ),
-              NavigationDestination(
-                icon: const Icon(Icons.queue_music_outlined),
-                selectedIcon: const Icon(Icons.queue_music),
-                label: l10n.navPlaylists,
-              ),
-              NavigationDestination(
-                icon: const Icon(Icons.download_outlined),
-                selectedIcon: const Icon(Icons.download),
-                label: l10n.navDownloads,
-              ),
-              NavigationDestination(
-                icon: const Icon(Icons.settings_outlined),
-                selectedIcon: const Icon(Icons.settings),
-                label: l10n.navProfile,
-              ),
-            ],
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

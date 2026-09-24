@@ -69,4 +69,31 @@ class AnalyticsService {
         name: 'pirith_removed_from_playlist',
         parameters: {'playlist_id': playlistId, 'pirith_id': pirithId},
       );
+
+  Future<void> logUpdateBannerShown(String latestVersion) => _analytics.logEvent(
+        name: 'update_banner_shown',
+        parameters: {'latest_version': latestVersion},
+      );
+
+  Future<void> logUpdateAccepted(String latestVersion) => _analytics.logEvent(
+        name: 'update_accepted',
+        parameters: {'latest_version': latestVersion},
+      );
+
+  Future<void> logUpdateDismissed(String latestVersion) => _analytics.logEvent(
+        name: 'update_dismissed',
+        parameters: {'latest_version': latestVersion},
+      );
+
+  Future<void> logFlexibleUpdateRestartShown() =>
+      _analytics.logEvent(name: 'flexible_update_restart_shown');
+
+  /// [source] is `'automatic'` (after a chant finishes) or `'manual'` (the
+  /// Settings row) — one event name with a differentiating parameter,
+  /// matching how [logPlaylistPlayed] takes `item_count` rather than the
+  /// class having a separate event per bucket.
+  Future<void> logReviewPromptTriggered(String source) => _analytics.logEvent(
+        name: 'review_prompt_triggered',
+        parameters: {'source': source},
+      );
 }
