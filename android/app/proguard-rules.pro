@@ -6,6 +6,14 @@
 # *runtime in release only* — never in debug and never in `flutter analyze` —
 # so treat additions as needing a real release-build smoke test on a device.
 
+# --- DEX Code Optimization & Repackaging ----------------------------------
+# Flatten and repackage obfuscated classes into the root package.
+# Satisfies Google Play Console R8 "Repackage Classes" check, increases
+# obfuscation/shrinking percentages above Google Play's 25% threshold,
+# and reduces uncompressed DEX size.
+-repackageclasses ''
+-allowaccessmodification
+
 # --- Crash reporting -------------------------------------------------------
 # Without these, Crashlytics stack traces come back as obfuscated noise and
 # field reports become undiagnosable.
@@ -15,9 +23,7 @@
 -renamesourcefileattribute SourceFile
 
 # --- just_audio / audio_service (ExoPlayer / Media3) -----------------------
-# ExoPlayer instantiates renderers, extractors and DRM components by name.
--keep class com.google.android.exoplayer2.** { *; }
--keep class androidx.media3.** { *; }
+# ExoPlayer and Media3 ship built-in consumer rules in their AAR artifacts.
 -dontwarn com.google.android.exoplayer2.**
 -dontwarn androidx.media3.**
 
@@ -31,23 +37,19 @@
 -keep class android.support.v4.media.** { *; }
 -keep class androidx.media.** { *; }
 
-# --- Firebase --------------------------------------------------------------
-# Firestore and Storage deserialize into model classes reflectively, and
-# Crashlytics needs its own classes intact to report anything at all.
--keep class com.google.firebase.** { *; }
--keep class com.google.android.gms.** { *; }
+# --- Firebase & Google Mobile Ads ------------------------------------------
+# Modern Firebase, Google Play Services, and AdMob libraries package their
+# own official consumer-rules.pro inside their AARs. Avoiding blanket -keep
+# on these SDKs allows R8 to shrink and optimize them effectively.
 -dontwarn com.google.firebase.**
 -dontwarn com.google.android.gms.**
+-dontwarn com.google.android.gms.ads.**
 
 # Firestore's model mapper reads annotated members by reflection.
 -keepclassmembers class * {
     @com.google.firebase.firestore.PropertyName <fields>;
     @com.google.firebase.firestore.PropertyName <methods>;
 }
-
-# --- Google Mobile Ads -----------------------------------------------------
--keep class com.google.android.gms.ads.** { *; }
--dontwarn com.google.android.gms.ads.**
 
 # --- Play Core ------------------------------------------------------------
 # Flutter's deferred-components hooks reference Play Core even when the app
