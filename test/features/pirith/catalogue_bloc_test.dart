@@ -19,23 +19,22 @@ PirithEntity _pirith({
   required String title,
   bool featured = false,
   int playCount = 0,
-}) =>
-    PirithEntity(
-      id: id,
-      title: title,
-      titleSinhala: title,
-      description: '',
-      descriptionSinhala: '',
-      coverUrl: '',
-      audioUrl: '',
-      duration: 754,
-      categoryId: _category.id,
-      isPremium: false,
-      isFeatured: featured,
-      sortOrder: 1,
-      playCount: playCount,
-      downloadCount: 0,
-    );
+}) => PirithEntity(
+  id: id,
+  title: title,
+  titleSinhala: title,
+  description: '',
+  descriptionSinhala: '',
+  coverUrl: '',
+  audioUrl: '',
+  duration: 754,
+  categoryId: _category.id,
+  isPremium: false,
+  isFeatured: featured,
+  sortOrder: 1,
+  playCount: playCount,
+  downloadCount: 0,
+);
 
 void main() {
   group('CatalogueBloc', () {
@@ -43,7 +42,12 @@ void main() {
       final repository = FakePirithRepository(
         categories: const [_category],
         pirith: [
-          _pirith(id: '1', title: 'Ratana Sutta', featured: true, playCount: 10),
+          _pirith(
+            id: '1',
+            title: 'Ratana Sutta',
+            featured: true,
+            playCount: 10,
+          ),
           _pirith(id: '2', title: 'Mangala Sutta', playCount: 30),
         ],
       );
@@ -53,7 +57,10 @@ void main() {
       );
       addTearDown(bloc.close);
 
-      final future = expectLater(bloc.stream, emitsThrough(isA<CatalogueLoaded>()));
+      final future = expectLater(
+        bloc.stream,
+        emitsThrough(isA<CatalogueLoaded>()),
+      );
       bloc.add(const CatalogueStarted());
       await future;
 

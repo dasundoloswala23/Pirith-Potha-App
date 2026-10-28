@@ -61,7 +61,8 @@ class PirithEntity extends Equatable {
 
   /// Whether this Pirith has any video content — an uploaded [videoUrl], a
   /// [youtubeUrl], or both.
-  bool get hasVideo => videoUrl.trim().isNotEmpty || youtubeUrl.trim().isNotEmpty;
+  bool get hasVideo =>
+      videoUrl.trim().isNotEmpty || youtubeUrl.trim().isNotEmpty;
 
   /// Video-only: a title, a cover, and an uploaded video or a YouTube link,
   /// but no audio file.
@@ -99,21 +100,21 @@ class PirithEntity extends Equatable {
 
   @override
   List<Object?> get props => [
-        id,
-        title,
-        titleSinhala,
-        description,
-        descriptionSinhala,
-        coverUrl,
-        audioUrl,
-        youtubeUrl,
-        videoUrl,
-        duration,
-        categoryId,
-        isPremium,
-        isFeatured,
-        sortOrder,
-        playCount,
-        downloadCount,
-      ];
+    id,
+    title,
+    titleSinhala,
+    description,
+    descriptionSinhala,
+    coverUrl,
+    audioUrl,
+    youtubeUrl,
+    videoUrl,
+    duration,
+    categoryId,
+    isPremium,
+    isFeatured,
+    sortOrder,
+    playCount,
+    downloadCount,
+  ];
 }

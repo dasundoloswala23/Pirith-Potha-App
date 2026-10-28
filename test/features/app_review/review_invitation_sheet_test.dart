@@ -35,8 +35,10 @@ Future<Future<ReviewSheetOutcome>> _open(
         home: Scaffold(
           body: Builder(
             builder: (context) => TextButton(
-              onPressed: () =>
-                  outcome = showReviewInvitationSheet(context, openStore: openStore),
+              onPressed: () => outcome = showReviewInvitationSheet(
+                context,
+                openStore: openStore,
+              ),
               child: const Text('open'),
             ),
           ),
@@ -57,12 +59,18 @@ void main() {
     await _open(tester, () async => true);
 
     expect(find.text('Enjoying your experience?'), findsOneWidget);
-    expect(find.textContaining('Your feedback means a lot to us!'), findsOneWidget);
+    expect(
+      find.textContaining('Your feedback means a lot to us!'),
+      findsOneWidget,
+    );
     expect(find.text('⭐ Rate App'), findsOneWidget);
     expect(find.text('Maybe Later'), findsOneWidget);
     // Decorative stars aren't tappable rating controls.
     expect(
-      find.ancestor(of: find.byIcon(Icons.star_rounded), matching: find.byType(InkWell)),
+      find.ancestor(
+        of: find.byIcon(Icons.star_rounded),
+        matching: find.byType(InkWell),
+      ),
       findsNothing,
     );
   });
@@ -98,10 +106,15 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.byType(ReviewInvitationSheet), findsOneWidget);
-    expect(find.text("Couldn't open the store. Please try again later."), findsOneWidget);
+    expect(
+      find.text("Couldn't open the store. Please try again later."),
+      findsOneWidget,
+    );
   });
 
-  testWidgets('repeated taps while opening call the store once', (tester) async {
+  testWidgets('repeated taps while opening call the store once', (
+    tester,
+  ) async {
     var calls = 0;
     final gate = Completer<bool>();
     await _open(tester, () {
@@ -113,8 +126,14 @@ void main() {
     await tester.tap(rate);
     await tester.pump();
     // The label is replaced by a spinner while in flight; tap the button area.
-    await tester.tap(find.byType(CircularProgressIndicator), warnIfMissed: false);
-    await tester.tap(find.byType(CircularProgressIndicator), warnIfMissed: false);
+    await tester.tap(
+      find.byType(CircularProgressIndicator),
+      warnIfMissed: false,
+    );
+    await tester.tap(
+      find.byType(CircularProgressIndicator),
+      warnIfMissed: false,
+    );
     await tester.pump();
     expect(calls, 1);
 

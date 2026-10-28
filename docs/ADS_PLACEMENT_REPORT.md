@@ -112,13 +112,24 @@ sequenceDiagram
 ## 4. Test vs Production Ad Unit IDs
 
 To prevent invalid traffic violations and ensure safe local QA:
-- **Android Test IDs**:
+- **Android Test IDs** (Google Official AdMob Sample IDs):
+  - Application ID: `ca-app-pub-3940256099942544~3347511713`
   - Banner: `ca-app-pub-3940256099942544/6300978111`
   - Interstitial: `ca-app-pub-3940256099942544/1033173712`
-- **iOS Test IDs**:
+  - Rewarded: `ca-app-pub-3940256099942544/5224354917`
+  - Rewarded Interstitial: `ca-app-pub-3940256099942544/5354046379`
+  - Native Advanced: `ca-app-pub-3940256099942544/2247696110`
+  - App Open: `ca-app-pub-3940256099942544/9257395921`
+- **iOS Test IDs** (Google Official AdMob Sample IDs):
+  - Application ID: `ca-app-pub-3940256099942544~1458002511`
   - Banner: `ca-app-pub-3940256099942544/2934735716`
   - Interstitial: `ca-app-pub-3940256099942544/4411468910`
-- Production credentials are injected via environment flavors (`--dart-define`) to ensure test keys are never deployed to production.
+  - Rewarded: `ca-app-pub-3940256099942544/1712485313`
+  - Rewarded Interstitial: `ca-app-pub-3940256099942544/6978759866`
+  - Native Advanced: `ca-app-pub-3940256099942544/3986624511`
+  - App Open: `ca-app-pub-3940256099942544/5575463023`
+- `ios/Runner/Info.plist` is configured with `GADApplicationIdentifier` and full Google `SKAdNetworkItems` (`cstr6suwn9.skadnetwork` etc.) for iOS 14+ ad impression compliance.
+- Production credentials are provided in `AdUnitIds` with automatic fallback to test IDs whenever a production slot is unconfigured.
 
 ---
 

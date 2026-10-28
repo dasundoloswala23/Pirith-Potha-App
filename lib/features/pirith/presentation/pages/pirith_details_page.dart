@@ -202,7 +202,9 @@ class _InlinePlayback extends StatelessWidget {
 
         final theme = Theme.of(context);
         final total = state.duration.inMilliseconds;
-        final position = state.position.inMilliseconds.clamp(0, total).toDouble();
+        final position = state.position.inMilliseconds
+            .clamp(0, total)
+            .toDouble();
 
         return Padding(
           padding: const EdgeInsets.only(top: AppSpacing.xl),
@@ -211,8 +213,12 @@ class _InlinePlayback extends StatelessWidget {
               SliderTheme(
                 data: SliderTheme.of(context).copyWith(
                   trackHeight: 3,
-                  thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 7),
-                  overlayShape: const RoundSliderOverlayShape(overlayRadius: 16),
+                  thumbShape: const RoundSliderThumbShape(
+                    enabledThumbRadius: 7,
+                  ),
+                  overlayShape: const RoundSliderOverlayShape(
+                    overlayRadius: 16,
+                  ),
                 ),
                 child: Slider(
                   value: position,

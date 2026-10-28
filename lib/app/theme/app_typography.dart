@@ -12,29 +12,38 @@ import 'package:google_fonts/google_fonts.dart';
 /// pubspec.yaml. If guaranteed-offline-on-first-run typography becomes a
 /// requirement, switch to google_fonts' bundled-asset mode then.
 abstract final class AppTypography {
-  static TextStyle sinhalaTitle({double fontSize = 16, FontWeight? weight, Color? color}) =>
-      GoogleFonts.notoSerifSinhala(
-        fontSize: fontSize,
-        fontWeight: weight ?? FontWeight.w600,
-        color: color,
-      );
+  static TextStyle sinhalaTitle({
+    double fontSize = 16,
+    FontWeight? weight,
+    Color? color,
+  }) => GoogleFonts.notoSerifSinhala(
+    fontSize: fontSize,
+    fontWeight: weight ?? FontWeight.w600,
+    color: color,
+  );
 
-  static TextStyle sinhalaBody({double fontSize = 14, FontWeight? weight, Color? color}) =>
-      GoogleFonts.notoSansSinhala(fontSize: fontSize, fontWeight: weight, color: color);
+  static TextStyle sinhalaBody({
+    double fontSize = 14,
+    FontWeight? weight,
+    Color? color,
+  }) => GoogleFonts.notoSansSinhala(
+    fontSize: fontSize,
+    fontWeight: weight,
+    color: color,
+  );
 
   static TextStyle englishSerif({
     double fontSize = 14,
     FontStyle fontStyle = FontStyle.normal,
     FontWeight? weight,
     Color? color,
-  }) =>
-      GoogleFonts.lora(
-        fontSize: fontSize,
-        fontStyle: fontStyle,
-        fontWeight: weight,
-        color: color,
-      );
+  }) => GoogleFonts.lora(
+    fontSize: fontSize,
+    fontStyle: fontStyle,
+    fontWeight: weight,
+    color: color,
+  );
 
-  static TextTheme textTheme(Color bodyColor) =>
-      GoogleFonts.interTextTheme().apply(bodyColor: bodyColor, displayColor: bodyColor);
+  static TextTheme textTheme(Color bodyColor) => GoogleFonts.interTextTheme()
+      .apply(bodyColor: bodyColor, displayColor: bodyColor);
 }

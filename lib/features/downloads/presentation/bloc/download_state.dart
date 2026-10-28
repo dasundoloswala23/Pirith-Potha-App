@@ -19,8 +19,9 @@ class DownloadsLoaded extends DownloadState {
 
   DownloadEntity? statusFor(String pirithId) => downloads[pirithId];
 
-  List<DownloadEntity> get completed =>
-      downloads.values.where((d) => d.status == DownloadStatus.downloaded).toList();
+  List<DownloadEntity> get completed => downloads.values
+      .where((d) => d.status == DownloadStatus.downloaded)
+      .toList();
 
   @override
   List<Object?> get props => [downloads];

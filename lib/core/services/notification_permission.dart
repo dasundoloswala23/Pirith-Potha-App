@@ -34,7 +34,11 @@ abstract final class NotificationPermission {
     try {
       return await _channel.invokeMethod<bool>('isGranted') ?? true;
     } on PlatformException catch (error, stackTrace) {
-      reportNonFatal(error, stackTrace, reason: 'Notification permission check');
+      reportNonFatal(
+        error,
+        stackTrace,
+        reason: 'Notification permission check',
+      );
       return true;
     } on MissingPluginException {
       // Widget tests and any host without the channel registered.
@@ -53,7 +57,11 @@ abstract final class NotificationPermission {
       if (await _channel.invokeMethod<bool>('isGranted') ?? true) return;
       await _channel.invokeMethod<bool>('request');
     } on PlatformException catch (error, stackTrace) {
-      reportNonFatal(error, stackTrace, reason: 'Notification permission request');
+      reportNonFatal(
+        error,
+        stackTrace,
+        reason: 'Notification permission request',
+      );
     } on MissingPluginException {
       // Nothing to do — see isGranted().
     }

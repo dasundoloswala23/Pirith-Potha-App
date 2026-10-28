@@ -28,7 +28,9 @@ class PirithLocalDataSource {
     final raw = _prefs.getString(_categoriesKey);
     if (raw == null) return null;
     final list = jsonDecode(raw) as List<dynamic>;
-    return list.map((e) => CategoryModel.fromJson(e as Map<String, dynamic>)).toList();
+    return list
+        .map((e) => CategoryModel.fromJson(e as Map<String, dynamic>))
+        .toList();
   }
 
   Future<void> cachePirith(List<PirithModel> pirith) {
@@ -40,6 +42,8 @@ class PirithLocalDataSource {
     final raw = _prefs.getString(_pirithKey);
     if (raw == null) return null;
     final list = jsonDecode(raw) as List<dynamic>;
-    return list.map((e) => PirithModel.fromJson(e as Map<String, dynamic>)).toList();
+    return list
+        .map((e) => PirithModel.fromJson(e as Map<String, dynamic>))
+        .toList();
   }
 }

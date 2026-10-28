@@ -49,8 +49,7 @@ void main() {
       'empty string': '',
       'whitespace only': '   ',
       'prose': 'not a youtube link at all',
-      'another host borrowing the shape':
-          'https://example.com/watch?v=$id',
+      'another host borrowing the shape': 'https://example.com/watch?v=$id',
       'a different video site': 'https://vimeo.com/12345',
       'the bare domain': 'https://www.youtube.com/',
       'watch with no v param': 'https://www.youtube.com/watch',
@@ -71,7 +70,10 @@ void main() {
     // Pinned literals: these are contracts with an external service, so a
     // change to them should have to be deliberate.
     test('thumbnail', () {
-      expect(youTubeThumbnailUrl(id), 'https://i.ytimg.com/vi/$id/maxresdefault.jpg');
+      expect(
+        youTubeThumbnailUrl(id),
+        'https://i.ytimg.com/vi/$id/maxresdefault.jpg',
+      );
     });
 
     test('fallback thumbnail', () {

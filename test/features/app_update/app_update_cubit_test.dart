@@ -49,7 +49,11 @@ void main() {
 
     await cubit.check();
     expect(cubit.state, isA<UpdateOptional>());
-    expect(cubit.shouldShowOptional, isFalse, reason: 'session flag survives rechecks');
+    expect(
+      cubit.shouldShowOptional,
+      isFalse,
+      reason: 'session flag survives rechecks',
+    );
   });
 
   test('newer minor or major: mandatory', () async {
@@ -84,32 +88,40 @@ void main() {
 
   test('platformStoreUrl: no App Store id yet means iOS has no store', () {
     // AppUrls.appStoreId is still empty in this repo.
-    expect(AppUpdateCubit.platformStoreUrl(), anyOf(isNull, contains('play.google.com')));
+    expect(
+      AppUpdateCubit.platformStoreUrl(),
+      anyOf(isNull, contains('play.google.com')),
+    );
   });
 
-  test('recheck stays blocked until the installed version actually changes', () async {
-    var installed = '1.00.03';
-    final cubit = _cubit(latest: '1.01.00', installed: () => installed);
-    addTearDown(cubit.close);
+  test(
+    'recheck stays blocked until the installed version actually changes',
+    () async {
+      var installed = '1.00.03';
+      final cubit = _cubit(latest: '1.01.00', installed: () => installed);
+      addTearDown(cubit.close);
 
-    await cubit.check();
-    expect(cubit.state, isA<UpdateMandatory>());
+      await cubit.check();
+      expect(cubit.state, isA<UpdateMandatory>());
 
-    // Back from the store without updating.
-    await cubit.recheck();
-    expect(cubit.state, isA<UpdateMandatory>());
+      // Back from the store without updating.
+      await cubit.recheck();
+      expect(cubit.state, isA<UpdateMandatory>());
 
-    installed = '1.01.00';
-    await cubit.recheck();
-    expect(cubit.state, isA<UpdateNotRequired>());
-  });
+      installed = '1.01.00';
+      await cubit.recheck();
+      expect(cubit.state, isA<UpdateNotRequired>());
+    },
+  );
 
   test('recheck does nothing unless blocked', () async {
     var reads = 0;
-    final cubit = _cubit(installed: () {
-      reads++;
-      return '1.00.03';
-    });
+    final cubit = _cubit(
+      installed: () {
+        reads++;
+        return '1.00.03';
+      },
+    );
     addTearDown(cubit.close);
     await cubit.check();
     final before = reads;

@@ -19,7 +19,9 @@ Future<void> maybeShowOptionalUpdateDialog(BuildContext context) async {
   if (!cubit.shouldShowOptional || state is! UpdateOptional) return;
   cubit.markOptionalShown();
 
-  _analytics?.logUpdatePromptShown(state.config.latestVersion, 'optional').ignore();
+  _analytics
+      ?.logUpdatePromptShown(state.config.latestVersion, 'optional')
+      .ignore();
 
   final reduceMotion = MediaQuery.of(context).disableAnimations;
   final updated = await showGeneralDialog<bool>(
@@ -28,12 +30,13 @@ Future<void> maybeShowOptionalUpdateDialog(BuildContext context) async {
     barrierLabel: MaterialLocalizations.of(context).modalBarrierDismissLabel,
     barrierColor: Colors.black.withValues(alpha: 0.55),
     transitionDuration: Duration(milliseconds: reduceMotion ? 0 : 320),
-    pageBuilder: (_, _, _) => OptionalUpdateDialog(
-      state: state,
-      openStore: cubit.openStore,
-    ),
+    pageBuilder: (_, _, _) =>
+        OptionalUpdateDialog(state: state, openStore: cubit.openStore),
     transitionBuilder: (context, animation, _, child) {
-      final curved = CurvedAnimation(parent: animation, curve: Curves.easeOutBack);
+      final curved = CurvedAnimation(
+        parent: animation,
+        curve: Curves.easeOutBack,
+      );
       return FadeTransition(
         opacity: CurvedAnimation(parent: animation, curve: Curves.easeOut),
         child: ScaleTransition(
@@ -49,7 +52,8 @@ Future<void> maybeShowOptionalUpdateDialog(BuildContext context) async {
   }
 }
 
-AnalyticsService? get _analytics => GetIt.instance.isRegistered<AnalyticsService>()
+AnalyticsService? get _analytics =>
+    GetIt.instance.isRegistered<AnalyticsService>()
     ? GetIt.instance<AnalyticsService>()
     : null;
 
@@ -164,7 +168,9 @@ class _OptionalUpdateDialogState extends State<OptionalUpdateDialog> {
                       Text(
                         copy.message,
                         textAlign: TextAlign.center,
-                        style: theme.textTheme.bodyMedium?.copyWith(height: 1.45),
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          height: 1.45,
+                        ),
                       ),
                       if (notes.isNotEmpty) ...[
                         const SizedBox(height: AppSpacing.lg),
@@ -250,7 +256,10 @@ class _ReleaseNotes extends StatelessWidget {
           ConstrainedBox(
             constraints: const BoxConstraints(maxHeight: 140),
             child: SingleChildScrollView(
-              child: Text(notes, style: theme.textTheme.bodySmall?.copyWith(height: 1.5)),
+              child: Text(
+                notes,
+                style: theme.textTheme.bodySmall?.copyWith(height: 1.5),
+              ),
             ),
           ),
         ],

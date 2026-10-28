@@ -19,39 +19,42 @@ class CategoriesPage extends StatelessWidget {
       body: SafeArea(
         bottom: false,
         child: CatalogueLoadedBuilder(
-        builder: (context, state) {
-          return Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              BilingualHeader(
-                sinhala: bi.si.sectionCategories,
-                english: bi.en.sectionCategories,
-                englishSuffix: '${state.categories.length}',
-              ),
-              Expanded(
-                child: GridView.builder(
-            padding: const EdgeInsets.all(16),
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2,
-              mainAxisSpacing: 12,
-              crossAxisSpacing: 12,
-              childAspectRatio: 140 / 120,
-            ),
-            itemCount: state.categories.length,
-            itemBuilder: (context, index) {
-              final category = state.categories[index];
-              return CategoryCard(
-                category: category,
-                index: index,
-                count: state.forCategory(category.id).length,
-                onTap: () => context.push(AppRoutePaths.categoryDetailsFor(category.id)),
-              );
-            },
+          builder: (context, state) {
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                BilingualHeader(
+                  sinhala: bi.si.sectionCategories,
+                  english: bi.en.sectionCategories,
+                  englishSuffix: '${state.categories.length}',
                 ),
-              ),
-            ],
-          );
-        },
+                Expanded(
+                  child: GridView.builder(
+                    padding: const EdgeInsets.all(16),
+                    gridDelegate:
+                        const SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 2,
+                          mainAxisSpacing: 12,
+                          crossAxisSpacing: 12,
+                          childAspectRatio: 140 / 120,
+                        ),
+                    itemCount: state.categories.length,
+                    itemBuilder: (context, index) {
+                      final category = state.categories[index];
+                      return CategoryCard(
+                        category: category,
+                        index: index,
+                        count: state.forCategory(category.id).length,
+                        onTap: () => context.push(
+                          AppRoutePaths.categoryDetailsFor(category.id),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              ],
+            );
+          },
         ),
       ),
     );

@@ -59,8 +59,9 @@ void main() {
     GoogleFonts.config.allowRuntimeFetching = false;
   });
 
-  testWidgets('App launches on the splash screen, then reaches Home',
-      (WidgetTester tester) async {
+  testWidgets('App launches on the splash screen, then reaches Home', (
+    WidgetTester tester,
+  ) async {
     final fakeRepository = FakeAuthRepository(
       initialUser: const AppUser(uid: 'guest-1', isAnonymous: true),
     );

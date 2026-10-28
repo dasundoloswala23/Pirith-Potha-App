@@ -97,8 +97,7 @@ class PirithAudioHandler extends BaseAudioHandler with SeekHandler {
   }
 
   @override
-  Future<void> playMediaItem(MediaItem mediaItem) =>
-      setQueue([mediaItem]);
+  Future<void> playMediaItem(MediaItem mediaItem) => setQueue([mediaItem]);
 
   Future<void> setPlaybackMode(PlaybackMode mode) async {
     await _player.setLoopMode(switch (mode) {

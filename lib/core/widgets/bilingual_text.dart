@@ -8,10 +8,17 @@ import '../l10n/bilingual.dart';
 /// *language* of the text, not its position: Sinhala always gets the
 /// Sinhala serif face, English the app's Latin ramp, so flipping the
 /// leading language never puts Latin glyphs in a Sinhala serif.
-TextStyle _leadStyle(BuildContext context, {required bool isSinhala, required double size}) {
+TextStyle _leadStyle(
+  BuildContext context, {
+  required bool isSinhala,
+  required double size,
+}) {
   final theme = Theme.of(context);
   return isSinhala
-      ? AppTypography.sinhalaTitle(fontSize: size, color: theme.colorScheme.onSurface)
+      ? AppTypography.sinhalaTitle(
+          fontSize: size,
+          color: theme.colorScheme.onSurface,
+        )
       : theme.textTheme.titleMedium!.copyWith(
           fontSize: size,
           fontWeight: FontWeight.w600,
@@ -63,7 +70,10 @@ class BilingualHeader extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(lead, style: _leadStyle(context, isSinhala: bi.sinhalaFirst, size: 20)),
+          Text(
+            lead,
+            style: _leadStyle(context, isSinhala: bi.sinhalaFirst, size: 20),
+          ),
           Text(sub, style: _subStyle(context, isSinhala: !bi.sinhalaFirst)),
         ],
       ),
@@ -100,7 +110,11 @@ class BilingualLabel extends StatelessWidget {
           lead,
           maxLines: maxLines,
           overflow: TextOverflow.ellipsis,
-          style: _leadStyle(context, isSinhala: bi.sinhalaFirst, size: sinhalaSize),
+          style: _leadStyle(
+            context,
+            isSinhala: bi.sinhalaFirst,
+            size: sinhalaSize,
+          ),
         ),
         if (sub.isNotEmpty)
           Text(

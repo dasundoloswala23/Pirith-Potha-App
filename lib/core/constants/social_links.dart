@@ -5,6 +5,7 @@
 /// SocialSection) until there's a real official Facebook page to link;
 /// TODO(social-links): add it and un-hide once one exists.
 abstract final class SocialLinks {
-  static const youTubeUrl = 'https://www.youtube.com/channel/UC4Ug5ybW6tJS3DKgtKJui3A';
+  static const youTubeUrl =
+      'https://www.youtube.com/channel/UC4Ug5ybW6tJS3DKgtKJui3A';
   static const facebookUrl = '';
 }

@@ -26,11 +26,11 @@ const _item = PirithEntity(
 );
 
 DownloadBloc _buildBloc(FakeDownloadRepository repository) => DownloadBloc(
-      downloadRepository: repository,
-      downloadPirith: DownloadPirith(repository),
-      cancelDownload: CancelDownload(repository),
-      deleteDownload: DeleteDownload(repository),
-    );
+  downloadRepository: repository,
+  downloadPirith: DownloadPirith(repository),
+  cancelDownload: CancelDownload(repository),
+  deleteDownload: DeleteDownload(repository),
+);
 
 void main() {
   group('DownloadBloc', () {
@@ -73,7 +73,13 @@ void main() {
 
       final future = expectLater(
         bloc.stream,
-        emits(isA<DownloadsLoaded>().having((s) => s.downloads, 'downloads', isEmpty)),
+        emits(
+          isA<DownloadsLoaded>().having(
+            (s) => s.downloads,
+            'downloads',
+            isEmpty,
+          ),
+        ),
       );
       bloc.add(const DownloadDeleteRequested('1'));
       await future;

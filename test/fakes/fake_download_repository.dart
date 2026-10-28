@@ -15,7 +15,8 @@ class FakeDownloadRepository implements DownloadRepository {
   Stream<Map<String, DownloadEntity>> get downloadsStream => _controller.stream;
 
   @override
-  Map<String, DownloadEntity> get currentDownloads => Map.unmodifiable(_downloads);
+  Map<String, DownloadEntity> get currentDownloads =>
+      Map.unmodifiable(_downloads);
 
   @override
   Future<void> initialize() async {}
@@ -44,5 +45,6 @@ class FakeDownloadRepository implements DownloadRepository {
   }
 
   @override
-  String? localAudioPathFor(String pirithId) => _downloads[pirithId]?.localAudioPath;
+  String? localAudioPathFor(String pirithId) =>
+      _downloads[pirithId]?.localAudioPath;
 }

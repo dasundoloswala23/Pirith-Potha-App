@@ -22,15 +22,21 @@ class DownloadBloc extends Bloc<DownloadEvent, DownloadState> {
     required DownloadPirith downloadPirith,
     required CancelDownload cancelDownload,
     required DeleteDownload deleteDownload,
-  })  : _downloadRepository = downloadRepository,
-        _downloadPirith = downloadPirith,
-        _cancelDownload = cancelDownload,
-        _deleteDownload = deleteDownload,
-        super(const DownloadsLoading()) {
+  }) : _downloadRepository = downloadRepository,
+       _downloadPirith = downloadPirith,
+       _cancelDownload = cancelDownload,
+       _deleteDownload = deleteDownload,
+       super(const DownloadsLoading()) {
     on<DownloadRequested>((event, emit) => _downloadPirith(event.item));
-    on<DownloadCancelRequested>((event, emit) => _cancelDownload(event.pirithId));
-    on<DownloadDeleteRequested>((event, emit) => _deleteDownload(event.pirithId));
-    on<_DownloadsChanged>((event, emit) => emit(DownloadsLoaded(event.downloads)));
+    on<DownloadCancelRequested>(
+      (event, emit) => _cancelDownload(event.pirithId),
+    );
+    on<DownloadDeleteRequested>(
+      (event, emit) => _deleteDownload(event.pirithId),
+    );
+    on<_DownloadsChanged>(
+      (event, emit) => emit(DownloadsLoaded(event.downloads)),
+    );
 
     add(_DownloadsChanged(_downloadRepository.currentDownloads));
     _subscription = _downloadRepository.downloadsStream.listen(

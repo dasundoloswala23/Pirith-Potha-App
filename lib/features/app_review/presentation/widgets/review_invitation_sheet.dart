@@ -173,7 +173,9 @@ class _ReviewInvitationSheetState extends State<ReviewInvitationSheet>
                   Text(
                     bi.primary.reviewStoreError,
                     textAlign: TextAlign.center,
-                    style: theme.textTheme.bodySmall?.copyWith(color: scheme.error),
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: scheme.error,
+                    ),
                   ),
                 ],
                 const SizedBox(height: AppSpacing.xl),
@@ -229,7 +231,11 @@ class _Stars extends StatelessWidget {
             child: ScaleTransition(
               scale: CurvedAnimation(
                 parent: animation,
-                curve: Interval(i * 0.2, 0.6 + i * 0.2, curve: Curves.elasticOut),
+                curve: Interval(
+                  i * 0.2,
+                  0.6 + i * 0.2,
+                  curve: Curves.elasticOut,
+                ),
               ),
               child: ShaderMask(
                 blendMode: BlendMode.srcIn,

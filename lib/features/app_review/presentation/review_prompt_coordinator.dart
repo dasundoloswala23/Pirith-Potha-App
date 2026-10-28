@@ -50,7 +50,8 @@ class ReviewPromptCoordinator {
   }) : _storage = storage,
        _scheduler = scheduler,
        _native = native,
-       _launcher = storeLauncher ??
+       _launcher =
+           storeLauncher ??
            DefaultReviewStoreLauncher(
              native: native,
              platform: platform ?? (() => defaultTargetPlatform),
@@ -90,7 +91,8 @@ class ReviewPromptCoordinator {
   ReviewState? get state => _state;
 
   bool get _supported =>
-      _platform() == TargetPlatform.android || _platform() == TargetPlatform.iOS;
+      _platform() == TargetPlatform.android ||
+      _platform() == TargetPlatform.iOS;
 
   /// Called by the host when an eligible screen mounts.
   void attach(ReviewPromptHost host) {
@@ -103,8 +105,11 @@ class ReviewPromptCoordinator {
         _state = normalized;
         if (normalized != loaded) unawaited(_storage.write(normalized));
         if (!normalized.actionInitiated) {
-          final isPastCooldown = normalized.laterCount == 0 ||
-              !now.isBefore(_scheduler.normalizedNextEligibleAt(normalized, now));
+          final isPastCooldown =
+              normalized.laterCount == 0 ||
+              !now.isBefore(
+                _scheduler.normalizedNextEligibleAt(normalized, now),
+              );
           if (isPastCooldown) {
             _tracker.start(_scheduler.usageRemaining(normalized));
           }
@@ -127,7 +132,8 @@ class ReviewPromptCoordinator {
       final state = _state;
       if (state != null && !state.actionInitiated && !_tracker.isRunning) {
         final now = _clock();
-        final isPastCooldown = state.laterCount == 0 ||
+        final isPastCooldown =
+            state.laterCount == 0 ||
             !now.isBefore(_scheduler.normalizedNextEligibleAt(state, now));
         if (isPastCooldown) {
           _tracker.start(_scheduler.usageRemaining(state));
@@ -145,7 +151,9 @@ class ReviewPromptCoordinator {
     if (_inFlight || _handledThisSession || !_foreground) return;
     if (!host.isSafeMoment) return;
 
-    final live = state.copyWith(activeUsage: state.activeUsage + _tracker.pending);
+    final live = state.copyWith(
+      activeUsage: state.activeUsage + _tracker.pending,
+    );
     if (!_scheduler.isEligible(live, _clock())) return;
 
     _inFlight = true;

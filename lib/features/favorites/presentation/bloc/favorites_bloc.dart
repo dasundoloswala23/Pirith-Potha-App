@@ -16,9 +16,9 @@ class FavoritesBloc extends Bloc<FavoritesEvent, FavoritesState> {
   FavoritesBloc({
     required FavoritesRepository favoritesRepository,
     required ToggleFavorite toggleFavorite,
-  })  : _favoritesRepository = favoritesRepository,
-        _toggleFavorite = toggleFavorite,
-        super(const FavoritesLoading()) {
+  }) : _favoritesRepository = favoritesRepository,
+       _toggleFavorite = toggleFavorite,
+       super(const FavoritesLoading()) {
     on<FavoriteToggled>((event, emit) => _toggleFavorite(event.pirithId));
     on<_FavoriteIdsChanged>((event, emit) => emit(FavoritesLoaded(event.ids)));
 

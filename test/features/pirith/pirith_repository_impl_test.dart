@@ -6,7 +6,12 @@ import 'package:pitithpotha/features/pirith/data/models/pirith_model.dart';
 import 'package:pitithpotha/features/pirith/data/repositories/pirith_repository_impl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-const _category = CategoryModel(id: 'protective', name: 'Protective', nameSinhala: 'x', sortOrder: 1);
+const _category = CategoryModel(
+  id: 'protective',
+  name: 'Protective',
+  nameSinhala: 'x',
+  sortOrder: 1,
+);
 
 const _pirith = PirithModel(
   id: '1',

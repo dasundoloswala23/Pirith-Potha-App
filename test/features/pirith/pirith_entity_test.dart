@@ -100,11 +100,14 @@ void main() {
       expect(_pirith(audioUrl: audio).displayCoverUrl, '');
     });
 
-    test('no cover, video-only with a resolvable YouTube id — uses the still', () {
-      final item = _pirith(youtubeUrl: video);
-      expect(item.displayCoverUrl, contains('dQw4w9WgXcQ'));
-      expect(item.displayCoverUrl, contains('hqdefault.jpg'));
-    });
+    test(
+      'no cover, video-only with a resolvable YouTube id — uses the still',
+      () {
+        final item = _pirith(youtubeUrl: video);
+        expect(item.displayCoverUrl, contains('dQw4w9WgXcQ'));
+        expect(item.displayCoverUrl, contains('hqdefault.jpg'));
+      },
+    );
 
     test('no cover, video-only with an unparseable YouTube link — empty', () {
       final item = _pirith(youtubeUrl: 'not a youtube link');

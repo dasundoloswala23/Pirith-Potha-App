@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart' as firebase;
-import 'package:google_sign_in/google_sign_in.dart' show GoogleSignInException, GoogleSignInExceptionCode;
+import 'package:google_sign_in/google_sign_in.dart'
+    show GoogleSignInException, GoogleSignInExceptionCode;
 import 'package:sign_in_with_apple/sign_in_with_apple.dart'
     show AuthorizationErrorCode, SignInWithAppleAuthorizationException;
 

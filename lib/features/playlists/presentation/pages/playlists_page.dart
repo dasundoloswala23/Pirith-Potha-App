@@ -84,8 +84,9 @@ class PlaylistsPage extends StatelessWidget {
                           return _PlaylistTile(
                             playlist: playlist,
                             coverUrls: [
-                              for (final item
-                                  in catalogue.byIds(playlist.pirithIds))
+                              for (final item in catalogue.byIds(
+                                playlist.pirithIds,
+                              ))
                                 item.displayCoverUrl,
                             ],
                           );

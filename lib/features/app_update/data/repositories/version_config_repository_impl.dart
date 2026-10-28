@@ -21,10 +21,7 @@ class VersionConfigRepositoryImpl implements VersionConfigRepository {
   @override
   Future<VersionConfig?> getVersionConfig() async {
     try {
-      final doc = await _firestore
-          .collection('config')
-          .doc('app_meta')
-          .get();
+      final doc = await _firestore.collection('config').doc('app_meta').get();
       final data = doc.data();
       if (data == null) return null;
 
@@ -41,7 +38,11 @@ class VersionConfigRepositoryImpl implements VersionConfigRepository {
         releaseNotesSinhala: _string(notes?['si']),
       );
     } catch (error, stackTrace) {
-      reportNonFatal(error, stackTrace, reason: 'Failed to read version config');
+      reportNonFatal(
+        error,
+        stackTrace,
+        reason: 'Failed to read version config',
+      );
       return null;
     }
   }

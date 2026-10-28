@@ -9,12 +9,12 @@ import 'package:pitithpotha/features/auth/presentation/bloc/auth_bloc.dart';
 import '../../fakes/fake_auth_repository.dart';
 
 AuthBloc _buildBloc(FakeAuthRepository repository) => AuthBloc(
-      authRepository: repository,
-      signInAnonymously: SignInAnonymously(repository),
-      signInWithGoogle: SignInWithGoogle(repository),
-      signInWithApple: SignInWithApple(repository),
-      signOut: SignOut(repository),
-    );
+  authRepository: repository,
+  signInAnonymously: SignInAnonymously(repository),
+  signInWithGoogle: SignInWithGoogle(repository),
+  signInWithApple: SignInWithApple(repository),
+  signOut: SignOut(repository),
+);
 
 void main() {
   group('AuthBloc', () {
@@ -36,41 +36,49 @@ void main() {
       expect((last as Authenticated).isGuest, isTrue);
     });
 
-    test('resumes an existing guest session without re-authenticating', () async {
-      final repository = FakeAuthRepository(
-        initialUser: const AppUser(uid: 'guest-42', isAnonymous: true),
-      );
-      final bloc = _buildBloc(repository);
-      addTearDown(bloc.close);
+    test(
+      'resumes an existing guest session without re-authenticating',
+      () async {
+        final repository = FakeAuthRepository(
+          initialUser: const AppUser(uid: 'guest-42', isAnonymous: true),
+        );
+        final bloc = _buildBloc(repository);
+        addTearDown(bloc.close);
 
-      bloc.add(const AuthStarted());
-      await expectLater(
-        bloc.stream,
-        emits(isA<Authenticated>().having((s) => s.user.uid, 'uid', 'guest-42')),
-      );
-    });
+        bloc.add(const AuthStarted());
+        await expectLater(
+          bloc.stream,
+          emits(
+            isA<Authenticated>().having((s) => s.user.uid, 'uid', 'guest-42'),
+          ),
+        );
+      },
+    );
 
-    test('sign-in with Google transitions Loading then Authenticated', () async {
-      final repository = FakeAuthRepository(
-        initialUser: const AppUser(uid: 'guest-1', isAnonymous: true),
-      );
-      final bloc = _buildBloc(repository);
-      addTearDown(bloc.close);
+    test(
+      'sign-in with Google transitions Loading then Authenticated',
+      () async {
+        final repository = FakeAuthRepository(
+          initialUser: const AppUser(uid: 'guest-1', isAnonymous: true),
+        );
+        final bloc = _buildBloc(repository);
+        addTearDown(bloc.close);
 
-      bloc.add(const AuthStarted());
-      await Future<void>.delayed(const Duration(milliseconds: 10));
+        bloc.add(const AuthStarted());
+        await Future<void>.delayed(const Duration(milliseconds: 10));
 
-      final future = expectLater(
-        bloc.stream,
-        emitsInOrder([
-          isA<AuthLoading>(),
-          isA<Authenticated>().having((s) => s.isGuest, 'isGuest', isFalse),
-        ]),
-      );
+        final future = expectLater(
+          bloc.stream,
+          emitsInOrder([
+            isA<AuthLoading>(),
+            isA<Authenticated>().having((s) => s.isGuest, 'isGuest', isFalse),
+          ]),
+        );
 
-      bloc.add(const AuthSignInWithGoogleRequested());
-      await future;
-    });
+        bloc.add(const AuthSignInWithGoogleRequested());
+        await future;
+      },
+    );
 
     test('sign-out returns to Unauthenticated', () async {
       final repository = FakeAuthRepository(

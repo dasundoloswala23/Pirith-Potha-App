@@ -62,7 +62,11 @@ class AppUpdateCubit extends Cubit<AppUpdateState> {
     try {
       return await _launchUrl(url);
     } catch (error, stackTrace) {
-      reportNonFatal(error, stackTrace, reason: 'Opening store for update failed');
+      reportNonFatal(
+        error,
+        stackTrace,
+        reason: 'Opening store for update failed',
+      );
       return false;
     }
   }

@@ -15,8 +15,8 @@ part 'history_state.dart';
 /// reflects state for the Home "Recently Played" section and its screen.
 class HistoryBloc extends Bloc<HistoryEvent, HistoryState> {
   HistoryBloc({required HistoryRepository historyRepository})
-      : _historyRepository = historyRepository,
-        super(const HistoryLoading()) {
+    : _historyRepository = historyRepository,
+      super(const HistoryLoading()) {
     on<_HistoryChanged>((event, emit) => emit(HistoryLoaded(event.entries)));
 
     add(_HistoryChanged(_historyRepository.currentHistory));

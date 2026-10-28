@@ -70,7 +70,9 @@ class _PlaylistDetailsPageState extends State<PlaylistDetailsPage> {
           if (playlist.pirithIds.length > 1 || _editing)
             TextButton(
               onPressed: () => setState(() => _editing = !_editing),
-              child: Text(_editing ? bi.primary.playlistDone : bi.primary.playlistEdit),
+              child: Text(
+                _editing ? bi.primary.playlistDone : bi.primary.playlistEdit,
+              ),
             ),
           PopupMenuButton<_PlaylistAction>(
             onSelected: (action) => _onAction(action, playlist),

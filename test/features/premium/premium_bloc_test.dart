@@ -24,7 +24,9 @@ void main() {
 
       final future = expectLater(
         bloc.stream,
-        emits(isA<PremiumState>().having((s) => s.isPremium, 'isPremium', isTrue)),
+        emits(
+          isA<PremiumState>().having((s) => s.isPremium, 'isPremium', isTrue),
+        ),
       );
       repository.setPremium(true);
       await future;

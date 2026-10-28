@@ -12,7 +12,10 @@ class UpdateCopy {
   final bool mandatory;
 
   String get message {
-    final remote = _pick(config.updateMessageSinhala, config.updateMessageEnglish);
+    final remote = _pick(
+      config.updateMessageSinhala,
+      config.updateMessageEnglish,
+    );
     if (remote.isNotEmpty) return remote;
     return mandatory
         ? bi.primary.updateMandatoryBody

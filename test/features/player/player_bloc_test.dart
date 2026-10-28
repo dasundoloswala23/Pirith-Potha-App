@@ -73,18 +73,18 @@ PlayerBloc _buildBloc(
   FakeAudioRepository repository, {
   FakeHistoryRepository? history,
 }) => PlayerBloc(
-      audioRepository: repository,
-      playPirith: PlayPirith(repository),
-      playQueue: PlayQueue(repository),
-      skipToNext: SkipToNext(repository),
-      skipToPrevious: SkipToPrevious(repository),
-      setPlaybackMode: SetPlaybackMode(repository),
-      pausePlayback: PausePlayback(repository),
-      resumePlayback: ResumePlayback(repository),
-      seekPlayback: SeekPlayback(repository),
-      stopPlayback: StopPlayback(repository),
-      recordPlayed: RecordPlayed(history ?? FakeHistoryRepository()),
-    );
+  audioRepository: repository,
+  playPirith: PlayPirith(repository),
+  playQueue: PlayQueue(repository),
+  skipToNext: SkipToNext(repository),
+  skipToPrevious: SkipToPrevious(repository),
+  setPlaybackMode: SetPlaybackMode(repository),
+  pausePlayback: PausePlayback(repository),
+  resumePlayback: ResumePlayback(repository),
+  seekPlayback: SeekPlayback(repository),
+  stopPlayback: StopPlayback(repository),
+  recordPlayed: RecordPlayed(history ?? FakeHistoryRepository()),
+);
 
 void main() {
   group('PlayerBloc', () {
@@ -96,8 +96,16 @@ void main() {
       final future = expectLater(
         bloc.stream,
         emitsInOrder([
-          isA<PlayerActive>().having((s) => s.status, 'status', PlaybackStatus.loading),
-          isA<PlayerActive>().having((s) => s.status, 'status', PlaybackStatus.playing),
+          isA<PlayerActive>().having(
+            (s) => s.status,
+            'status',
+            PlaybackStatus.loading,
+          ),
+          isA<PlayerActive>().having(
+            (s) => s.status,
+            'status',
+            PlaybackStatus.playing,
+          ),
         ]),
       );
 
@@ -115,7 +123,13 @@ void main() {
 
       final future = expectLater(
         bloc.stream,
-        emits(isA<PlayerActive>().having((s) => s.status, 'status', PlaybackStatus.paused)),
+        emits(
+          isA<PlayerActive>().having(
+            (s) => s.status,
+            'status',
+            PlaybackStatus.paused,
+          ),
+        ),
       );
       bloc.add(const PlayerPauseRequested());
       await future;
@@ -227,10 +241,11 @@ void main() {
       addTearDown(bloc.close);
 
       bloc.add(
-        PlayerQueueRequested([
-          _make('a'),
-          _make('b'),
-        ], startIndex: 1, mode: PlaybackMode.repeatAll),
+        PlayerQueueRequested(
+          [_make('a'), _make('b')],
+          startIndex: 1,
+          mode: PlaybackMode.repeatAll,
+        ),
       );
       await Future<void>.delayed(const Duration(milliseconds: 10));
 
@@ -375,7 +390,9 @@ void main() {
 
         final future = expectLater(
           bloc.stream,
-          emitsThrough(isA<PlayerActive>().having((s) => s.item.id, 'item', 'b')),
+          emitsThrough(
+            isA<PlayerActive>().having((s) => s.item.id, 'item', 'b'),
+          ),
         );
         bloc.add(const PlayerQueueIndexSelected(1));
         await future;

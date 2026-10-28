@@ -27,19 +27,16 @@ void main() {
     );
 
     test('resolves ids in the order given, not catalogue order', () {
-      expect(
-        state.byIds(['c', 'a']).map((item) => item.id),
-        ['c', 'a'],
-      );
+      expect(state.byIds(['c', 'a']).map((item) => item.id), ['c', 'a']);
     });
 
     test('skips ids no longer in the catalogue', () {
       // A Pirith unpublished from the admin app must not blank out or crash
       // a playlist that still lists it.
-      expect(
-        state.byIds(['a', 'gone', 'b']).map((item) => item.id),
-        ['a', 'b'],
-      );
+      expect(state.byIds(['a', 'gone', 'b']).map((item) => item.id), [
+        'a',
+        'b',
+      ]);
     });
 
     test('an entirely stale list resolves to nothing rather than throwing', () {

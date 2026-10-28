@@ -30,8 +30,13 @@ class HistoryRepositoryImpl implements HistoryRepository {
 
   @override
   Future<void> recordPlayed(String pirithId) async {
-    final withoutExisting = _entries.where((e) => e.pirithId != pirithId).toList();
-    final updated = [HistoryEntry(pirithId: pirithId, playedAt: DateTime.now()), ...withoutExisting];
+    final withoutExisting = _entries
+        .where((e) => e.pirithId != pirithId)
+        .toList();
+    final updated = [
+      HistoryEntry(pirithId: pirithId, playedAt: DateTime.now()),
+      ...withoutExisting,
+    ];
     _entries = updated.take(_maxEntries).toList();
     await _prefs.setStringList(_key, _entries.map(_encode).toList());
     _controller.add(List.unmodifiable(_entries));

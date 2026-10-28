@@ -82,7 +82,9 @@ class MiniPlayerBar extends StatelessWidget {
                         iconSize: 28,
                         color: theme.colorScheme.primary,
                         icon: Icon(
-                          state.isPlaying ? Icons.pause_circle : Icons.play_circle,
+                          state.isPlaying
+                              ? Icons.pause_circle
+                              : Icons.play_circle,
                         ),
                         onPressed: () => context.read<PlayerBloc>().add(
                           state.isPlaying

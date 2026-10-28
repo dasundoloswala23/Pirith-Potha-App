@@ -487,10 +487,9 @@ class _Transport extends StatelessWidget {
             color: theme.colorScheme.onSurface,
             tooltip: l10n.actionPrevious,
             onPressed: state.hasPrevious
-                ? () =>
-                      context.read<PlayerBloc>().add(
-                        const PlayerPreviousRequested(),
-                      )
+                ? () => context.read<PlayerBloc>().add(
+                    const PlayerPreviousRequested(),
+                  )
                 : null,
           ),
           SizedBox(width: gap),
@@ -521,10 +520,9 @@ class _Transport extends StatelessWidget {
             color: theme.colorScheme.onSurface,
             tooltip: l10n.actionNext,
             onPressed: state.hasNext
-                ? () =>
-                      context.read<PlayerBloc>().add(
-                        const PlayerNextRequested(),
-                      )
+                ? () => context.read<PlayerBloc>().add(
+                    const PlayerNextRequested(),
+                  )
                 : null,
           ),
         ],

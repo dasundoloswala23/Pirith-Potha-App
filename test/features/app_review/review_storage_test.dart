@@ -43,7 +43,9 @@ void main() {
       laterCount: 2,
       nextEligibleAt: DateTime.fromMillisecondsSinceEpoch(1_900_000_000_000),
       lastReviewLaterAt: DateTime.fromMillisecondsSinceEpoch(1_899_000_000_000),
-      lastReviewPromptAt: DateTime.fromMillisecondsSinceEpoch(1_898_000_000_000),
+      lastReviewPromptAt: DateTime.fromMillisecondsSinceEpoch(
+        1_898_000_000_000,
+      ),
       reviewPromptCount: 3,
     );
     await ReviewStorage(prefs).write(saved);

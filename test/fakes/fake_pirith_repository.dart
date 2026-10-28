@@ -10,8 +10,8 @@ class FakePirithRepository implements PirithRepository {
   FakePirithRepository({
     List<CategoryEntity> categories = const [],
     List<PirithEntity> pirith = const [],
-  })  : _categories = categories,
-        _pirith = pirith;
+  }) : _categories = categories,
+       _pirith = pirith;
 
   final List<CategoryEntity> _categories;
   final List<PirithEntity> _pirith;

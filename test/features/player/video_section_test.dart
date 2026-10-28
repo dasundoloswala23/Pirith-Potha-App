@@ -138,9 +138,7 @@ void main() {
     expect(find.byType(AspectRatio), findsNWidgets(2));
 
     final videoTop = tester.getTopLeft(find.byType(AspectRatio).first).dy;
-    final youtubeTop = tester
-        .getTopLeft(find.byType(YouTubePreviewCard))
-        .dy;
+    final youtubeTop = tester.getTopLeft(find.byType(YouTubePreviewCard)).dy;
     expect(videoTop, lessThan(youtubeTop));
   });
 

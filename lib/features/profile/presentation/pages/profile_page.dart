@@ -106,8 +106,10 @@ class ProfilePage extends StatelessWidget {
                       english: bi.en.profilePremium,
                       sinhala: bi.si.profilePremium,
                       enabled: false,
-                      trailing: Text(l10n.comingSoon,
-                          style: Theme.of(context).textTheme.labelSmall),
+                      trailing: Text(
+                        l10n.comingSoon,
+                        style: Theme.of(context).textTheme.labelSmall,
+                      ),
                     ),
                     SettingsRow(
                       icon: Icons.info_outline,

@@ -47,14 +47,16 @@ class FirebaseAuthRemoteDataSource implements AuthRemoteDataSource {
     final hashedNonce = sha256ofString(rawNonce);
 
     final appleCredential = await SignInWithApple.getAppleIDCredential(
-      scopes: [AppleIDAuthorizationScopes.email, AppleIDAuthorizationScopes.fullName],
+      scopes: [
+        AppleIDAuthorizationScopes.email,
+        AppleIDAuthorizationScopes.fullName,
+      ],
       nonce: hashedNonce,
     );
 
-    final credential = OAuthProvider('apple.com').credential(
-      idToken: appleCredential.identityToken,
-      rawNonce: rawNonce,
-    );
+    final credential = OAuthProvider(
+      'apple.com',
+    ).credential(idToken: appleCredential.identityToken, rawNonce: rawNonce);
     return _signInOrLinkWithCredential(credential);
   }
 
@@ -85,7 +87,8 @@ class FirebaseAuthRemoteDataSource implements AuthRemoteDataSource {
         final result = await current.linkWithCredential(credential);
         return result.user!;
       } on FirebaseAuthException catch (e) {
-        if (e.code != 'credential-already-in-use' && e.code != 'email-already-in-use') {
+        if (e.code != 'credential-already-in-use' &&
+            e.code != 'email-already-in-use') {
           rethrow;
         }
         // Falls through to a plain sign-in below.

@@ -35,22 +35,24 @@ class PlaylistBloc extends Bloc<PlaylistEvent, PlaylistState> {
     required RemovePirithFromPlaylist removePirithFromPlaylist,
     required ReorderPlaylist reorderPlaylist,
     AnalyticsService? analytics,
-  })  : _playlistRepository = playlistRepository,
-        _createPlaylist = createPlaylist,
-        _renamePlaylist = renamePlaylist,
-        _deletePlaylist = deletePlaylist,
-        _addPirithToPlaylist = addPirithToPlaylist,
-        _removePirithFromPlaylist = removePirithFromPlaylist,
-        _reorderPlaylist = reorderPlaylist,
-        _analytics = analytics,
-        super(const PlaylistsLoading()) {
+  }) : _playlistRepository = playlistRepository,
+       _createPlaylist = createPlaylist,
+       _renamePlaylist = renamePlaylist,
+       _deletePlaylist = deletePlaylist,
+       _addPirithToPlaylist = addPirithToPlaylist,
+       _removePirithFromPlaylist = removePirithFromPlaylist,
+       _reorderPlaylist = reorderPlaylist,
+       _analytics = analytics,
+       super(const PlaylistsLoading()) {
     on<PlaylistCreated>(_onCreated);
     on<PlaylistRenamed>(_onRenamed);
     on<PlaylistDeleted>(_onDeleted);
     on<PlaylistItemAdded>(_onItemAdded);
     on<PlaylistItemRemoved>(_onItemRemoved);
     on<PlaylistItemsReordered>(_onItemsReordered);
-    on<_PlaylistsChanged>((event, emit) => emit(PlaylistsLoaded(event.playlists)));
+    on<_PlaylistsChanged>(
+      (event, emit) => emit(PlaylistsLoaded(event.playlists)),
+    );
 
     add(_PlaylistsChanged(_playlistRepository.currentPlaylists));
     _subscription = _playlistRepository.playlistsStream.listen(
@@ -72,7 +74,10 @@ class PlaylistBloc extends Bloc<PlaylistEvent, PlaylistState> {
 
   late final StreamSubscription<List<Playlist>> _subscription;
 
-  Future<void> _onCreated(PlaylistCreated event, Emitter<PlaylistState> emit) async {
+  Future<void> _onCreated(
+    PlaylistCreated event,
+    Emitter<PlaylistState> emit,
+  ) async {
     final name = event.name.trim();
     if (name.isEmpty) return;
 
@@ -89,18 +94,27 @@ class PlaylistBloc extends Bloc<PlaylistEvent, PlaylistState> {
     }
   }
 
-  Future<void> _onRenamed(PlaylistRenamed event, Emitter<PlaylistState> emit) async {
+  Future<void> _onRenamed(
+    PlaylistRenamed event,
+    Emitter<PlaylistState> emit,
+  ) async {
     final name = event.name.trim();
     if (name.isEmpty) return;
     await _renamePlaylist(event.id, name: name, description: event.description);
   }
 
-  Future<void> _onDeleted(PlaylistDeleted event, Emitter<PlaylistState> emit) async {
+  Future<void> _onDeleted(
+    PlaylistDeleted event,
+    Emitter<PlaylistState> emit,
+  ) async {
     await _deletePlaylist(event.id);
     _analytics?.logPlaylistDeleted(event.id);
   }
 
-  Future<void> _onItemAdded(PlaylistItemAdded event, Emitter<PlaylistState> emit) async {
+  Future<void> _onItemAdded(
+    PlaylistItemAdded event,
+    Emitter<PlaylistState> emit,
+  ) async {
     final added = await _addPirithToPlaylist(event.playlistId, event.pirithId);
     if (added) {
       _analytics?.logPirithAddedToPlaylist(event.playlistId, event.pirithId);

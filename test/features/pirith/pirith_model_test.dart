@@ -21,7 +21,10 @@ Map<String, dynamic> _json({Object? categoryId = 'protective'}) => {
 void main() {
   group('PirithModel.fromJson categoryId', () {
     test('present — decodes as-is', () {
-      expect(PirithModel.fromJson(_json(categoryId: 'protective')).categoryId, 'protective');
+      expect(
+        PirithModel.fromJson(_json(categoryId: 'protective')).categoryId,
+        'protective',
+      );
     });
 
     test('null — a Pirith can genuinely have no category', () {

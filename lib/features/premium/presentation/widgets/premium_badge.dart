@@ -20,7 +20,11 @@ class PremiumBadge extends StatelessWidget {
       ),
       child: Text(
         l10n.profilePremium,
-        style: const TextStyle(fontSize: 10, color: AppColors.gold, fontWeight: FontWeight.w600),
+        style: const TextStyle(
+          fontSize: 10,
+          color: AppColors.gold,
+          fontWeight: FontWeight.w600,
+        ),
       ),
     );
   }

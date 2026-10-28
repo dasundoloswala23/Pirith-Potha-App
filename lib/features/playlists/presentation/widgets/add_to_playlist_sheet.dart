@@ -103,7 +103,9 @@ Future<void> showAddToPlaylistSheet(
                       }
                       messenger.showSnackBar(
                         SnackBar(
-                          content: Text(bi.primary.playlistAddedTo(result.name)),
+                          content: Text(
+                            bi.primary.playlistAddedTo(result.name),
+                          ),
                         ),
                       );
                     },
@@ -149,8 +151,12 @@ Future<void> showAddToPlaylistSheet(
                               SnackBar(
                                 content: Text(
                                   contains
-                                      ? bi.primary.playlistRemovedFrom(playlist.name)
-                                      : bi.primary.playlistAddedTo(playlist.name),
+                                      ? bi.primary.playlistRemovedFrom(
+                                          playlist.name,
+                                        )
+                                      : bi.primary.playlistAddedTo(
+                                          playlist.name,
+                                        ),
                                 ),
                               ),
                             );

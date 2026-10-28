@@ -38,7 +38,9 @@ void openPirith(
     ScaffoldMessenger.of(context)
       ..hideCurrentSnackBar()
       ..showSnackBar(
-        SnackBar(content: Text(Bilingual.read(context).primary.pirithUnavailable)),
+        SnackBar(
+          content: Text(Bilingual.read(context).primary.pirithUnavailable),
+        ),
       );
     return;
   }

@@ -20,9 +20,8 @@ Failure mapFirebaseError(Object error) {
     return switch (error.code) {
       'unavailable' || 'deadline-exceeded' => const NetworkFailure(),
       'not-found' => const NotFoundFailure(),
-      'permission-denied' || 'unauthenticated' => ServerFailure(
-          error.message ?? error.code,
-        ),
+      'permission-denied' ||
+      'unauthenticated' => ServerFailure(error.message ?? error.code),
       _ => ServerFailure(error.message ?? error.code),
     };
   }

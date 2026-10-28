@@ -25,8 +25,8 @@ class DefaultReviewStoreLauncher implements ReviewStoreLauncher {
   DefaultReviewStoreLauncher({
     NativeReviewApi native = const InAppReviewApi(),
     TargetPlatform Function()? platform,
-  })  : _native = native,
-        _platform = platform ?? (() => defaultTargetPlatform);
+  }) : _native = native,
+       _platform = platform ?? (() => defaultTargetPlatform);
 
   final NativeReviewApi _native;
   final TargetPlatform Function() _platform;
@@ -42,7 +42,8 @@ class DefaultReviewStoreLauncher implements ReviewStoreLauncher {
       reportNonFatal(
         error,
         stackTrace,
-        reason: 'Native openStoreListing failed, attempting fallback URL launch',
+        reason:
+            'Native openStoreListing failed, attempting fallback URL launch',
       );
     }
 
@@ -62,7 +63,9 @@ class DefaultReviewStoreLauncher implements ReviewStoreLauncher {
 
   Future<bool> _launchAndroidFallback() async {
     try {
-      final marketUri = Uri.parse('market://details?id=${AppUrls.androidPackageId}');
+      final marketUri = Uri.parse(
+        'market://details?id=${AppUrls.androidPackageId}',
+      );
       if (await canLaunchUrl(marketUri)) {
         final launched = await launchUrl(
           marketUri,
@@ -110,4 +113,3 @@ class DefaultReviewStoreLauncher implements ReviewStoreLauncher {
     return false;
   }
 }
-

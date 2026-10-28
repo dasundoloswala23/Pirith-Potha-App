@@ -30,7 +30,9 @@ class _FakeHost implements ReviewPromptHost {
     if (tapRate) {
       storeOpenedResult = await openStore();
       // A failed open keeps the sheet up; the user then picks Later.
-      return storeOpenedResult! ? ReviewSheetOutcome.storeOpened : ReviewSheetOutcome.later;
+      return storeOpenedResult!
+          ? ReviewSheetOutcome.storeOpened
+          : ReviewSheetOutcome.later;
     }
     return answer!;
   }
@@ -70,7 +72,10 @@ class _Harness {
   ReviewPromptCoordinator build(FakeAsync async) => ReviewPromptCoordinator(
     storage: storage,
     native: native,
-    tracker: UsageTracker(monotonicNow: () => async.elapsed, timerFactory: Timer.new),
+    tracker: UsageTracker(
+      monotonicNow: () => async.elapsed,
+      timerFactory: Timer.new,
+    ),
     clock: () => now,
     platform: () => platform,
     installedVersion: () async => version,
@@ -119,21 +124,24 @@ void main() {
     });
   });
 
-  test('concurrent triggers while one is in flight never double-show', () async {
-    final h = await _harness(saved: _fiveMinutes);
-    h.host.hold = Completer<void>();
-    fakeAsync((async) {
-      final c = h.build(async);
-      c.attach(h.host);
-      unawaited(c.tryPrompt());
-      unawaited(c.tryPrompt());
-      async.flushMicrotasks();
-      expect(h.host.presented, 1);
-      h.host.hold!.complete();
-      async.flushMicrotasks();
-      c.dispose();
-    });
-  });
+  test(
+    'concurrent triggers while one is in flight never double-show',
+    () async {
+      final h = await _harness(saved: _fiveMinutes);
+      h.host.hold = Completer<void>();
+      fakeAsync((async) {
+        final c = h.build(async);
+        c.attach(h.host);
+        unawaited(c.tryPrompt());
+        unawaited(c.tryPrompt());
+        async.flushMicrotasks();
+        expect(h.host.presented, 1);
+        h.host.hold!.complete();
+        async.flushMicrotasks();
+        c.dispose();
+      });
+    },
+  );
 
   test('waits for a safe moment, then shows', () async {
     final h = await _harness(saved: _fiveMinutes);
@@ -166,45 +174,58 @@ void main() {
     });
   });
 
-  test('Maybe Later: persists a 34 h cooldown from the tap; later launches '
-      'during it show nothing; after it, shows once usage requirement is met', () async {
-    final h = await _harness(saved: _fiveMinutes);
-    fakeAsync((async) {
-      final c = h.build(async)..attach(h.host);
-      async.flushMicrotasks();
-      c.dispose();
-    });
-    final saved = h.storage.read();
-    expect(saved.laterCount, 1);
-    expect(saved.nextEligibleAt, h.now.add(const Duration(hours: 34)));
-
-    // Several relaunches during the cooldown.
-    for (final hoursLater in [1, 12, 33]) {
-      final relaunch = _Harness(h.prefs)..now = h.now.add(Duration(hours: hoursLater));
+  test(
+    'Maybe Later: persists a 34 h cooldown from the tap; later launches '
+    'during it show nothing; after it, shows once usage requirement is met',
+    () async {
+      final h = await _harness(saved: _fiveMinutes);
       fakeAsync((async) {
-        final c = relaunch.build(async)..attach(relaunch.host);
+        final c = h.build(async)..attach(h.host);
         async.flushMicrotasks();
-        expect(relaunch.host.presented, 0, reason: '$hoursLater h into cooldown');
         c.dispose();
       });
-    }
+      final saved = h.storage.read();
+      expect(saved.laterCount, 1);
+      expect(saved.nextEligibleAt, h.now.add(const Duration(hours: 34)));
 
-    // Reopened after it expired: requires 5 minutes of usage in the new session.
-    final after = _Harness(h.prefs)..now = h.now.add(const Duration(hours: 40));
-    after.host.answer = ReviewSheetOutcome.later;
-    fakeAsync((async) {
-      final c = after.build(async)..attach(after.host);
-      async.flushMicrotasks();
-      expect(after.host.presented, 0, reason: 'must accumulate 5 minutes of usage first');
-      async.elapse(const Duration(minutes: 5));
-      async.flushMicrotasks();
-      expect(after.host.presented, 1);
-      c.dispose();
-    });
-    final second = after.storage.read();
-    expect(second.laterCount, 2);
-    expect(second.nextEligibleAt, after.now.add(const Duration(hours: 24)));
-  });
+      // Several relaunches during the cooldown.
+      for (final hoursLater in [1, 12, 33]) {
+        final relaunch = _Harness(h.prefs)
+          ..now = h.now.add(Duration(hours: hoursLater));
+        fakeAsync((async) {
+          final c = relaunch.build(async)..attach(relaunch.host);
+          async.flushMicrotasks();
+          expect(
+            relaunch.host.presented,
+            0,
+            reason: '$hoursLater h into cooldown',
+          );
+          c.dispose();
+        });
+      }
+
+      // Reopened after it expired: requires 5 minutes of usage in the new session.
+      final after = _Harness(h.prefs)
+        ..now = h.now.add(const Duration(hours: 40));
+      after.host.answer = ReviewSheetOutcome.later;
+      fakeAsync((async) {
+        final c = after.build(async)..attach(after.host);
+        async.flushMicrotasks();
+        expect(
+          after.host.presented,
+          0,
+          reason: 'must accumulate 5 minutes of usage first',
+        );
+        async.elapse(const Duration(minutes: 5));
+        async.flushMicrotasks();
+        expect(after.host.presented, 1);
+        c.dispose();
+      });
+      final second = after.storage.read();
+      expect(second.laterCount, 2);
+      expect(second.nextEligibleAt, after.now.add(const Duration(hours: 24)));
+    },
+  );
 
   test('Rate: store opens → flagged and never shown again', () async {
     final h = await _harness(saved: _fiveMinutes);
@@ -246,7 +267,10 @@ void main() {
 
   group('iOS', () {
     test('shows the custom sheet on iOS and opens store', () async {
-      final h = await _harness(saved: _fiveMinutes, platform: TargetPlatform.iOS);
+      final h = await _harness(
+        saved: _fiveMinutes,
+        platform: TargetPlatform.iOS,
+      );
       fakeAsync((async) {
         final c = h.build(async)..attach(h.host);
         async.flushMicrotasks();
@@ -255,21 +279,30 @@ void main() {
       });
     });
 
-    test('requestNativeReview records version and invokes native API', () async {
-      final h = await _harness(saved: _fiveMinutes, platform: TargetPlatform.iOS);
-      fakeAsync((async) {
-        final c = h.build(async);
-        unawaited(c.requestNativeReview());
-        async.flushMicrotasks();
-        expect(h.native.requests, 1);
-        c.dispose();
-      });
-      final saved = h.storage.read();
-      expect(saved.nativePromptVersion, '1.00.03');
-    });
+    test(
+      'requestNativeReview records version and invokes native API',
+      () async {
+        final h = await _harness(
+          saved: _fiveMinutes,
+          platform: TargetPlatform.iOS,
+        );
+        fakeAsync((async) {
+          final c = h.build(async);
+          unawaited(c.requestNativeReview());
+          async.flushMicrotasks();
+          expect(h.native.requests, 1);
+          c.dispose();
+        });
+        final saved = h.storage.read();
+        expect(saved.nativePromptVersion, '1.00.03');
+      },
+    );
 
     test('native API unavailable: recorded, nothing thrown', () async {
-      final h = await _harness(saved: _fiveMinutes, platform: TargetPlatform.iOS);
+      final h = await _harness(
+        saved: _fiveMinutes,
+        platform: TargetPlatform.iOS,
+      );
       h.native.available = false;
       fakeAsync((async) {
         final c = h.build(async);
@@ -283,13 +316,19 @@ void main() {
   });
 
   test('unsupported platform: nothing tracked, nothing shown', () async {
-    final h = await _harness(saved: _fiveMinutes, platform: TargetPlatform.windows);
+    final h = await _harness(
+      saved: _fiveMinutes,
+      platform: TargetPlatform.windows,
+    );
     fakeAsync((async) {
       final c = h.build(async)..attach(h.host);
       async.elapse(const Duration(minutes: 10));
       expect(h.host.presented, 0);
       c.dispose();
     });
-    expect(h.storage.read(), const ReviewState(activeUsage: Duration(minutes: 5)));
+    expect(
+      h.storage.read(),
+      const ReviewState(activeUsage: Duration(minutes: 5)),
+    );
   });
 }

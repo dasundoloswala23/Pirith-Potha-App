@@ -20,7 +20,8 @@ PlaylistBloc _buildBloc(FakePlaylistRepository repository) => PlaylistBloc(
 );
 
 /// Lets the BLoC's event queue and the repository stream drain.
-Future<void> _settle() => Future<void>.delayed(const Duration(milliseconds: 10));
+Future<void> _settle() =>
+    Future<void>.delayed(const Duration(milliseconds: 10));
 
 void main() {
   group('PlaylistBloc', () {
@@ -49,26 +50,26 @@ void main() {
       expect(state.playlists.single.name, 'උදෑසන පිරිත්');
     });
 
-    test('a blank name is ignored rather than creating a nameless playlist',
-        () async {
-      final repository = FakePlaylistRepository();
-      final bloc = _buildBloc(repository);
-      addTearDown(bloc.close);
+    test(
+      'a blank name is ignored rather than creating a nameless playlist',
+      () async {
+        final repository = FakePlaylistRepository();
+        final bloc = _buildBloc(repository);
+        addTearDown(bloc.close);
 
-      bloc.add(const PlaylistCreated(name: '   '));
-      await _settle();
+        bloc.add(const PlaylistCreated(name: '   '));
+        await _settle();
 
-      expect((bloc.state as PlaylistsLoaded).playlists, isEmpty);
-    });
+        expect((bloc.state as PlaylistsLoaded).playlists, isEmpty);
+      },
+    );
 
     test('creating with an initial Pirith adds it in the same step', () async {
       final repository = FakePlaylistRepository();
       final bloc = _buildBloc(repository);
       addTearDown(bloc.close);
 
-      bloc.add(
-        const PlaylistCreated(name: 'New', initialPirithId: 'pirith-1'),
-      );
+      bloc.add(const PlaylistCreated(name: 'New', initialPirithId: 'pirith-1'));
       await _settle();
 
       final state = bloc.state as PlaylistsLoaded;
@@ -82,12 +83,8 @@ void main() {
       addTearDown(bloc.close);
 
       bloc
-        ..add(
-          PlaylistItemAdded(playlistId: playlist.id, pirithId: 'pirith-1'),
-        )
-        ..add(
-          PlaylistItemAdded(playlistId: playlist.id, pirithId: 'pirith-1'),
-        );
+        ..add(PlaylistItemAdded(playlistId: playlist.id, pirithId: 'pirith-1'))
+        ..add(PlaylistItemAdded(playlistId: playlist.id, pirithId: 'pirith-1'));
       await _settle();
 
       final state = bloc.state as PlaylistsLoaded;

@@ -54,8 +54,10 @@ class FakePlaylistRepository implements PlaylistRepository {
   }) async {
     _update(
       id,
-      (playlist) =>
-          playlist.copyWith(name: name.trim(), description: description?.trim()),
+      (playlist) => playlist.copyWith(
+        name: name.trim(),
+        description: description?.trim(),
+      ),
     );
   }
 

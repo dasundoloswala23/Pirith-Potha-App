@@ -273,7 +273,6 @@ class _PlayButton extends StatelessWidget {
   }
 }
 
-
 /// Marks a Pirith that exists only as a video, in place of a duration.
 class _VideoBadge extends StatelessWidget {
   const _VideoBadge();

@@ -63,7 +63,10 @@ class _SplashPageState extends State<SplashPage> with TickerProviderStateMixin {
   }
 
   void _maybeContinue(AuthState state) {
-    final settled = state is Authenticated || state is Unauthenticated || state is AuthError;
+    final settled =
+        state is Authenticated ||
+        state is Unauthenticated ||
+        state is AuthError;
     if (_minimumTimeElapsed && settled) {
       context.go(AppRoutePaths.home);
     }
@@ -99,7 +102,11 @@ class _SplashPageState extends State<SplashPage> with TickerProviderStateMixin {
                   children: [
                     FadeTransition(
                       opacity: _logoOpacity,
-                      child: Image.asset('assets/logo.png', width: 96, height: 96),
+                      child: Image.asset(
+                        'assets/logo.png',
+                        width: 96,
+                        height: 96,
+                      ),
                     ),
                     const SizedBox(height: 32),
                     FadeTransition(
@@ -127,7 +134,10 @@ class _SplashPageState extends State<SplashPage> with TickerProviderStateMixin {
                       ),
                     ),
                     const SizedBox(height: 60),
-                    FadeTransition(opacity: _dotsOpacity, child: const _LoadingDots()),
+                    FadeTransition(
+                      opacity: _dotsOpacity,
+                      child: const _LoadingDots(),
+                    ),
                   ],
                 ),
               ),
@@ -161,7 +171,8 @@ class _LoadingDots extends StatefulWidget {
   State<_LoadingDots> createState() => _LoadingDotsState();
 }
 
-class _LoadingDotsState extends State<_LoadingDots> with SingleTickerProviderStateMixin {
+class _LoadingDotsState extends State<_LoadingDots>
+    with SingleTickerProviderStateMixin {
   late final _controller = AnimationController(
     vsync: this,
     duration: const Duration(milliseconds: 2000),
@@ -188,7 +199,10 @@ class _LoadingDotsState extends State<_LoadingDots> with SingleTickerProviderSta
               padding: const EdgeInsets.symmetric(horizontal: 3),
               child: Opacity(
                 opacity: opacity.clamp(0.6, 1.0),
-                child: const CircleAvatar(radius: 3, backgroundColor: Color(0xFFC09050)),
+                child: const CircleAvatar(
+                  radius: 3,
+                  backgroundColor: Color(0xFFC09050),
+                ),
               ),
             );
           }),

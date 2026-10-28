@@ -13,8 +13,8 @@ class PremiumRepositoryImpl implements PremiumRepository {
   PremiumRepositoryImpl({
     required FirebaseFirestore firestore,
     required AuthRepository authRepository,
-  })  : _firestore = firestore,
-        _authRepository = authRepository {
+  }) : _firestore = firestore,
+       _authRepository = authRepository {
     _authSubscription = _authRepository.authStateChanges.listen((user) {
       _watchUid(user?.uid);
     });
@@ -44,10 +44,14 @@ class PremiumRepositoryImpl implements PremiumRepository {
       _update(false);
       return;
     }
-    _docSubscription = _firestore.collection('users').doc(uid).snapshots().listen(
-      (doc) => _update((doc.data()?['isPremium'] as bool?) ?? false),
-      onError: (_) => _update(false),
-    );
+    _docSubscription = _firestore
+        .collection('users')
+        .doc(uid)
+        .snapshots()
+        .listen(
+          (doc) => _update((doc.data()?['isPremium'] as bool?) ?? false),
+          onError: (_) => _update(false),
+        );
   }
 
   void _update(bool value) {

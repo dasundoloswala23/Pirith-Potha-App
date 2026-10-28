@@ -18,7 +18,11 @@ import 'youtube_preview_card.dart';
 /// with no leftover spacing, so a Pirith with no video content looks
 /// identical to this widget not being there at all.
 class VideoSection extends StatelessWidget {
-  const VideoSection({required this.videoUrl, required this.youtubeUrl, super.key});
+  const VideoSection({
+    required this.videoUrl,
+    required this.youtubeUrl,
+    super.key,
+  });
 
   final String videoUrl;
   final String youtubeUrl;

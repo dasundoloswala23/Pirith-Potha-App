@@ -46,18 +46,18 @@ class PlayerBloc extends Bloc<PlayerEvent, PlayerState> {
     required SeekPlayback seekPlayback,
     required StopPlayback stopPlayback,
     required RecordPlayed recordPlayed,
-  })  : _audioRepository = audioRepository,
-        _playPirith = playPirith,
-        _playQueue = playQueue,
-        _skipToNext = skipToNext,
-        _skipToPrevious = skipToPrevious,
-        _setPlaybackMode = setPlaybackMode,
-        _pausePlayback = pausePlayback,
-        _resumePlayback = resumePlayback,
-        _seekPlayback = seekPlayback,
-        _stopPlayback = stopPlayback,
-        _recordPlayed = recordPlayed,
-        super(const PlayerIdle()) {
+  }) : _audioRepository = audioRepository,
+       _playPirith = playPirith,
+       _playQueue = playQueue,
+       _skipToNext = skipToNext,
+       _skipToPrevious = skipToPrevious,
+       _setPlaybackMode = setPlaybackMode,
+       _pausePlayback = pausePlayback,
+       _resumePlayback = resumePlayback,
+       _seekPlayback = seekPlayback,
+       _stopPlayback = stopPlayback,
+       _recordPlayed = recordPlayed,
+       super(const PlayerIdle()) {
     on<PlayerPlayRequested>(_onPlayRequested);
     on<PlayerQueueRequested>(_onQueueRequested);
     on<PlayerNextRequested>((event, emit) => _skipToNext());
@@ -171,7 +171,10 @@ class PlayerBloc extends Bloc<PlayerEvent, PlayerState> {
   /// Without this an AppException thrown by the repository escapes the
   /// handler and the state stays on `loading` forever — the spinner that
   /// never resolves.
-  Future<void> _play(Emitter<PlayerState> emit, Future<void> Function() run) async {
+  Future<void> _play(
+    Emitter<PlayerState> emit,
+    Future<void> Function() run,
+  ) async {
     try {
       await run();
     } on AppException catch (error, stackTrace) {
@@ -229,14 +232,20 @@ class PlayerBloc extends Bloc<PlayerEvent, PlayerState> {
     }
   }
 
-  void _onPositionChanged(_PlayerPositionChanged event, Emitter<PlayerState> emit) {
+  void _onPositionChanged(
+    _PlayerPositionChanged event,
+    Emitter<PlayerState> emit,
+  ) {
     final current = state;
     if (current is PlayerActive) {
       emit(current.copyWith(position: event.position));
     }
   }
 
-  void _onDurationChanged(_PlayerDurationChanged event, Emitter<PlayerState> emit) {
+  void _onDurationChanged(
+    _PlayerDurationChanged event,
+    Emitter<PlayerState> emit,
+  ) {
     final current = state;
     if (current is PlayerActive && event.duration != null) {
       emit(current.copyWith(duration: event.duration));

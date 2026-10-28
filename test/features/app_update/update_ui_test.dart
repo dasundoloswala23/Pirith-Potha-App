@@ -53,7 +53,10 @@ Future<AppUpdateCubit> _pump(WidgetTester tester, String latest) async {
 
   final cubit = AppUpdateCubit(
     repository: FakeVersionConfigRepository(
-      VersionConfig(latestVersion: latest, releaseNotesEnglish: 'Faster downloads'),
+      VersionConfig(
+        latestVersion: latest,
+        releaseNotesEnglish: 'Faster downloads',
+      ),
     ),
     installedVersion: () async => '1.00.03',
     storeUrl: () => 'https://play.google.com/store/apps/details?id=x',
@@ -148,7 +151,10 @@ void main() {
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 300));
 
-    expect(find.text("Couldn't open the store. Please try again."), findsOneWidget);
+    expect(
+      find.text("Couldn't open the store. Please try again."),
+      findsOneWidget,
+    );
     expect(find.byType(MandatoryUpdateScreen), findsOneWidget);
   });
 
@@ -161,6 +167,9 @@ void main() {
     await tester.pump(const Duration(milliseconds: 300));
 
     expect(find.byType(OptionalUpdateDialog), findsOneWidget);
-    expect(find.text("Couldn't open the store. Please try again."), findsOneWidget);
+    expect(
+      find.text("Couldn't open the store. Please try again."),
+      findsOneWidget,
+    );
   });
 }

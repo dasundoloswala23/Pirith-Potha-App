@@ -19,11 +19,15 @@ void main() {
 
     test('usageRemaining counts down to zero, never negative', () {
       expect(
-        scheduler.usageRemaining(const ReviewState(activeUsage: Duration(minutes: 2))),
+        scheduler.usageRemaining(
+          const ReviewState(activeUsage: Duration(minutes: 2)),
+        ),
         const Duration(minutes: 3),
       );
       expect(
-        scheduler.usageRemaining(const ReviewState(activeUsage: Duration(minutes: 9))),
+        scheduler.usageRemaining(
+          const ReviewState(activeUsage: Duration(minutes: 9)),
+        ),
         Duration.zero,
       );
     });
@@ -48,16 +52,36 @@ void main() {
       }
     });
 
-    test('ineligible during the cooldown, eligible after cooldown once usage met', () {
-      final later = scheduler.afterLater(ready, now);
-      expect(scheduler.isEligible(later, now.add(const Duration(hours: 33, minutes: 59))), isFalse);
-      expect(scheduler.isEligible(later, now.add(const Duration(hours: 34))), isFalse,
-          reason: 'needs 5 minutes of usage in the new session');
-      final withUsage = later.copyWith(activeUsage: const Duration(minutes: 5));
-      expect(scheduler.isEligible(withUsage, now.add(const Duration(hours: 34))), isTrue);
-      expect(scheduler.isEligible(withUsage, now.add(const Duration(days: 10))), isTrue,
-          reason: 'cooldown expired while the app was closed and usage met');
-    });
+    test(
+      'ineligible during the cooldown, eligible after cooldown once usage met',
+      () {
+        final later = scheduler.afterLater(ready, now);
+        expect(
+          scheduler.isEligible(
+            later,
+            now.add(const Duration(hours: 33, minutes: 59)),
+          ),
+          isFalse,
+        );
+        expect(
+          scheduler.isEligible(later, now.add(const Duration(hours: 34))),
+          isFalse,
+          reason: 'needs 5 minutes of usage in the new session',
+        );
+        final withUsage = later.copyWith(
+          activeUsage: const Duration(minutes: 5),
+        );
+        expect(
+          scheduler.isEligible(withUsage, now.add(const Duration(hours: 34))),
+          isTrue,
+        );
+        expect(
+          scheduler.isEligible(withUsage, now.add(const Duration(days: 10))),
+          isTrue,
+          reason: 'cooldown expired while the app was closed and usage met',
+        );
+      },
+    );
   });
 
   test('store opened: never eligible again', () {
@@ -65,7 +89,10 @@ void main() {
       const ReviewState(activeUsage: Duration(hours: 9), laterCount: 3),
     );
     expect(opened.actionInitiated, isTrue);
-    expect(scheduler.isEligible(opened, now.add(const Duration(days: 999))), isFalse);
+    expect(
+      scheduler.isEligible(opened, now.add(const Duration(days: 999))),
+      isFalse,
+    );
   });
 
   group('clock changes and bad data', () {
@@ -80,16 +107,25 @@ void main() {
         scheduler.normalizedNextEligibleAt(state, now),
         now.add(const Duration(hours: 34)),
       );
-      expect(scheduler.normalize(state, now).nextEligibleAt, now.add(const Duration(hours: 34)));
+      expect(
+        scheduler.normalize(state, now).nextEligibleAt,
+        now.add(const Duration(hours: 34)),
+      );
     });
 
     test('a missing cooldown end after a Later is repaired, not fired '
         'immediately', () {
-      const state = ReviewState(activeUsage: Duration(minutes: 5), laterCount: 2);
+      const state = ReviewState(
+        activeUsage: Duration(minutes: 5),
+        laterCount: 2,
+      );
       final normalized = scheduler.normalize(state, now);
       expect(normalized.nextEligibleAt, now.add(const Duration(hours: 24)));
       expect(scheduler.isEligible(normalized, now), isFalse);
-      expect(scheduler.isEligible(normalized, now.add(const Duration(hours: 24))), isTrue);
+      expect(
+        scheduler.isEligible(normalized, now.add(const Duration(hours: 24))),
+        isTrue,
+      );
     });
 
     test('a valid cooldown end is left alone', () {

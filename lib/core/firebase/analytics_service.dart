@@ -10,38 +10,41 @@ class AnalyticsService {
 
   final FirebaseAnalytics _analytics;
 
-  Future<void> logPirithPlayed(String pirithId) =>
-      _analytics.logEvent(name: 'pirith_played', parameters: {'pirith_id': pirithId});
+  Future<void> logPirithPlayed(String pirithId) => _analytics.logEvent(
+    name: 'pirith_played',
+    parameters: {'pirith_id': pirithId},
+  );
 
   Future<void> logPirithDownloaded(String pirithId) => _analytics.logEvent(
-        name: 'pirith_downloaded',
-        parameters: {'pirith_id': pirithId},
-      );
+    name: 'pirith_downloaded',
+    parameters: {'pirith_id': pirithId},
+  );
 
   Future<void> logPirithCompleted(String pirithId) => _analytics.logEvent(
-        name: 'pirith_completed',
-        parameters: {'pirith_id': pirithId},
-      );
+    name: 'pirith_completed',
+    parameters: {'pirith_id': pirithId},
+  );
 
   Future<void> logFavoriteAdded(String pirithId) => _analytics.logEvent(
-        name: 'favorite_added',
-        parameters: {'pirith_id': pirithId},
-      );
+    name: 'favorite_added',
+    parameters: {'pirith_id': pirithId},
+  );
 
   Future<void> logSearchUsed(String query) =>
       _analytics.logEvent(name: 'search_used', parameters: {'query': query});
 
-  Future<void> logPremiumClicked() => _analytics.logEvent(name: 'premium_clicked');
+  Future<void> logPremiumClicked() =>
+      _analytics.logEvent(name: 'premium_clicked');
 
   Future<void> logPlaylistCreated(String playlistId) => _analytics.logEvent(
-        name: 'playlist_created',
-        parameters: {'playlist_id': playlistId},
-      );
+    name: 'playlist_created',
+    parameters: {'playlist_id': playlistId},
+  );
 
   Future<void> logPlaylistDeleted(String playlistId) => _analytics.logEvent(
-        name: 'playlist_deleted',
-        parameters: {'playlist_id': playlistId},
-      );
+    name: 'playlist_deleted',
+    parameters: {'playlist_id': playlistId},
+  );
 
   Future<void> logPlaylistPlayed(String playlistId, int itemCount) =>
       _analytics.logEvent(
@@ -64,11 +67,10 @@ class AnalyticsService {
   Future<void> logPirithRemovedFromPlaylist(
     String playlistId,
     String pirithId,
-  ) =>
-      _analytics.logEvent(
-        name: 'pirith_removed_from_playlist',
-        parameters: {'playlist_id': playlistId, 'pirith_id': pirithId},
-      );
+  ) => _analytics.logEvent(
+    name: 'pirith_removed_from_playlist',
+    parameters: {'playlist_id': playlistId, 'pirith_id': pirithId},
+  );
 
   /// [type] is `'optional'` or `'mandatory'`.
   Future<void> logUpdatePromptShown(String latestVersion, String type) =>
@@ -78,27 +80,27 @@ class AnalyticsService {
       );
 
   Future<void> logUpdateAccepted(String latestVersion) => _analytics.logEvent(
-        name: 'update_accepted',
-        parameters: {'latest_version': latestVersion},
-      );
+    name: 'update_accepted',
+    parameters: {'latest_version': latestVersion},
+  );
 
   Future<void> logUpdateDismissed(String latestVersion) => _analytics.logEvent(
-        name: 'update_dismissed',
-        parameters: {'latest_version': latestVersion},
-      );
+    name: 'update_dismissed',
+    parameters: {'latest_version': latestVersion},
+  );
 
   /// [source] is `'automatic'` (the usage-based invitation or native
   /// prompt) or `'manual'` (the Settings row) — one event name with a
   /// differentiating parameter, matching how [logPlaylistPlayed] takes
   /// `item_count` rather than the class having a separate event per bucket.
   Future<void> logReviewPromptTriggered(String source) => _analytics.logEvent(
-        name: 'review_prompt_triggered',
-        parameters: {'source': source},
-      );
+    name: 'review_prompt_triggered',
+    parameters: {'source': source},
+  );
 
   /// [action] is `'rate'` (store opened) or `'later'`.
   Future<void> logReviewInvitationAction(String action) => _analytics.logEvent(
-        name: 'review_invitation_action',
-        parameters: {'action': action},
-      );
+    name: 'review_invitation_action',
+    parameters: {'action': action},
+  );
 }

@@ -79,7 +79,9 @@ class Playlist extends Equatable {
       coverImagePath: json['coverImagePath'] is String
           ? json['coverImagePath'] as String
           : null,
-      pirithIds: (json['pirithIds'] as List?)?.whereType<String>().toList() ?? const [],
+      pirithIds:
+          (json['pirithIds'] as List?)?.whereType<String>().toList() ??
+          const [],
       createdAt: DateTime.fromMillisecondsSinceEpoch(createdAt),
       updatedAt: DateTime.fromMillisecondsSinceEpoch(updatedAt),
     );

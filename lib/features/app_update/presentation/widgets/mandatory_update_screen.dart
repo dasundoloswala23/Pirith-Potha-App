@@ -98,9 +98,10 @@ class _MandatoryUpdateScreenState extends State<MandatoryUpdateScreen>
     );
 
     final fade = CurvedAnimation(parent: _entrance, curve: Curves.easeOut);
-    final rise = Tween(begin: const Offset(0, 0.06), end: Offset.zero).animate(
-      CurvedAnimation(parent: _entrance, curve: Curves.easeOutCubic),
-    );
+    final rise = Tween(
+      begin: const Offset(0, 0.06),
+      end: Offset.zero,
+    ).animate(CurvedAnimation(parent: _entrance, curve: Curves.easeOutCubic));
 
     return Material(
       color: AppColors.player,
@@ -109,7 +110,11 @@ class _MandatoryUpdateScreenState extends State<MandatoryUpdateScreen>
           gradient: RadialGradient(
             center: Alignment(0, -0.45),
             radius: 1.1,
-            colors: [Color(0xFF2A1708), AppColors.playerSurface, AppColors.player],
+            colors: [
+              Color(0xFF2A1708),
+              AppColors.playerSurface,
+              AppColors.player,
+            ],
             stops: [0, 0.45, 1],
           ),
         ),

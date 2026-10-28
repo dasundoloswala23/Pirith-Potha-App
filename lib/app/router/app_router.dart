@@ -129,20 +129,21 @@ GoRouter buildAppRouter({NavigatorObserver? adObserver}) {
         // depending on the path string.
         name: PlayerExitAdObserver.playerRouteName,
         path: AppRoutePaths.player,
-        builder: (context, state) => const ReviewPromptScope(child: PlayerPage()),
+        builder: (context, state) =>
+            const ReviewPromptScope(child: PlayerPage()),
       ),
       GoRoute(
         path: AppRoutePaths.queue,
-        builder: (context, state) => const ReviewPromptScope(child: QueuePage()),
+        builder: (context, state) =>
+            const ReviewPromptScope(child: QueuePage()),
       ),
       // Deliberately NOT named PlayerExitAdObserver.playerRouteName: an
       // interstitial firing as the user crosses to or from the YouTube app
       // is the worst possible placement for it.
       GoRoute(
         path: AppRoutePaths.videoPirith,
-        builder: (context, state) => VideoPirithPage(
-          pirithId: state.pathParameters['pirithId']!,
-        ),
+        builder: (context, state) =>
+            VideoPirithPage(pirithId: state.pathParameters['pirithId']!),
       ),
     ],
   );

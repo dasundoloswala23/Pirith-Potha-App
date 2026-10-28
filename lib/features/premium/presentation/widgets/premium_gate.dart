@@ -13,7 +13,9 @@ import '../bloc/premium_bloc.dart';
 bool ensurePremiumAccess(BuildContext context, {required bool isPremiumItem}) {
   if (!isPremiumItem) return true;
 
-  final hasAccess = context.read<PremiumBloc>().state.hasAccess(PremiumFeature.premiumContent);
+  final hasAccess = context.read<PremiumBloc>().state.hasAccess(
+    PremiumFeature.premiumContent,
+  );
   if (hasAccess) return true;
 
   final l10n = AppLocalizations.of(context);

@@ -8,7 +8,11 @@ import '../../../../core/l10n/bilingual.dart';
 /// "PLAYBACK", "STORAGE") — the grouping from the approved design, which
 /// replaces the previous flat list of tiles.
 class SettingsSection extends StatelessWidget {
-  const SettingsSection({required this.title, required this.children, super.key});
+  const SettingsSection({
+    required this.title,
+    required this.children,
+    super.key,
+  });
 
   final String title;
   final List<Widget> children;

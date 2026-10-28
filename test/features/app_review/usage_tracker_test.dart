@@ -7,10 +7,8 @@ import 'package:pitithpotha/features/app_review/presentation/usage_tracker.dart'
 
 /// A tracker on fake time: the monotonic clock is the fake zone's elapsed
 /// time, and its one-shot timer is a real (fake-zone) Timer.
-UsageTracker _tracker(FakeAsync async) => UsageTracker(
-  monotonicNow: () => async.elapsed,
-  timerFactory: Timer.new,
-);
+UsageTracker _tracker(FakeAsync async) =>
+    UsageTracker(monotonicNow: () => async.elapsed, timerFactory: Timer.new);
 
 void main() {
   test('foreground time is flushed when the app backgrounds', () {
@@ -46,8 +44,7 @@ void main() {
     });
   });
 
-  test('2 min, close, then 3 min in a later session reaches the threshold',
-      () {
+  test('2 min, close, then 3 min in a later session reaches the threshold', () {
     fakeAsync((async) {
       var stored = Duration.zero;
       var reached = false;

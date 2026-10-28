@@ -172,8 +172,9 @@ class _PlaylistNameDialogState extends State<_PlaylistNameDialog> {
                       onPressed: () => Navigator.of(context).pop(),
                       style: TextButton.styleFrom(
                         padding: const EdgeInsets.symmetric(vertical: 14),
-                        foregroundColor: theme.colorScheme.onSurface
-                            .withValues(alpha: 0.7),
+                        foregroundColor: theme.colorScheme.onSurface.withValues(
+                          alpha: 0.7,
+                        ),
                       ),
                       child: Text(widget.l10n.actionCancel),
                     ),

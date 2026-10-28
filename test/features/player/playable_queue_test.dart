@@ -2,7 +2,11 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:pitithpotha/features/pirith/domain/entities/pirith_entity.dart';
 import 'package:pitithpotha/features/player/domain/playable_queue.dart';
 
-PirithEntity _pirith(String id, {String audioUrl = '', String youtubeUrl = ''}) {
+PirithEntity _pirith(
+  String id, {
+  String audioUrl = '',
+  String youtubeUrl = '',
+}) {
   return PirithEntity(
     id: id,
     title: 'Sutta $id',

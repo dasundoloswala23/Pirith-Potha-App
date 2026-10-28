@@ -26,12 +26,12 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     required SignInWithGoogle signInWithGoogle,
     required SignInWithApple signInWithApple,
     required SignOut signOut,
-  })  : _authRepository = authRepository,
-        _signInAnonymously = signInAnonymously,
-        _signInWithGoogle = signInWithGoogle,
-        _signInWithApple = signInWithApple,
-        _signOut = signOut,
-        super(const AuthInitial()) {
+  }) : _authRepository = authRepository,
+       _signInAnonymously = signInAnonymously,
+       _signInWithGoogle = signInWithGoogle,
+       _signInWithApple = signInWithApple,
+       _signOut = signOut,
+       super(const AuthInitial()) {
     on<AuthStarted>(_onStarted);
     on<_AuthUserChanged>(_onUserChanged);
     on<AuthSignInWithGoogleRequested>(_onSignInWithGoogleRequested);
@@ -48,11 +48,11 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   StreamSubscription<AppUser?>? _authSubscription;
 
   AppUser? get _currentUserFromState => switch (state) {
-        Authenticated(:final user) => user,
-        AuthLoading(:final previousUser) => previousUser,
-        AuthError(:final previousUser) => previousUser,
-        _ => null,
-      };
+    Authenticated(:final user) => user,
+    AuthLoading(:final previousUser) => previousUser,
+    AuthError(:final previousUser) => previousUser,
+    _ => null,
+  };
 
   Future<void> _onStarted(AuthStarted event, Emitter<AuthState> emit) async {
     await _authSubscription?.cancel();
@@ -72,7 +72,9 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   }
 
   void _onUserChanged(_AuthUserChanged event, Emitter<AuthState> emit) {
-    emit(event.user == null ? const Unauthenticated() : Authenticated(event.user!));
+    emit(
+      event.user == null ? const Unauthenticated() : Authenticated(event.user!),
+    );
   }
 
   Future<void> _onSignInWithGoogleRequested(
@@ -100,7 +102,11 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       emit(Authenticated(user));
     } on SignInCancelledException {
       // User dismissed the sheet — return to whatever state they were in.
-      emit(previousUser == null ? const Unauthenticated() : Authenticated(previousUser));
+      emit(
+        previousUser == null
+            ? const Unauthenticated()
+            : Authenticated(previousUser),
+      );
     } catch (e) {
       emit(AuthError(_toFailure(e), previousUser));
     }

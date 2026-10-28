@@ -37,7 +37,9 @@ class ReviewStorage {
     return ReviewState(
       activeUsage: Duration(milliseconds: usageMs < 0 ? 0 : usageMs),
       actionInitiated: _prefs.get(_actionKey) == true,
-      nativePromptVersion: native is String && native.isNotEmpty ? native : null,
+      nativePromptVersion: native is String && native.isNotEmpty
+          ? native
+          : null,
       laterCount: _int(_laterCountKey).clamp(0, 1 << 20),
       nextEligibleAt: nextMs is int && nextMs > 0
           ? DateTime.fromMillisecondsSinceEpoch(nextMs)

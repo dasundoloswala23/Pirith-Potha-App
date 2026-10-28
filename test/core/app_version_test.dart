@@ -31,7 +31,10 @@ void main() {
     });
 
     test('malformed remote value fails safe: never claims outdated', () {
-      expect(isOutdated(installed: '1.00.02', latest: 'not-a-version'), isFalse);
+      expect(
+        isOutdated(installed: '1.00.02', latest: 'not-a-version'),
+        isFalse,
+      );
       expect(isOutdated(installed: '1.00.02', latest: ''), isFalse);
       expect(isOutdated(installed: '1.00.02', latest: '1.x.2'), isFalse);
     });

@@ -15,8 +15,8 @@ part 'premium_state.dart';
 /// rather than reaching into the repository directly.
 class PremiumBloc extends Bloc<PremiumEvent, PremiumState> {
   PremiumBloc({required PremiumRepository premiumRepository})
-      : _premiumRepository = premiumRepository,
-        super(PremiumState(isPremium: premiumRepository.isPremium)) {
+    : _premiumRepository = premiumRepository,
+      super(PremiumState(isPremium: premiumRepository.isPremium)) {
     on<_PremiumStatusChanged>(
       (event, emit) => emit(PremiumState(isPremium: event.isPremium)),
     );

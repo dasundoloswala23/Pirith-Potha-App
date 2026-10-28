@@ -9,7 +9,11 @@ import '../bloc/favorites_bloc.dart';
 /// [PirithCard], Pirith details, and the full player (see
 /// docs/09_development_roadmap.md, Phase 7).
 class FavoriteButton extends StatelessWidget {
-  const FavoriteButton({required this.pirithId, this.outlined = false, super.key});
+  const FavoriteButton({
+    required this.pirithId,
+    this.outlined = false,
+    super.key,
+  });
 
   final String pirithId;
   final bool outlined;
@@ -26,11 +30,16 @@ class FavoriteButton extends StatelessWidget {
       isFavorite ? Icons.favorite : Icons.favorite_outline,
       color: isFavorite ? AppColors.maroon : null,
     );
-    void onPressed() => context.read<FavoritesBloc>().add(FavoriteToggled(pirithId));
+    void onPressed() =>
+        context.read<FavoritesBloc>().add(FavoriteToggled(pirithId));
     final tooltip = l10n.actionAddFavorite;
 
     return outlined
-        ? IconButton.outlined(icon: icon, tooltip: tooltip, onPressed: onPressed)
+        ? IconButton.outlined(
+            icon: icon,
+            tooltip: tooltip,
+            onPressed: onPressed,
+          )
         : IconButton(icon: icon, tooltip: tooltip, onPressed: onPressed);
   }
 }

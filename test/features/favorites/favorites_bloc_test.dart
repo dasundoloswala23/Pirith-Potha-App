@@ -5,9 +5,9 @@ import 'package:pitithpotha/features/favorites/presentation/bloc/favorites_bloc.
 import '../../fakes/fake_favorites_repository.dart';
 
 FavoritesBloc _buildBloc(FavoritesRepositoryFake repository) => FavoritesBloc(
-      favoritesRepository: repository,
-      toggleFavorite: ToggleFavorite(repository),
-    );
+  favoritesRepository: repository,
+  toggleFavorite: ToggleFavorite(repository),
+);
 
 void main() {
   group('FavoritesBloc', () {
@@ -35,7 +35,9 @@ void main() {
 
       final addSecondFuture = expectLater(
         bloc.stream,
-        emitsThrough(isA<FavoritesLoaded>().having((s) => s.ids, 'ids', ['2', '1'])),
+        emitsThrough(
+          isA<FavoritesLoaded>().having((s) => s.ids, 'ids', ['2', '1']),
+        ),
       );
       bloc.add(const FavoriteToggled('2'));
       await addSecondFuture;

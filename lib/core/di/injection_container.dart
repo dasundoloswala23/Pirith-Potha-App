@@ -162,7 +162,9 @@ Future<void> _registerHistoryFeature(SharedPreferences prefs) async {
   getIt
     ..registerSingleton<HistoryRepository>(repository)
     ..registerLazySingleton(() => RecordPlayed(getIt<HistoryRepository>()))
-    ..registerLazySingleton(() => HistoryBloc(historyRepository: getIt<HistoryRepository>()));
+    ..registerLazySingleton(
+      () => HistoryBloc(historyRepository: getIt<HistoryRepository>()),
+    );
 }
 
 /// Eager like favorites/history: the store is read from SharedPreferences
@@ -219,7 +221,10 @@ Future<void> _registerPlayerFeature() async {
   getIt
     ..registerSingleton<PirithAudioHandler>(audioHandler)
     ..registerLazySingleton<AudioRepository>(
-      () => AudioRepositoryImpl(getIt<PirithAudioHandler>(), getIt<DownloadRepository>()),
+      () => AudioRepositoryImpl(
+        getIt<PirithAudioHandler>(),
+        getIt<DownloadRepository>(),
+      ),
     )
     ..registerLazySingleton(() => PlayPirith(getIt<AudioRepository>()))
     ..registerLazySingleton(() => PlayQueue(getIt<AudioRepository>()))
@@ -252,7 +257,9 @@ void _registerPirithFeature(SharedPreferences prefs) {
     ..registerLazySingleton<PirithRemoteDataSource>(
       () => FirestorePirithRemoteDataSource(getIt<FirebaseFirestore>()),
     )
-    ..registerLazySingleton<PirithLocalDataSource>(() => PirithLocalDataSource(prefs))
+    ..registerLazySingleton<PirithLocalDataSource>(
+      () => PirithLocalDataSource(prefs),
+    )
     ..registerLazySingleton<PirithRepository>(
       () => PirithRepositoryImpl(
         getIt<PirithRemoteDataSource>(),

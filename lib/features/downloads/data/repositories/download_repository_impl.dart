@@ -31,7 +31,8 @@ class DownloadRepositoryImpl implements DownloadRepository {
   Stream<Map<String, DownloadEntity>> get downloadsStream => _controller.stream;
 
   @override
-  Map<String, DownloadEntity> get currentDownloads => Map.unmodifiable(_downloads);
+  Map<String, DownloadEntity> get currentDownloads =>
+      Map.unmodifiable(_downloads);
 
   @override
   Future<void> initialize() async {
@@ -72,7 +73,9 @@ class DownloadRepositoryImpl implements DownloadRepository {
     final audioPath = '${dir.path}/audio.mp3';
     final tempPath = '$audioPath.part';
 
-    _update(DownloadEntity(pirithId: item.id, status: DownloadStatus.downloading));
+    _update(
+      DownloadEntity(pirithId: item.id, status: DownloadStatus.downloading),
+    );
 
     final cancelToken = CancelToken();
     _cancelTokens[item.id] = cancelToken;
@@ -85,7 +88,11 @@ class DownloadRepositoryImpl implements DownloadRepository {
         onReceiveProgress: (received, total) {
           if (total <= 0) return;
           _update(
-            (_downloads[item.id] ?? DownloadEntity(pirithId: item.id, status: DownloadStatus.downloading))
+            (_downloads[item.id] ??
+                    DownloadEntity(
+                      pirithId: item.id,
+                      status: DownloadStatus.downloading,
+                    ))
                 .copyWith(progress: received / total),
           );
         },
@@ -105,7 +112,9 @@ class DownloadRepositoryImpl implements DownloadRepository {
         _downloads.remove(item.id);
         _emit();
       } else {
-        _update(DownloadEntity(pirithId: item.id, status: DownloadStatus.failed));
+        _update(
+          DownloadEntity(pirithId: item.id, status: DownloadStatus.failed),
+        );
       }
     } catch (_) {
       await _cleanupPartial(tempPath);
