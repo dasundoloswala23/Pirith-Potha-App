@@ -86,7 +86,7 @@ class PlaylistsPage extends StatelessWidget {
                             coverUrls: [
                               for (final item
                                   in catalogue.byIds(playlist.pirithIds))
-                                item.coverUrl,
+                                item.displayCoverUrl,
                             ],
                           );
                         },

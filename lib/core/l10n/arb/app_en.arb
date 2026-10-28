@@ -127,6 +127,7 @@
   "labelVideo": "Video",
   "actionWatchVideo": "Watch video",
   "videoOnlyNote": "This Pirith is video only",
+  "videoUnavailable": "This video can't be played right now",
   "pirithUnavailable": "This Pirith isn't available yet",
   "linkErrorGeneric": "Couldn't open that link.",
   "catalogueErrorGeneric": "Couldn't load the Pirith catalogue. Check your connection and try again.",
@@ -205,17 +206,26 @@
   "actionRemove": "Remove",
   "actionReorderHint": "Drag to reorder",
   "profileRateApp": "Rate this app",
-  "updateBannerTitle": "Update available",
-  "updateBannerBody": "Version {version} is ready to install.",
-  "@updateBannerBody": {
+  "updateOptionalTitle": "New version available",
+  "updateMandatoryTitle": "Update required",
+  "updateVersionLabel": "Version {version}",
+  "@updateVersionLabel": {
     "placeholders": {
       "version": {
         "type": "String"
       }
     }
   },
-  "updateBannerActionUpdate": "Update",
-  "updateBannerActionLater": "Later",
-  "updateRestartTitle": "Update downloaded",
-  "updateRestartAction": "Restart"
+  "updateOptionalBody": "A new version of Pirith Potha is ready, with improvements and fixes.",
+  "updateMandatoryBody": "This version is no longer supported. Please update to keep listening.",
+  "updateWhatsNew": "What's new",
+  "updateActionNow": "Update Now",
+  "updateActionLater": "Maybe Later",
+  "updateStoreError": "Couldn't open the store. Please try again.",
+  "reviewTitle": "Enjoying your experience?",
+  "reviewBody": "Your feedback means a lot to us! Take a moment to rate our app and help us make it even better.",
+  "reviewActionRate": "⭐ Rate App",
+  "reviewActionLater": "Maybe Later",
+  "reviewThanks": "Thank you for your feedback!",
+  "reviewStoreError": "Couldn't open the store. Please try again later."
 }

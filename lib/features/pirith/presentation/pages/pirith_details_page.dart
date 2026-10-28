@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:go_router/go_router.dart';
 
 import '../../../../core/ads/widgets/banner_ad_widget.dart';
 import '../../../../app/theme/app_spacing.dart';
 import '../../../../app/theme/app_typography.dart';
-import '../../../../core/constants/app_route_paths.dart';
 import '../../../../core/l10n/app_localizations.dart';
 import '../../../../core/l10n/bilingual.dart';
 import '../../../../core/widgets/confirm_dialog.dart';
@@ -13,6 +11,7 @@ import '../../../downloads/domain/entities/download_entity.dart';
 import '../../../downloads/presentation/bloc/download_bloc.dart';
 import '../../../favorites/presentation/widgets/favorite_button.dart';
 import '../../../player/presentation/bloc/player_bloc.dart';
+import '../../../player/presentation/widgets/video_section.dart';
 import '../../../playlists/presentation/widgets/add_to_playlist_sheet.dart';
 import '../../../premium/presentation/widgets/premium_badge.dart';
 import '../../../premium/presentation/widgets/premium_gate.dart';
@@ -55,7 +54,7 @@ class PirithDetailsPage extends StatelessWidget {
                     children: [
                       PirithArtwork(
                         pirithId: item.id,
-                        coverUrl: item.coverUrl,
+                        coverUrl: item.displayCoverUrl,
                         size: 160,
                         radius: AppRadius.lg,
                       ),
@@ -87,6 +86,13 @@ class PirithDetailsPage extends StatelessWidget {
                         ],
                       ),
                       const SizedBox(height: 20),
+                      VideoSection(
+                        videoUrl: item.videoUrl,
+                        youtubeUrl: item.youtubeUrl,
+                      ),
+                      if (item.videoUrl.trim().isNotEmpty ||
+                          item.youtubeUrl.trim().isNotEmpty)
+                        const SizedBox(height: 20),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [

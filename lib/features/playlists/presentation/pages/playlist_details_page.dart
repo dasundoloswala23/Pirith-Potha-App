@@ -177,7 +177,7 @@ class _Header extends StatelessWidget {
         children: [
           PlaylistCover(
             playlistId: playlist.id,
-            coverUrls: [for (final item in items) item.coverUrl],
+            coverUrls: [for (final item in items) item.displayCoverUrl],
             size: 140,
             radius: AppRadius.lg,
           ),
@@ -335,7 +335,7 @@ class _ReorderableItems extends StatelessWidget {
               ),
               PirithArtwork(
                 pirithId: item.id,
-                coverUrl: item.coverUrl,
+                coverUrl: item.displayCoverUrl,
                 size: 40,
                 radius: AppRadius.sm,
               ),

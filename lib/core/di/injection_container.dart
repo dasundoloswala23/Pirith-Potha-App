@@ -64,8 +64,11 @@ import '../../features/playlists/presentation/bloc/playlist_bloc.dart';
 import '../../features/premium/data/repositories/premium_repository_impl.dart';
 import '../../features/premium/domain/repositories/premium_repository.dart';
 import '../../features/premium/presentation/bloc/premium_bloc.dart';
+import '../../features/app_review/data/review_storage.dart';
+import '../../features/app_review/presentation/review_prompt_coordinator.dart';
 import '../../features/app_update/data/repositories/version_config_repository_impl.dart';
 import '../../features/app_update/domain/repositories/version_config_repository.dart';
+import '../../features/app_update/presentation/bloc/app_update_cubit.dart';
 import '../ads/ad_service.dart';
 import '../ads/mobile_ads_service.dart';
 import '../audio/audio_service_initializer.dart';
@@ -104,10 +107,20 @@ Future<void> configureDependencies() async {
   await _registerAdsFeature();
   getIt.registerLazySingleton(() => SleepTimerCubit(getIt<PlayerBloc>()));
 
-  getIt.registerLazySingleton<VersionConfigRepository>(
-    () => VersionConfigRepositoryImpl(getIt<FirebaseFirestore>()),
-  );
-  AppReviewService.configure(prefs, getIt<AnalyticsService>());
+  getIt
+    ..registerLazySingleton<VersionConfigRepository>(
+      () => VersionConfigRepositoryImpl(getIt<FirebaseFirestore>()),
+    )
+    ..registerLazySingleton(
+      () => AppUpdateCubit(repository: getIt<VersionConfigRepository>()),
+    )
+    ..registerLazySingleton(
+      () => ReviewPromptCoordinator(
+        storage: ReviewStorage(prefs),
+        analytics: getIt<AnalyticsService>(),
+      ),
+    );
+  AppReviewService.configure(getIt<AnalyticsService>());
 }
 
 void _registerPremiumFeature() {

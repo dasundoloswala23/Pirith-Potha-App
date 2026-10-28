@@ -7,7 +7,6 @@ import '../../../../core/l10n/app_localizations.dart';
 import '../../../../core/l10n/bilingual.dart';
 import '../../../../core/widgets/empty_state.dart';
 import '../../../../core/widgets/bilingual_text.dart';
-import '../../../../core/widgets/pirith_mark.dart';
 import '../../../pirith/presentation/bloc/catalogue_bloc.dart';
 import '../../../pirith/presentation/widgets/pirith_card.dart';
 import '../bloc/download_bloc.dart';
@@ -17,7 +16,6 @@ class DownloadsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
     final bi = Bilingual.of(context);
     return Scaffold(
       body: SafeArea(

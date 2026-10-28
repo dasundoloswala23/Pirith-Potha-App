@@ -44,4 +44,53 @@ void main() {
       expect(isOutdated(installed: ' 1.00.02 ', latest: '1.00.03'), isTrue);
     });
   });
+
+  group('classifyUpdate', () {
+    UpdateType c(String installed, String latest) =>
+        classifyUpdate(installed: installed, latest: latest);
+
+    test('newer patch is optional', () {
+      expect(c('1.00.03', '1.00.04'), UpdateType.optional);
+      expect(c('2.4.1', '2.4.9'), UpdateType.optional);
+    });
+
+    test('newer minor is mandatory, even with a lower patch', () {
+      expect(c('1.00.03', '1.01.00'), UpdateType.mandatory);
+      expect(c('2.4.9', '2.5.0'), UpdateType.mandatory);
+    });
+
+    test('newer major is mandatory, even with lower minor and patch', () {
+      expect(c('1.00.03', '2.00.00'), UpdateType.mandatory);
+      expect(c('1.9.9', '2.0.0'), UpdateType.mandatory);
+    });
+
+    test('equal or older remote means no update', () {
+      expect(c('1.00.03', '1.00.03'), UpdateType.none);
+      expect(c('1.00.04', '1.00.03'), UpdateType.none);
+      expect(c('1.01.00', '1.00.09'), UpdateType.none);
+      expect(c('2.0.0', '1.9.9'), UpdateType.none);
+    });
+
+    test('compares numerically, not as strings', () {
+      expect(c('1.9.0', '1.10.0'), UpdateType.mandatory);
+      expect(c('1.0.9', '1.0.10'), UpdateType.optional);
+    });
+
+    test('build numbers and whitespace are ignored', () {
+      expect(c('1.00.03+3', '1.00.03+9'), UpdateType.none);
+      expect(c(' 1.00.03+3 ', ' 1.00.04 '), UpdateType.optional);
+    });
+
+    test('missing segments count as zero', () {
+      expect(c('1', '1.0.1'), UpdateType.optional);
+      expect(c('1.0', '1.1'), UpdateType.mandatory);
+    });
+
+    test('malformed on either side fails open', () {
+      for (final bad in ['', 'garbage', '1.x.0', '1.0.-1', 'v1.0.0']) {
+        expect(c('1.00.03', bad), UpdateType.none, reason: 'latest "$bad"');
+        expect(c(bad, '9.0.0'), UpdateType.none, reason: 'installed "$bad"');
+      }
+    });
+  });
 }

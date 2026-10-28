@@ -17,9 +17,7 @@ import '../../../pirith/presentation/widgets/category_card.dart';
 import '../../../pirith/presentation/widgets/pirith_artwork.dart';
 import '../../../pirith/presentation/utils/open_pirith.dart';
 import '../../../pirith/presentation/widgets/pirith_card.dart';
-import '../../../player/presentation/bloc/player_bloc.dart';
 import '../../../pirith/presentation/widgets/catalogue_loaded_builder.dart';
-import '../../../premium/presentation/widgets/premium_gate.dart';
 import '../widgets/social_section.dart';
 
 class HomePage extends StatelessWidget {
@@ -381,7 +379,7 @@ class _RecentTile extends StatelessWidget {
           children: [
             PirithArtwork(
               pirithId: item.id,
-              coverUrl: item.coverUrl,
+              coverUrl: item.displayCoverUrl,
               size: 96,
               radius: AppRadius.md,
             ),
@@ -433,7 +431,7 @@ class _FeaturedCard extends StatelessWidget {
           children: [
             PirithArtwork(
               pirithId: item.id,
-              coverUrl: item.coverUrl,
+              coverUrl: item.displayCoverUrl,
               size: 400,
               radius: 0,
             ),
@@ -493,7 +491,11 @@ class _FeaturedCard extends StatelessWidget {
                         ),
                         const SizedBox(height: 2),
                         Text(
-                          '${item.title} · ${item.durationLabel()}',
+                          item.hasAudio
+                              ? '${item.title} · ${item.durationLabel()}'
+                              : item.isVideoOnly
+                              ? '${item.title} · ${AppLocalizations.of(context).labelVideo}'
+                              : item.title,
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                           style: const TextStyle(
@@ -512,8 +514,8 @@ class _FeaturedCard extends StatelessWidget {
                       color: AppColors.gold,
                       shape: BoxShape.circle,
                     ),
-                    child: const Icon(
-                      Icons.play_arrow,
+                    child: Icon(
+                      item.isVideoOnly ? Icons.smart_display : Icons.play_arrow,
                       color: Colors.white,
                       size: 26,
                     ),

@@ -31,15 +31,25 @@ class VersionConfigRepositoryImpl implements VersionConfigRepository {
       final latestVersion = data['latestVersion'] as String?;
       if (latestVersion == null || latestVersion.trim().isEmpty) return null;
 
-      final message = data['updateMessage'] as Map<String, dynamic>?;
+      final message = _map(data['updateMessage']);
+      final notes = _map(data['releaseNotes']);
       return VersionConfig(
         latestVersion: latestVersion,
-        updateMessageEnglish: (message?['en'] as String?) ?? '',
-        updateMessageSinhala: (message?['si'] as String?) ?? '',
+        updateMessageEnglish: _string(message?['en']),
+        updateMessageSinhala: _string(message?['si']),
+        releaseNotesEnglish: _string(notes?['en']),
+        releaseNotesSinhala: _string(notes?['si']),
       );
     } catch (error, stackTrace) {
       reportNonFatal(error, stackTrace, reason: 'Failed to read version config');
       return null;
     }
   }
+
+  // Hand-edited in the Firebase console, so a field of the wrong type must
+  // read as absent rather than throw away the whole config.
+  static Map<String, dynamic>? _map(Object? value) =>
+      value is Map<String, dynamic> ? value : null;
+
+  static String _string(Object? value) => value is String ? value.trim() : '';
 }

@@ -9,7 +9,7 @@ import '../../../pirith/presentation/widgets/catalogue_loaded_builder.dart';
 import '../widgets/mini_player_bar.dart';
 import '../widgets/player_artwork.dart';
 import '../widgets/player_title_block.dart';
-import '../widgets/youtube_preview_card.dart';
+import '../widgets/video_section.dart';
 
 /// A Pirith that exists only as a video: cover, title, favourite and the
 /// YouTube card. No transport, no progress, no download, no sleep timer —
@@ -98,7 +98,10 @@ class VideoPirithPage extends StatelessWidget {
                         const SizedBox(height: AppSpacing.lg),
                         FavoriteButton(pirithId: item.id, outlined: true),
                         const SizedBox(height: AppSpacing.lg),
-                        YouTubePreviewCard(youtubeUrl: item.youtubeUrl),
+                        VideoSection(
+                          videoUrl: item.videoUrl,
+                          youtubeUrl: item.youtubeUrl,
+                        ),
                         const SizedBox(height: AppSpacing.xl),
                         const BannerAdWidget(mediumRectangle: true),
                         const SizedBox(height: AppSpacing.lg),

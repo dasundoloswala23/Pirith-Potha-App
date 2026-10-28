@@ -12,6 +12,7 @@ class PirithModel extends PirithEntity {
     required super.coverUrl,
     required super.audioUrl,
     super.youtubeUrl,
+    super.videoUrl,
     required super.duration,
     required super.categoryId,
     required super.isPremium,
@@ -34,6 +35,7 @@ class PirithModel extends PirithEntity {
       coverUrl: (data['coverUrl'] as String?) ?? '',
       audioUrl: (data['audioUrl'] as String?) ?? '',
       youtubeUrl: (data['youtubeUrl'] as String?) ?? '',
+      videoUrl: (data['videoUrl'] as String?) ?? '',
       duration: (data['duration'] as num?)?.toInt() ?? 0,
       categoryId: (data['categoryId'] as String?) ?? '',
       isPremium: (data['isPremium'] as bool?) ?? false,
@@ -61,8 +63,12 @@ class PirithModel extends PirithEntity {
       audioUrl: json['audioUrl'] as String,
       // Tolerant: entries cached before this field existed won't have it.
       youtubeUrl: (json['youtubeUrl'] as String?) ?? '',
+      // Tolerant: entries cached before this field existed won't have it.
+      videoUrl: (json['videoUrl'] as String?) ?? '',
       duration: json['duration'] as int,
-      categoryId: json['categoryId'] as String,
+      // Tolerant: a Pirith can genuinely have no category (admin-optional),
+      // and entries cached before that was possible won't have the field.
+      categoryId: (json['categoryId'] as String?) ?? '',
       isPremium: json['isPremium'] as bool,
       isFeatured: json['isFeatured'] as bool,
       sortOrder: json['sortOrder'] as int,
@@ -80,6 +86,7 @@ class PirithModel extends PirithEntity {
     'coverUrl': coverUrl,
     'audioUrl': audioUrl,
     'youtubeUrl': youtubeUrl,
+    'videoUrl': videoUrl,
     'duration': duration,
     'categoryId': categoryId,
     'isPremium': isPremium,

@@ -1,5 +1,7 @@
 import 'package:equatable/equatable.dart';
 
+import '../../../../core/utils/youtube_url.dart';
+
 /// Domain-level Pirith (chant) entity — see docs/03_database_schema.md.
 class PirithEntity extends Equatable {
   const PirithEntity({
@@ -11,6 +13,7 @@ class PirithEntity extends Equatable {
     required this.coverUrl,
     required this.audioUrl,
     this.youtubeUrl = '',
+    this.videoUrl = '',
     required this.duration,
     required this.categoryId,
     required this.isPremium,
@@ -28,9 +31,14 @@ class PirithEntity extends Equatable {
   final String coverUrl;
   final String audioUrl;
 
-  /// Optional companion video, set per-Pirith in the admin app. Empty when
-  /// there isn't one, which is the common case.
+  /// Optional companion YouTube link, set per-Pirith in the admin app. Empty
+  /// when there isn't one, which is the common case.
   final String youtubeUrl;
+
+  /// Optional uploaded companion video, set per-Pirith in the admin app.
+  /// Independent of [youtubeUrl] — a Pirith may have either, both, or
+  /// neither. Empty when there isn't one.
+  final String videoUrl;
 
   /// Duration in seconds.
   final int duration;
@@ -51,7 +59,12 @@ class PirithEntity extends Equatable {
   /// these URLs as free text, without trimming.
   bool get hasAudio => audioUrl.trim().isNotEmpty;
 
-  /// Video-only: a title, a cover and a YouTube link, but no audio file.
+  /// Whether this Pirith has any video content — an uploaded [videoUrl], a
+  /// [youtubeUrl], or both.
+  bool get hasVideo => videoUrl.trim().isNotEmpty || youtubeUrl.trim().isNotEmpty;
+
+  /// Video-only: a title, a cover, and an uploaded video or a YouTube link,
+  /// but no audio file.
   ///
   /// A presentation predicate — it decides which screen a tap opens. False
   /// when there is no video either, so the video screen can never be opened
@@ -60,7 +73,23 @@ class PirithEntity extends Equatable {
   /// Derived rather than stored: `PirithModel.fromFirestore` already coerces
   /// a missing `audioUrl` to `''`, so this needs no schema change, no
   /// backfill, and no new cache key — see docs/03_database_schema.md.
-  bool get isVideoOnly => !hasAudio && youtubeUrl.trim().isNotEmpty;
+  bool get isVideoOnly => !hasAudio && hasVideo;
+
+  /// What [PirithArtwork] should render for this Pirith.
+  ///
+  /// `coverUrl` wins whenever it's set — an admin who bothered to upload
+  /// square artwork gets it everywhere, video or not. Only when there's no
+  /// cover AND no audio does a YouTube-derived still stand in, so a
+  /// video-only Pirith with no cover reads as "this video" rather than a
+  /// generic placeholder. No uploaded-video-only fallback exists (no video
+  /// thumbnail is stored anywhere), so that case still falls through to the
+  /// id-keyed placeholder in `PirithArtwork`.
+  String get displayCoverUrl {
+    if (coverUrl.trim().isNotEmpty) return coverUrl;
+    if (!isVideoOnly) return coverUrl;
+    final videoId = youTubeVideoId(youtubeUrl);
+    return videoId == null ? '' : youTubeFallbackThumbnailUrl(videoId);
+  }
 
   String durationLabel() {
     final minutes = duration ~/ 60;
@@ -78,6 +107,7 @@ class PirithEntity extends Equatable {
         coverUrl,
         audioUrl,
         youtubeUrl,
+        videoUrl,
         duration,
         categoryId,
         isPremium,

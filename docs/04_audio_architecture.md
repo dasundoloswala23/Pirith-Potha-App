@@ -89,3 +89,19 @@ shuffle modes, and working lock-screen skip buttons for free.
 
 - Sleep timer (shipped since — layered on top of `PlayerBloc` via
   `SleepTimerCubit` without changing the audio layer, as anticipated)
+
+## Uploaded video
+
+A Pirith may also carry an uploaded `videoUrl`, played in-app via
+`video_player` + `chewie` inside `VideoSection`
+(`lib/features/player/presentation/widgets/video_section.dart`). This is
+deliberately **not** centralized the way audio is: video has no background,
+lock-screen, or queue requirement, so its `VideoPlayerController`/
+`ChewieController` are owned entirely by the widget that creates them and
+are disposed with it — never promoted to a shared/global instance.
+
+The only interaction between the two systems: starting video playback
+dispatches `PlayerPauseRequested` to the same `PlayerBloc` the transport
+controls use, pausing any playing audio, since both occupying the speaker/
+notification at once is undesirable. `AudioRepository`'s pause is a no-op
+when nothing is playing, so this is safe to call unconditionally.

@@ -5,6 +5,7 @@ import 'package:pitithpotha/features/player/presentation/bloc/sleep_timer_cubit.
 import 'package:google_fonts/google_fonts.dart';
 
 import 'package:pitithpotha/app/app.dart';
+import 'package:pitithpotha/features/app_update/presentation/bloc/app_update_cubit.dart';
 import 'package:pitithpotha/features/auth/domain/entities/app_user.dart';
 import 'package:pitithpotha/features/auth/domain/usecases/sign_in_anonymously.dart';
 import 'package:pitithpotha/features/auth/domain/usecases/sign_in_with_apple.dart';
@@ -49,6 +50,7 @@ import 'fakes/fake_history_repository.dart';
 import 'fakes/fake_pirith_repository.dart';
 import 'fakes/fake_playlist_repository.dart';
 import 'fakes/fake_premium_repository.dart';
+import 'fakes/fake_version_config_repository.dart';
 
 void main() {
   setUpAll(() {
@@ -138,6 +140,12 @@ void main() {
     );
     addTearDown(playlistBloc.close);
 
+    final appUpdateCubit = AppUpdateCubit(
+      repository: FakeVersionConfigRepository(),
+      storeUrl: () => null,
+    );
+    addTearDown(appUpdateCubit.close);
+
     await tester.pumpWidget(
       PirithPothaApp(
         authBloc: authBloc,
@@ -150,6 +158,7 @@ void main() {
         playlistBloc: playlistBloc,
         languageCubit: languageCubit,
         sleepTimerCubit: sleepTimerCubit,
+        appUpdateCubit: appUpdateCubit,
       ),
     );
     expect(find.byType(PirithPothaApp), findsOneWidget);

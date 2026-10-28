@@ -37,7 +37,7 @@ class PlayerArtwork extends StatelessWidget {
       ),
       child: PirithArtwork(
         pirithId: item.id,
-        coverUrl: item.coverUrl,
+        coverUrl: item.displayCoverUrl,
         size: width,
         height: height,
         radius: 20,

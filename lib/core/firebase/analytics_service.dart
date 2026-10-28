@@ -70,9 +70,11 @@ class AnalyticsService {
         parameters: {'playlist_id': playlistId, 'pirith_id': pirithId},
       );
 
-  Future<void> logUpdateBannerShown(String latestVersion) => _analytics.logEvent(
-        name: 'update_banner_shown',
-        parameters: {'latest_version': latestVersion},
+  /// [type] is `'optional'` or `'mandatory'`.
+  Future<void> logUpdatePromptShown(String latestVersion, String type) =>
+      _analytics.logEvent(
+        name: 'update_prompt_shown',
+        parameters: {'latest_version': latestVersion, 'type': type},
       );
 
   Future<void> logUpdateAccepted(String latestVersion) => _analytics.logEvent(
@@ -85,15 +87,18 @@ class AnalyticsService {
         parameters: {'latest_version': latestVersion},
       );
 
-  Future<void> logFlexibleUpdateRestartShown() =>
-      _analytics.logEvent(name: 'flexible_update_restart_shown');
-
-  /// [source] is `'automatic'` (after a chant finishes) or `'manual'` (the
-  /// Settings row) — one event name with a differentiating parameter,
-  /// matching how [logPlaylistPlayed] takes `item_count` rather than the
-  /// class having a separate event per bucket.
+  /// [source] is `'automatic'` (the usage-based invitation or native
+  /// prompt) or `'manual'` (the Settings row) — one event name with a
+  /// differentiating parameter, matching how [logPlaylistPlayed] takes
+  /// `item_count` rather than the class having a separate event per bucket.
   Future<void> logReviewPromptTriggered(String source) => _analytics.logEvent(
         name: 'review_prompt_triggered',
         parameters: {'source': source},
+      );
+
+  /// [action] is `'rate'` (store opened) or `'later'`.
+  Future<void> logReviewInvitationAction(String action) => _analytics.logEvent(
+        name: 'review_invitation_action',
+        parameters: {'action': action},
       );
 }

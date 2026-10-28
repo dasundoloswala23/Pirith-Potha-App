@@ -5,7 +5,6 @@ import '../../../../core/ads/widgets/banner_ad_widget.dart';
 import '../../../../core/l10n/app_localizations.dart';
 import '../../../../core/l10n/bilingual.dart';
 import '../../../../core/widgets/empty_state.dart';
-import '../../../../core/widgets/pirith_mark.dart';
 import '../../../pirith/presentation/widgets/catalogue_loaded_builder.dart';
 import '../../../pirith/presentation/widgets/pirith_card.dart';
 import '../bloc/history_bloc.dart';

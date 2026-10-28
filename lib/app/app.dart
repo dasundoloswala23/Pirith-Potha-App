@@ -8,8 +8,10 @@ import '../core/ads/player_exit_ad_observer.dart';
 import '../core/firebase/analytics_service.dart';
 import '../core/l10n/app_localizations.dart';
 import '../core/l10n/language_cubit.dart';
-import '../core/services/app_review_service.dart';
 import '../core/services/notification_permission.dart';
+import '../features/app_review/presentation/review_prompt_coordinator.dart';
+import '../features/app_update/presentation/bloc/app_update_cubit.dart';
+import '../features/app_update/presentation/widgets/update_gate.dart';
 import '../features/auth/presentation/bloc/auth_bloc.dart';
 import '../features/player/domain/entities/playback_status.dart';
 import '../features/downloads/presentation/bloc/download_bloc.dart';
@@ -42,6 +44,8 @@ class PirithPothaApp extends StatefulWidget {
     required this.playlistBloc,
     required this.languageCubit,
     required this.sleepTimerCubit,
+    required this.appUpdateCubit,
+    this.reviewCoordinator,
     this.adService,
     super.key,
   });
@@ -56,6 +60,10 @@ class PirithPothaApp extends StatefulWidget {
   final PlaylistBloc playlistBloc;
   final LanguageCubit languageCubit;
   final SleepTimerCubit sleepTimerCubit;
+  final AppUpdateCubit appUpdateCubit;
+
+  /// Null in widget tests, where no automatic review prompt is wanted.
+  final ReviewPromptCoordinator? reviewCoordinator;
 
   /// Null in widget tests, which build the app without the ad SDK; the
   /// player-exit interstitial is simply not wired up in that case.
@@ -65,7 +73,30 @@ class PirithPothaApp extends StatefulWidget {
   State<PirithPothaApp> createState() => _PirithPothaAppState();
 }
 
-class _PirithPothaAppState extends State<PirithPothaApp> {
+/// Also the app's single lifecycle observer: it forwards foreground/
+/// background changes to the review coordinator (active-usage timing) and,
+/// on return to the app, has the update cubit re-read the installed
+/// version — the only way a mandatory-update block lifts.
+class _PirithPothaAppState extends State<PirithPothaApp>
+    with WidgetsBindingObserver {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    widget.reviewCoordinator?.didChangeAppLifecycleState(state);
+    if (state == AppLifecycleState.resumed) widget.appUpdateCubit.recheck();
+  }
+
   late final _router = buildAppRouter(
     adObserver: widget.adService == null
         ? null
@@ -92,6 +123,11 @@ class _PirithPothaAppState extends State<PirithPothaApp> {
         BlocProvider<PlaylistBloc>.value(value: widget.playlistBloc),
         BlocProvider<LanguageCubit>.value(value: widget.languageCubit),
         BlocProvider<SleepTimerCubit>.value(value: widget.sleepTimerCubit),
+        BlocProvider<AppUpdateCubit>.value(value: widget.appUpdateCubit),
+        if (widget.reviewCoordinator != null)
+          RepositoryProvider<ReviewPromptCoordinator>.value(
+            value: widget.reviewCoordinator!,
+          ),
       ],
       child: MultiBlocListener(
         listeners: [
@@ -105,12 +141,11 @@ class _PirithPothaAppState extends State<PirithPothaApp> {
             listener: (context, state) =>
                 NotificationPermission.requestIfNeeded(),
           ),
-          // A chant finishing to completion is the one moment this app
-          // treats as "positive" enough to ask for a review — never on cold
-          // start, never mid-queue (just_audio's own auto-advance never
-          // surfaces PlaybackStatus.completed; see PirithAudioHandler).
-          // maybePromptAfterPositiveMoment caps itself at one attempt per
-          // app version regardless of outcome.
+          // Analytics only. just_audio's own auto-advance never surfaces
+          // PlaybackStatus.completed (see PirithAudioHandler), so this fires
+          // once per chant played to the end, not per queue step. The
+          // review request is driven by active usage instead — see
+          // ReviewPromptCoordinator.
           BlocListener<PlayerBloc, PlayerState>(
             listenWhen: (previous, current) =>
                 previous is PlayerActive &&
@@ -124,7 +159,6 @@ class _PirithPothaAppState extends State<PirithPothaApp> {
                     .logPirithCompleted(item.id)
                     .ignore();
               }
-              AppReviewService.maybePromptAfterPositiveMoment();
             },
           ),
         ],
@@ -142,6 +176,10 @@ class _PirithPothaAppState extends State<PirithPothaApp> {
             GlobalCupertinoLocalizations.delegate,
           ],
           routerConfig: _router,
+          // Above the router, so a mandatory update covers splash, every
+          // tab and every pushed route without each needing a guard.
+          builder: (context, child) =>
+              UpdateGate(child: child ?? const SizedBox.shrink()),
         ),
       ),
     );

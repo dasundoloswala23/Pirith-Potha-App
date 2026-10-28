@@ -5,6 +5,8 @@ import 'core/ads/ad_service.dart';
 import 'core/di/injection_container.dart';
 import 'core/l10n/language_cubit.dart';
 import 'core/firebase/firebase_initializer.dart';
+import 'features/app_review/presentation/review_prompt_coordinator.dart';
+import 'features/app_update/presentation/bloc/app_update_cubit.dart';
 import 'features/auth/presentation/bloc/auth_bloc.dart';
 import 'features/downloads/presentation/bloc/download_bloc.dart';
 import 'features/favorites/presentation/bloc/favorites_bloc.dart';
@@ -31,6 +33,8 @@ Future<void> main() async {
       premiumBloc: getIt<PremiumBloc>(),
       languageCubit: getIt<LanguageCubit>(),
       sleepTimerCubit: getIt<SleepTimerCubit>(),
+      appUpdateCubit: getIt<AppUpdateCubit>(),
+      reviewCoordinator: getIt<ReviewPromptCoordinator>(),
       adService: getIt<AdService>(),
     ),
   );

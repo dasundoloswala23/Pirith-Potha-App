@@ -82,6 +82,7 @@ WHAT YOU CAN DO
 • Set a sleep timer so the chanting stops on its own
 • Save favourites and return to what you played recently
 • Browse by category, or search by name
+• Watch companion videos for chants that have one, right from the app
 
 SINHALA AND ENGLISH TOGETHER
 
@@ -131,7 +132,8 @@ Listen to chants from short suttas to the full Maha Piritha. Download any of
 them and play with no connection at all — on a flight, in a signal-free area,
 or without spending mobile data twice. Build playlists and play them straight
 through or shuffled, repeat a single chant, or loop a whole list. A sleep
-timer stops the chanting on its own so you can fall asleep to it.
+timer stops the chanting on its own so you can fall asleep to it. Some chants
+come with a companion video, shown right on the player.
 
 Every screen shows Sinhala and English together. Chant names appear in Sinhala
 with the English name beneath, so the app suits Sinhala speakers and anyone

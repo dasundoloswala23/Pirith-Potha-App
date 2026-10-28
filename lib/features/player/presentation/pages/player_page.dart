@@ -13,7 +13,6 @@ import '../../../downloads/domain/entities/download_entity.dart';
 import '../../../downloads/presentation/bloc/download_bloc.dart';
 import '../../../favorites/presentation/bloc/favorites_bloc.dart';
 import '../../../pirith/domain/entities/pirith_entity.dart';
-import '../../../pirith/presentation/widgets/pirith_artwork.dart';
 import '../../../playlists/presentation/widgets/add_to_playlist_sheet.dart';
 import '../../domain/entities/playback_mode.dart';
 import '../../domain/entities/playback_status.dart';
@@ -21,7 +20,7 @@ import '../bloc/player_bloc.dart';
 import '../bloc/sleep_timer_cubit.dart';
 import '../widgets/player_artwork.dart';
 import '../widgets/player_title_block.dart';
-import '../widgets/youtube_preview_card.dart';
+import '../widgets/video_section.dart';
 
 /// Full-screen "now playing", driven by the app-scoped [PlayerBloc] — see
 /// docs/04_audio_architecture.md. Background/lock-screen playback and
@@ -144,10 +143,11 @@ class _NowPlaying extends StatelessWidget {
                   // The button this replaced brought its own padding, so the
                   // Wrap above needed no spacer; a card butted against the
                   // chips would read as a layout bug.
-                  if (state.item.youtubeUrl.trim().isNotEmpty) ...[
-                    const SizedBox(height: AppSpacing.lg),
-                    YouTubePreviewCard(youtubeUrl: state.item.youtubeUrl),
-                  ],
+                  const SizedBox(height: AppSpacing.lg),
+                  VideoSection(
+                    videoUrl: state.item.videoUrl,
+                    youtubeUrl: state.item.youtubeUrl,
+                  ),
                   // Last thing on the screen, well clear of the transport
                   // row: an ad crowding the play controls invites accidental
                   // taps, which AdMob counts as invalid traffic.

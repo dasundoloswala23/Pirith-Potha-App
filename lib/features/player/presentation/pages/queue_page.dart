@@ -44,7 +44,7 @@ class QueuePage extends StatelessWidget {
               return ListTile(
                 leading: PirithArtwork(
                   pirithId: item.id,
-                  coverUrl: item.coverUrl,
+                  coverUrl: item.displayCoverUrl,
                   size: 44,
                   radius: AppRadius.sm,
                 ),

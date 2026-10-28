@@ -9,19 +9,29 @@ class VersionConfig extends Equatable {
     required this.latestVersion,
     this.updateMessageEnglish = '',
     this.updateMessageSinhala = '',
+    this.releaseNotesEnglish = '',
+    this.releaseNotesSinhala = '',
   });
 
   /// Dotted version string matching this app's own `versionName`
   /// (`pubspec.yaml`'s `version:` before the `+build`), e.g. `"1.00.03"`.
+  ///
+  /// Only raise this once that build is live on the store: a minor/major
+  /// bump makes the update mandatory, and pointing it at a version users
+  /// can't download yet locks them out.
   final String latestVersion;
 
   final String updateMessageEnglish;
   final String updateMessageSinhala;
+  final String releaseNotesEnglish;
+  final String releaseNotesSinhala;
 
   @override
   List<Object?> get props => [
     latestVersion,
     updateMessageEnglish,
     updateMessageSinhala,
+    releaseNotesEnglish,
+    releaseNotesSinhala,
   ];
 }

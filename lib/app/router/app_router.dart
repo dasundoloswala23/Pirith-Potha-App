@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../core/ads/player_exit_ad_observer.dart';
 import '../../core/constants/app_route_paths.dart';
+import '../../features/app_review/presentation/widgets/review_prompt_scope.dart';
 import '../../features/downloads/presentation/pages/downloads_page.dart';
 import '../../features/favorites/presentation/pages/favorites_page.dart';
 import '../../features/history/presentation/pages/recently_played_page.dart';
@@ -128,11 +129,11 @@ GoRouter buildAppRouter({NavigatorObserver? adObserver}) {
         // depending on the path string.
         name: PlayerExitAdObserver.playerRouteName,
         path: AppRoutePaths.player,
-        builder: (context, state) => const PlayerPage(),
+        builder: (context, state) => const ReviewPromptScope(child: PlayerPage()),
       ),
       GoRoute(
         path: AppRoutePaths.queue,
-        builder: (context, state) => const QueuePage(),
+        builder: (context, state) => const ReviewPromptScope(child: QueuePage()),
       ),
       // Deliberately NOT named PlayerExitAdObserver.playerRouteName: an
       // interstitial firing as the user crosses to or from the YouTube app

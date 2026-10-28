@@ -7,7 +7,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../core/constants/app_route_paths.dart';
 import '../../core/l10n/app_localizations.dart';
-import '../../core/services/app_update_service.dart';
+import '../../features/app_update/presentation/bloc/app_update_cubit.dart';
 import '../../features/auth/presentation/bloc/auth_bloc.dart';
 import '../theme/app_colors.dart';
 import '../theme/app_typography.dart';
@@ -57,11 +57,9 @@ class _SplashPageState extends State<SplashPage> with TickerProviderStateMixin {
       setState(() => _minimumTimeElapsed = true);
       _maybeContinue(context.read<AuthBloc>().state);
     });
-    // Fire-and-forget, started as early as possible so Android's background
-    // download has maximum time to finish before HomeShell needs to show
-    // the "restart to apply" prompt — but never awaited here, since a slow
-    // or failed check must not delay reaching Home.
-    AppUpdateService.checkAndStartFlexibleUpdate();
+    // Fire-and-forget: started early so a mandatory block can cover splash,
+    // but never awaited, so a slow or failed check never delays Home.
+    context.read<AppUpdateCubit>().check();
   }
 
   void _maybeContinue(AuthState state) {

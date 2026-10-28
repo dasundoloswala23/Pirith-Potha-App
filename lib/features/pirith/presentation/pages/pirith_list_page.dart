@@ -1,12 +1,9 @@
 import 'package:flutter/material.dart';
 
 import '../../../../app/theme/app_spacing.dart';
-import '../../../../app/theme/app_typography.dart';
-import '../../../../core/l10n/app_localizations.dart';
 import '../../../../core/l10n/bilingual.dart';
 import '../../../../core/widgets/empty_state.dart';
 import '../../../../core/widgets/bilingual_text.dart';
-import '../../../../core/widgets/pirith_mark.dart';
 import '../widgets/catalogue_loaded_builder.dart';
 import '../widgets/pirith_card.dart';
 
@@ -33,7 +30,6 @@ class _PirithListPageState extends State<PirithListPage> {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
     final bi = Bilingual.of(context);
     final query = _controller.text.trim();
 
